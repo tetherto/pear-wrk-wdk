@@ -1,0 +1,45 @@
+name: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        required: false
+        default: true
+  push:
+    branches: [main, develop, workflow-fix]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node 22.19.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.19.0"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Auth for private GitHub git deps
+        run: |
+          git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Install dependencies
+        run: npm clean-install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Install bare
+        run: npm install -g bare
+
+      - name: Lint code with standard
+        run: npm run lint
