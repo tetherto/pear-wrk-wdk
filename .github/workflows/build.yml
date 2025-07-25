@@ -32,7 +32,7 @@ jobs:
           git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-          
+
       - name: Install dependencies
         run: npm clean-install
         env:

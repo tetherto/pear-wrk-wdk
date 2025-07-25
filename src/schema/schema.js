@@ -84,7 +84,7 @@ schemaNs.register({
   name: 'quoteSendTransaction-request-options',
   fields: [
     { name: 'to', type: 'string', required: true },
-    { name: 'value', type: 'uint', required: true }
+    { name: 'value', type: 'string', required: true }
   ]
 })
 schemaNs.register({
@@ -99,7 +99,7 @@ schemaNs.register({
 schemaNs.register({
   name: 'quoteSendTransaction-response',
   fields: [
-    { name: 'fee', type: 'uint' }
+    { name: 'fee', type: 'string' }
   ]
 })
 
@@ -110,7 +110,7 @@ schemaNs.register({
   name: 'sendTransaction-request-options',
   fields: [
     { name: 'to', type: 'string', required: true },
-    { name: 'value', type: 'uint', required: true }
+    { name: 'value', type: 'string', required: true }
   ]
 })
 schemaNs.register({
@@ -125,7 +125,7 @@ schemaNs.register({
 schemaNs.register({
   name: 'sendTransaction-response',
   fields: [
-    { name: 'fee', type: 'uint' },
+    { name: 'fee', type: 'string' },
     { name: 'hash', type: 'string' }
   ]
 })
@@ -198,7 +198,19 @@ schemaNs.register({
   fields: [
     { name: 'token', type: 'string', required: true },
     { name: 'recipient', type: 'string', required: true },
-    { name: 'amount', type: 'uint', required: true }
+    { name: 'amount', type: 'string', required: true }
+  ]
+})
+schemaNs.register({
+  name: 'abstractedAccountTransfer-request-config-paymasterToken',
+  fields: [
+    { name: 'address', type: 'string', required: true }
+  ]
+})
+schemaNs.register({
+  name: 'abstractedAccountTransfer-request-config',
+  fields: [
+    { name: 'paymasterToken', type: '@wdk-core/abstractedAccountTransfer-request-config-paymasterToken', required: false }
   ]
 })
 schemaNs.register({
@@ -206,7 +218,8 @@ schemaNs.register({
   fields: [
     { name: 'network', type: 'string', required: true },
     { name: 'accountIndex', type: 'uint', required: true },
-    { name: 'options', type: '@wdk-core/abstractedAccountTransfer-request-options', required: true }
+    { name: 'options', type: '@wdk-core/abstractedAccountTransfer-request-options', required: true },
+    { name: 'config', type: '@wdk-core/abstractedAccountTransfer-request-config', required: false }
   ]
 })
 
@@ -214,7 +227,7 @@ schemaNs.register({
   name: 'abstractedAccountTransfer-response',
   fields: [
     { name: 'hash', type: 'string' },
-    { name: 'fee', type: 'uint' }
+    { name: 'fee', type: 'string' }
   ]
 })
 
@@ -226,7 +239,7 @@ schemaNs.register({
   fields: [
     { name: 'token', type: 'string', required: true },
     { name: 'recipient', type: 'string', required: true },
-    { name: 'amount', type: 'uint', required: true }
+    { name: 'amount', type: 'string', required: true }
   ]
 })
 
@@ -234,7 +247,7 @@ schemaNs.register({
   name: 'getApproveTransaction-response',
   fields: [
     { name: 'to', type: 'string', required: true },
-    { name: 'value', type: 'uint', required: true },
+    { name: 'value', type: 'string', required: true },
     { name: 'data', type: 'string', required: true }
   ]
 })
@@ -243,17 +256,15 @@ schemaNs.register({
  * abstractedSendTransaction
  */
 schemaNs.register({
-  name: 'abstractedSendTransaction-request-options',
+  name: 'abstractedSendTransaction-request-config-paymasterToken',
   fields: [
-    { name: 'to', type: 'string', required: true },
-    { name: 'value', type: 'uint', required: true },
-    { name: 'data', type: 'string', required: true }
+    { name: 'address', type: 'string', required: true }
   ]
 })
 schemaNs.register({
   name: 'abstractedSendTransaction-request-config',
   fields: [
-    { name: 'paymasterToken', type: 'string', required: true }
+    { name: 'paymasterToken', type: '@wdk-core/abstractedSendTransaction-request-config-paymasterToken', required: false }
   ]
 })
 schemaNs.register({
@@ -270,7 +281,7 @@ schemaNs.register({
   name: 'abstractedSendTransaction-response',
   fields: [
     { name: 'hash', type: 'string' },
-    { name: 'fee', type: 'uint' }
+    { name: 'fee', type: 'string' }
   ]
 })
 
@@ -282,7 +293,19 @@ schemaNs.register({
   fields: [
     { name: 'token', type: 'string', required: true },
     { name: 'recipient', type: 'string', required: true },
-    { name: 'amount', type: 'uint', required: true }
+    { name: 'amount', type: 'string', required: true }
+  ]
+})
+schemaNs.register({
+  name: 'abstractedAccountQuoteTransfer-request-config-paymasterToken',
+  fields: [
+    { name: 'address', type: 'string', required: true }
+  ]
+})
+schemaNs.register({
+  name: 'abstractedAccountQuoteTransfer-request-config',
+  fields: [
+    { name: 'paymasterToken', type: '@wdk-core/abstractedAccountQuoteTransfer-request-config-paymasterToken', required: false }
   ]
 })
 schemaNs.register({
@@ -290,14 +313,15 @@ schemaNs.register({
   fields: [
     { name: 'network', type: 'string', required: true },
     { name: 'accountIndex', type: 'uint', required: true },
-    { name: 'options', type: '@wdk-core/abstractedAccountQuoteTransfer-request-options', required: true }
+    { name: 'options', type: '@wdk-core/abstractedAccountQuoteTransfer-request-options', required: true },
+    { name: 'config', type: '@wdk-core/abstractedAccountQuoteTransfer-request-config', required: false }
   ]
 })
 
 schemaNs.register({
   name: 'abstractedAccountQuoteTransfer-response',
   fields: [
-    { name: 'fee', type: 'uint' }
+    { name: 'fee', type: 'string' }
   ]
 })
 
