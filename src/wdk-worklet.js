@@ -1,4 +1,3 @@
-require('bare-wdk-runtime')
 const { IPC } = BareKit
 const HRPC = require('../spec/hrpc')
 const ERROR_CODES = require('./exceptions/error-codes')
@@ -15,7 +14,7 @@ let wdk = null
 
 rpc.onWorkletStart(async init => {
   try {
-    if (wdk) wdk.dispose(); // cleanup existing;
+    if (wdk) wdk.dispose() // cleanup existing;
     wdk = new WdkManager(init.seedPhrase, JSON.parse(init.config))
     return { status: 'started' }
   } catch (error) {
@@ -36,7 +35,7 @@ rpc.onGetAddress(async payload => {
 rpc.onGetAddressBalance(async payload => {
   try {
     const balance = await wdk.getAddressBalance(payload.network, payload.accountIndex)
-    return { balance: balance.toString() }
+    return { balance: balance }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -47,6 +46,16 @@ rpc.onQuoteSendTransaction(async payload => {
   try {
     const transaction = await wdk.quoteSendTransaction(payload.network, payload.accountIndex, payload.options)
     return { fee: transaction.fee }
+  } catch (error) {
+    throw new Error(rpcException.stringifyError(error))
+  }
+
+})
+
+rpc.onSendTransaction(async payload => {
+  try {
+    const transaction = await wdk.sendTransaction(payload.network, payload.accountIndex, payload.options)
+    return { fee: transaction.fee, hash: transaction.hash }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -70,7 +79,7 @@ rpc.onGetAbstractedAddress(async payload => {
 rpc.onGetAbstractedAddressBalance(async payload => {
   try {
     const balance = await wdk.getAbstractedAddressBalance(payload.network, payload.accountIndex)
-    return { balance: balance.toString() }
+    return { balance: balance }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -80,7 +89,7 @@ rpc.onGetAbstractedAddressBalance(async payload => {
 rpc.onGetAbstractedAddressTokenBalance(async payload => {
   try {
     const balance = await wdk.getAbstractedAddressTokenBalance(payload.network, payload.accountIndex, payload.tokenAddress)
-    return { balance: balance.toString() }
+    return { balance: balance }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -90,7 +99,18 @@ rpc.onGetAbstractedAddressTokenBalance(async payload => {
 rpc.onAbstractedAccountTransfer(async payload => {
   try {
     const transfer = await wdk.abstractedAccountTransfer(payload.network, payload.accountIndex, payload.options)
-    return { fee: transfer.fee }
+    return { fee: transfer.fee, hash: transfer.hash }
+  } catch (error) {
+    throw new Error(rpcException.stringifyError(error))
+  }
+
+})
+
+rpc.onAbstractedSendTransaction(async payload => {
+  try {
+    const options = JSON.parse(payload.options)
+    const transfer = await wdk.abstractedSendTransaction(payload.network, payload.accountIndex, options, payload.config)
+    return { fee: transfer.fee, hash: transfer.hash }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -106,6 +126,31 @@ rpc.onAbstractedAccountQuoteTransfer(async payload => {
   }
 
 })
+
+rpc.onGetTransactionReceipt(async payload => {
+  try {
+    let receipt = await wdk.getTransactionReceipt(payload.network, payload.accountIndex, payload.hash)
+    if (receipt) {
+      return { receipt: JSON.stringify(receipt) }
+    }
+    return {}
+  } catch (error) {
+    throw new Error(rpcException.stringifyError(error))
+  }
+})
+
+rpc.onGetApproveTransaction(async payload => {
+  try {
+    let approveTx = await wdk.getApproveTransaction(payload)
+    if (approveTx) {
+      return approveTx
+    }
+    return {}
+  } catch (error) {
+    throw new Error(rpcException.stringifyError(error))
+  }
+})
+
 rpc.onDispose(() => {
   try {
     wdk.dispose()

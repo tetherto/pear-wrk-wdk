@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 'use strict'
-
-const bit39 = require('bip39')
 /** @typedef {import('@wdk/wallet').FeeRates} FeeRates */
 
 /** @typedef {import('@wdk/wallet').TransferOptions} TransferOptions */
@@ -23,6 +21,7 @@ const bit39 = require('bip39')
 /** @typedef {import('@wdk/wallet').IWalletAccount} IWalletAccount */
 
 /** @typedef {import('@wdk/wallet-evm').EvmWalletConfig} EvmWalletConfig */
+/** @typedef {import('@wdk/wallet-evm').EvmTransaction} EvmTransaction */
 /** @typedef {import('@wdk/wallet-evm-erc-4337').EvmErc4337WalletConfig} EvmErc4337WalletConfig */
 
 /** @typedef {import('@wdk/wallet-ton').TonWalletConfig} TonWalletConfig */
@@ -67,6 +66,13 @@ const bit39 = require('bip39')
  */
 
 /**
+ * @typedef {Object} ApproveOptions
+ * @property {string} token
+ * @property {string} recipient
+ * @property {number} amount
+ */
+
+/**
  * Enumeration for all available blockchains.
  *
  * @enum {string}
@@ -107,6 +113,17 @@ class WdkManager {
 
         /** @private */
         this._account_abstraction_wallets = { }
+
+        /** @private */
+        this._imports = { }
+            this.initDefaultImports().then();
+
+    }
+
+    //todo workaround to support ethers
+    async initDefaultImports() {
+        const {default: Ethers} = await import('@wdk/bare-ethers')
+        if (!this._imports['ethers']) this._imports['ethers'] = Ethers;
     }
 
     /**
@@ -254,6 +271,29 @@ class WdkManager {
         return await account.quoteSendTransaction(options)
     }
 
+    /**
+     * Transfers a token to another address.
+     *
+     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
+     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
+     * @param {Transaction} options - The transfer's options.
+     * @returns {Promise<Omit<TransactionResult, "hash">>} The transfer's result.
+     *
+     * @example
+     * // Transfer 1 BTC from the spark wallet's account at index 0 to another address
+     * const transfer = await wdk.transfer("spark", 0, {
+     *     to: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+     *     value: 1
+     * });
+     *
+     * console.log("Transaction hash:", transfer.hash);
+     */
+    async sendTransaction (blockchain, accountIndex, options) {
+        const account = await this.getAccount(blockchain, accountIndex)
+
+        return await account.sendTransaction(options)
+    }
+
 
     /**
      * Returns the abstracted address of an account.
@@ -340,6 +380,22 @@ class WdkManager {
     }
 
     /**
+     * Transfers a token to another address.
+     *
+     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
+     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
+     * @param {EvmTransaction[]} options - The transaction options.
+     * @param {TransferConfig} [config] - If set, overrides the 'transferMaxFee' and 'paymasterToken' options defined in the manager configuration.
+     * @returns {Promise<TransactionResult>} The transfer's result.
+     *
+     */
+    async abstractedSendTransaction (blockchain, accountIndex, options, config) {
+        const account = await this.getAbstractedAccount(blockchain, accountIndex)
+
+        return await account.sendTransaction(options, config)
+    }
+
+    /**
      * Quotes the costs of a transfer operation.
      *
      * @see {@link transfer}
@@ -361,8 +417,40 @@ class WdkManager {
      */
     async abstractedAccountQuoteTransfer (blockchain, accountIndex, options, config) {
         const account = await this.getAbstractedAccount(blockchain, accountIndex)
+        return await account.quoteTransfer(options)
+    }
 
-        return await account.quoteTransfer(options, config)
+    /**
+     * Get abstracted account transaction receipt.
+     *
+     * @param {Blockchain} blockchain - A blockchain identifier (e.g., "ethereum").
+     * @param {number} accountIndex - The index of the account to use (see [BIP-44](https://en.bitcoin.it/wiki/BIP_0044)).
+     * @param {string} hash - Transaction hash.
+     * @return {Promise<unknown | null>} - The receipt, or null if the transaction has not been included in a block yet.
+     */
+    async getTransactionReceipt (blockchain, accountIndex, hash) {
+        const account = await this.getAbstractedAccount(blockchain, accountIndex)
+        return await account.getTransactionReceipt(hash)
+    }
+
+    /**
+     * Returns an evm transaction to approve the interaction transaction.
+     *
+     * @param {ApproveOptions} options - The approve options.
+     * @returns {Promise<EvmTransaction>} The evm transaction.
+     */
+     async getApproveTransaction (options) {
+        const { token, recipient, amount } = options
+
+        const erc20Abi = ["function approve(address spender, uint256 amount) external returns (bool)"];
+
+        const contract = new this._imports['ethers'].Contract(token, erc20Abi)
+
+        return {
+            to: token,
+            value: 0,
+            data: contract.interface.encodeFunctionData('approve', [recipient, amount])
+        }
     }
 
     /** Disposes all the wallet accounts, erasing their private keys from the memory. */
