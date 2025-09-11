@@ -144,7 +144,7 @@
       "fields": [
         {
           "name": "balance",
-          "type": "uint",
+          "type": "string",
           "version": 1
         }
       ]
@@ -333,7 +333,7 @@
       "fields": [
         {
           "name": "balance",
-          "type": "uint",
+          "type": "string",
           "version": 1
         }
       ]
@@ -372,7 +372,7 @@
       "fields": [
         {
           "name": "balance",
-          "type": "uint",
+          "type": "string",
           "version": 1
         }
       ]

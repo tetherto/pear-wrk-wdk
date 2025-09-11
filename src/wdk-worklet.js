@@ -35,7 +35,7 @@ rpc.onGetAddress(async payload => {
 rpc.onGetAddressBalance(async payload => {
   try {
     const balance = await wdk.getAddressBalance(payload.network, payload.accountIndex)
-    return { balance: balance }
+    return { balance: balance.toString() }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -79,7 +79,7 @@ rpc.onGetAbstractedAddress(async payload => {
 rpc.onGetAbstractedAddressBalance(async payload => {
   try {
     const balance = await wdk.getAbstractedAddressBalance(payload.network, payload.accountIndex)
-    return { balance: balance }
+    return { balance: balance.toString() }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
@@ -89,7 +89,7 @@ rpc.onGetAbstractedAddressBalance(async payload => {
 rpc.onGetAbstractedAddressTokenBalance(async payload => {
   try {
     const balance = await wdk.getAbstractedAddressTokenBalance(payload.network, payload.accountIndex, payload.tokenAddress)
-    return { balance: balance }
+    return { balance: balance.toString() }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
