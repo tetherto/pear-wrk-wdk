@@ -23,7 +23,9 @@
 /** @typedef {import('./src/wdk-core/wdk-manager.js').WdkConfig} WdkConfig */
 
 /** @typedef {import('./src/wdk-core/wdk-manager.js').TransferConfig} TransferConfig */
+import 'bare-wdk-runtime'
 
+/* eslint-disable */
 export { default } from './src/wdk-core/wdk-manager.js'
 
 // Export spec/hrpc
@@ -31,3 +33,4 @@ export { default as HRPC } from './spec/hrpc/index.js'
 
 // Export a react-native-bare-kit compatible bundle that generates on postinstall.
 export { default as bundle } from './bundle/worklet.bundle.mjs'
+/* eslint-enable */
