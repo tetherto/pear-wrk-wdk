@@ -4,3 +4,5 @@
 /bundle/worklet.bundle.mjs
 /local
 .env
+.runner.mjs
+.runner.cov.mjs
