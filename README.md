@@ -1,4 +1,4 @@
- @tetherto/pear-wrk-wdk
+# @tetherto/pear-wrk-wdk
 
 Note: This package is published as `@tetherto/pear-wrk-wdk` (folder name: `pear-wrk-wdk`).
 
