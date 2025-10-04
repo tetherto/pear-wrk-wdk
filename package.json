@@ -32,6 +32,7 @@
     "encoding": "npm:bare-encoding@1.0.0",
     "hrpc": "4.2.0",
     "hyperschema": "1.16.0",
+    "os": "npm:bare-os@3.6.1",
     "bare-wdk-runtime": "2.0.1"
   },
   "devDependencies": {
