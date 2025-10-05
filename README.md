@@ -158,9 +158,6 @@ const txResult = await wdk.abstractedSendTransaction('ethereum', 0, [{
 const receipt = await wdk.getTransactionReceipt('ethereum', 0, txResult.hash)
 ```
 
-### ERC20 Approve Helper (EVM)
-
-Build an `approve` transaction for ERC20 tokens using embedded ethers interface.
 
 ```javascript
 const approveTx = await wdk.getApproveTransaction({
