@@ -33,6 +33,7 @@
     "encoding": "npm:bare-encoding@1.0.0",
     "hrpc": "4.2.0",
     "hyperschema": "1.16.0",
+    "ledger-bitcoin": "file:shims/ledger-bitcoin",
     "os": "npm:bare-os@3.6.1"
   },
   "devDependencies": {
