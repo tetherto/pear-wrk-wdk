@@ -27,7 +27,6 @@
     "@tetherto/wdk-wallet-ton-gasless": "^1.0.0-beta.1",
     "@tetherto/wdk-wallet-tron": "^1.0.0-beta.1",
     "@tetherto/wdk-wallet-tron-gasfree": "^1.0.0-beta.1",
-    "@wdk/bare-ethers": "https://github.com/noxtton/wdk-bare-ethers-internal#07dfa4190f90aef6fcfca4abe60aa8ca07e78ba0",
     "bare-ipc": "1.1.1",
     "bare-wdk-runtime": "2.0.1",
     "encoding": "npm:bare-encoding@1.0.0",
