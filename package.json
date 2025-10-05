@@ -1,6 +1,6 @@
 {
-  "name": "@wdk/bare",
-  "version": "0.1.6",
+  "name": "@tetherto/pear-wrk-wdk",
+  "version": "1.0.0-beta.1",
   "main": "index.js",
   "type": "module",
   "types": "./types",
@@ -18,27 +18,31 @@
     "test:coverage": "npm run -s gen:test:runner:cov && bare tests/.runner.cov.mjs"
   },
   "dependencies": {
+    "@tetherto/wdk-wallet": "^1.0.0-beta.1",
+    "@tetherto/wdk-wallet-btc": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-evm": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-evm-erc-4337": "^1.0.0-beta.1",
+    "@tetherto/wdk-wallet-solana": "^1.0.0-beta.1",
+    "@tetherto/wdk-wallet-ton": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-ton-gasless": "^1.0.0-beta.1",
+    "@tetherto/wdk-wallet-tron": "^1.0.0-beta.1",
+    "@tetherto/wdk-wallet-tron-gasfree": "^1.0.0-beta.1",
     "@wdk/bare-ethers": "https://github.com/noxtton/wdk-bare-ethers-internal#07dfa4190f90aef6fcfca4abe60aa8ca07e78ba0",
-    "@wdk/wallet": "https://github.com/tetherto/wdk-wallet#ee0f6046b6128d0a096f18cc6ca7845ca4cedb12",
-    "@wdk/wallet-btc": "https://github.com/tetherto/wdk-wallet-btc#ed35de0b49344bb07736fc296a28b8465a8e8a6e",
-    "@wdk/wallet-evm": "https://github.com/tetherto/wdk-wallet-evm#74e281ea63f7df6e2590580bba988daeda021df6",
-    "@wdk/wallet-evm-erc-4337": "https://github.com/tetherto/wdk-wallet-evm-erc-4337#27893776faa361fbc9bd2b24e3b1f985fdc515cc",
-    "@wdk/wallet-solana": "https://github.com/tetherto/wdk-wallet-solana#e132dc8247cd7b9e84aeaad6c20667a92830e212",
-    "@wdk/wallet-ton": "https://github.com/tetherto/wdk-wallet-ton#e2fc2c913fc003a0ad895822dc452db263faa259",
-    "@wdk/wallet-ton-gasless": "https://github.com/tetherto/wdk-wallet-ton-gasless#4b62e81488647158b2492e06c6cde176b69dd17d",
-    "@wdk/wallet-tron": "https://github.com/tetherto/wdk-wallet-tron#ec076473a5b8340599e005ab5ece8c8d246b3965",
-    "@wdk/wallet-tron-gasfree": "https://github.com/tetherto/wdk-wallet-tron-gasfree#fd57ed375801ae281e98c6882ea0f2ad4c2b30f5",
     "bare-ipc": "1.1.1",
+    "bare-wdk-runtime": "2.0.1",
     "encoding": "npm:bare-encoding@1.0.0",
     "hrpc": "4.2.0",
     "hyperschema": "1.16.0",
-    "os": "npm:bare-os@3.6.1",
-    "bare-wdk-runtime": "2.0.1"
+    "os": "npm:bare-os@3.6.1"
   },
   "devDependencies": {
+    "brittle": "3.19.0",
     "standard": "17.1.2",
-    "typescript": "5.9.3",
-    "brittle": "3.19.0"
+    "typescript": "5.9.3"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://registry.npmjs.org/"
   },
   "exports": {
     ".": {
