@@ -1,6 +1,17 @@
 name: publish
 
 on:
+  # Allow calling this workflow from other workflows (local tests with act)
+  workflow_call:
+    inputs:
+      dry_run:
+        type: boolean
+        required: false
+        default: true
+    secrets:
+      NPM_TOKEN:
+        required: false
+
   push:
     tags:
       - "v*.*.*"
