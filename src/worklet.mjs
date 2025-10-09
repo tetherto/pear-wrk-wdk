@@ -1,9 +1,10 @@
-const { IPC } = BareKit
-
 import HRPC from '../spec/hrpc'
 
 import WdkManager from './wdk-core/wdk-manager.js'
 import { stringifyError } from '../src/exceptions/rpc-exception'
+
+/* eslint-disable no-undef */
+const { IPC } = BareKit
 
 const rpc = new HRPC(IPC)
 /**
@@ -27,7 +28,6 @@ rpc.onGetAddress(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onGetAddressBalance(async payload => {
@@ -37,19 +37,17 @@ rpc.onGetAddressBalance(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onQuoteSendTransaction(async payload => {
   try {
-    //Convert amount value to number
+    // Convert amount value to number
     payload.options.value = Number(payload.options.value)
     const transaction = await wdk.quoteSendTransaction(payload.network, payload.accountIndex, payload.options)
     return { fee: transaction.fee.toString() }
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onSendTransaction(async payload => {
@@ -60,7 +58,6 @@ rpc.onSendTransaction(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 /*****************
@@ -74,7 +71,6 @@ rpc.onGetAbstractedAddress(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onGetAbstractedAddressBalance(async payload => {
@@ -84,7 +80,6 @@ rpc.onGetAbstractedAddressBalance(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onGetAbstractedAddressTokenBalance(async payload => {
@@ -94,7 +89,6 @@ rpc.onGetAbstractedAddressTokenBalance(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onAbstractedAccountTransfer(async payload => {
@@ -105,7 +99,6 @@ rpc.onAbstractedAccountTransfer(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onAbstractedSendTransaction(async payload => {
@@ -116,7 +109,6 @@ rpc.onAbstractedSendTransaction(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onAbstractedAccountQuoteTransfer(async payload => {
@@ -128,12 +120,11 @@ rpc.onAbstractedAccountQuoteTransfer(async payload => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
 
 rpc.onGetTransactionReceipt(async payload => {
   try {
-    let receipt = await wdk.getTransactionReceipt(payload.network, payload.accountIndex, payload.hash)
+    const receipt = await wdk.getTransactionReceipt(payload.network, payload.accountIndex, payload.hash)
     if (receipt) {
       return { receipt: JSON.stringify(receipt) }
     }
@@ -146,7 +137,7 @@ rpc.onGetTransactionReceipt(async payload => {
 rpc.onGetApproveTransaction(async payload => {
   try {
     payload.amount = Number(payload.amount)
-    let approveTx = await wdk.getApproveTransaction(payload)
+    const approveTx = await wdk.getApproveTransaction(payload)
     if (approveTx) {
       approveTx.value = approveTx.value.toString()
       return approveTx
@@ -164,5 +155,4 @@ rpc.onDispose(() => {
   } catch (error) {
     throw new Error(stringifyError(error))
   }
-
 })
