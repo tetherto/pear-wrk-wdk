@@ -54,7 +54,10 @@
     }
   },
   "files": [
-    "bundle/worklet.bundle.d.mts"
+    "index.js",
+    "bundle/",
+    "src/",
+    "spec/"
   ],
   "author": "Tether",
   "license": "Apache-2.0"
