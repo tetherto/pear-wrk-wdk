@@ -1,4 +1,4 @@
-import ERROR_CODES from './error-codes'
+const ERROR_CODES = require('./error-codes')
 
 /**
  * @typedef {Object} rpcExceptionPayload
@@ -13,6 +13,8 @@ import ERROR_CODES from './error-codes'
  * @property {string} message - Error message
  * @property {string} error - Original exception converted to string
  */
+
+
 
 function stringifyError (error) {
   if (error instanceof Error) {
@@ -41,7 +43,7 @@ function rpcException (payload) {
   }
 }
 
-export {
+module.exports = {
   rpcException,
   stringifyError
 }
