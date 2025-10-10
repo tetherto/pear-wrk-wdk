@@ -1,8 +1,4 @@
 /node_modules
 /.idea
 .DS_Store
-/bundle/worklet.bundle.mjs
-/local
-.env
-.runner.mjs
-.runner.cov.mjs
+/bundle

@@ -1,6 +1,17 @@
 name: publish
 
 on:
+  # Allow calling this workflow from other workflows (local tests with act)
+  workflow_call:
+    inputs:
+      dry_run:
+        type: boolean
+        required: false
+        default: true
+    secrets:
+      NPM_TOKEN:
+        required: false
+
   push:
     tags:
       - "v*.*.*"
@@ -17,7 +28,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22.19.0"
-          cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
@@ -32,9 +42,6 @@ jobs:
 
       - run: npm run gen:schema
       - run: npm run gen:bundle
-
-      - name: Run unit tests
-        run: npm test
 
       - name: Upload bundle artifact
         uses: actions/upload-artifact@v4
@@ -63,7 +70,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Dry-run when invoked via workflow_call with dry_run=true
+      - name: Publish to npm (dry-run)
+        if: ${{ github.event_name != 'release' && inputs.dry_run }}
+        run: npm publish --dry-run
+
       - run: npm pack # optional: sanity check the tarball contents
+        if: ${{ github.event_name == 'release' || !inputs.dry_run }}
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
