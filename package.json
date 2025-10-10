@@ -54,5 +54,12 @@
     }
   },
   "author": "Tether",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "standard": {
+    "ignore": [
+      "bundle/*.mjs",
+      "bundle/*.d.mts",
+      "tests/**/*.js"
+    ]
+  }
 }
