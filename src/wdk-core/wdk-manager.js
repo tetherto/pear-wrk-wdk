@@ -116,13 +116,6 @@ class WdkManager {
 
     /** @private */
     this._imports = { }
-    this.initDefaultImports().then()
-  }
-
-  // todo workaround to support ethers
-  async initDefaultImports () {
-    const { default: Ethers } = await import('@wdk/bare-ethers')
-    if (!this._imports.ethers) this._imports.ethers = Ethers
   }
 
   /**
