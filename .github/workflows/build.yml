@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Install bare
         run: npm install -g bare
