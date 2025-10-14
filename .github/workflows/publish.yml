@@ -2,6 +2,11 @@ name: publish
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        required: false
+        default: true
   # Allow calling this workflow from other workflows (local tests with act)
   workflow_call:
     inputs:
