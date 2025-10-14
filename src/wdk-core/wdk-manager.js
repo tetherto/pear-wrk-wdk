@@ -113,9 +113,6 @@ class WdkManager {
 
     /** @private */
     this._account_abstraction_wallets = { }
-
-    /** @private */
-    this._imports = { }
   }
 
   /**
@@ -407,7 +404,7 @@ class WdkManager {
      */
   async abstractedAccountQuoteTransfer (blockchain, accountIndex, options, config) {
     const account = await this.getAbstractedAccount(blockchain, accountIndex)
-    return await account.quoteTransfer(options)
+    return await account.quoteTransfer(options, config)
   }
 
   /**
