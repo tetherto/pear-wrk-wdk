@@ -65,7 +65,6 @@ jobs:
           if-no-files-found: error
 
   publish:
-    if: startsWith(github.ref, 'refs/tags/v')
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -90,13 +89,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      # Dry-run when invoked via workflow_call with dry_run=true
-      - name: Publish to npm (dry-run)
-        if: ${{ github.event_name != 'release' && inputs.dry_run }}
-        run: npm publish --dry-run
-
-      - run: npm pack # optional: sanity check the tarball contents
-        if: ${{ github.event_name == 'release' || !inputs.dry_run }}
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
