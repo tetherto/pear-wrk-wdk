@@ -1,6 +1,7 @@
 name: publish
 
 on:
+  workflow_dispatch:
   # Allow calling this workflow from other workflows (local tests with act)
   workflow_call:
     inputs:
