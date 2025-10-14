@@ -25,6 +25,14 @@ jobs:
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Auth for private GitHub git deps
+        run: |
+          git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://${PAT_TOKEN}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          
       - name: Install dependencies
         run: npm clean-install
         env:
