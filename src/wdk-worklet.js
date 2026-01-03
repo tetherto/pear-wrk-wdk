@@ -371,12 +371,6 @@ rpc.onInitializeWDK(withErrorHandling(async (init) => {
   }
   
   const networkConfigs = JSON.parse(init.config || '{}')
-  const missingNetworks = requiredNetworks.filter(network => !networkConfigs[network])
-  
-  if (missingNetworks.length > 0) {
-    throw new Error(`Missing network configurations: ${missingNetworks.join(', ')}`)
-  }
-  
   let decryptedSeedBuffer
   
   if (init.encryptionKey && init.encryptedSeed) {

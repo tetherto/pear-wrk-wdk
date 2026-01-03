@@ -10,18 +10,28 @@
     "gen:hrpc": "node scripts/generate-hrpc.js",
     "gen:macos-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && npx bare-pack --target darwin-arm64 --linked --out generated/bundle/wdk-worklet.bundle.js src/wdk-worklet.js",
     "gen:mobile-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && npx bare-pack --target ios-arm64 --target ios-arm64-simulator --target ios-x64-simulator --target android-arm --target android-arm64 --target android-ia32 --target android-x64 --linked --imports ./pack.imports.json --out generated/bundle/wdk-worklet.mobile.bundle.js src/wdk-worklet.js",
-    "postinstall": "npm run gen:mobile-bundle"
+    "postinstall": "npm run gen:mobile-bundle",
+    "build-pack": "npm i && npm run postinstall && npm pack"
   },
   "dependencies": {
     "@scure/bip39": "^1.6.0",
-    "@tetherto/wdk": "1.0.0-beta.4",
-    "@tetherto/wdk-wallet-evm-erc-4337": "1.0.0-beta.3",
-    "@tetherto/wdk-wallet-spark": "1.0.0-beta.6",
+    "@tetherto/wdk": "^1.0.0-beta.4",
+    "@tetherto/wdk-wallet-evm-erc-4337": "^1.0.0-beta.3",
+    "@tetherto/wdk-wallet-spark": "^1.0.0-beta.6",
+    "@tetherto/wdk-wallet-btc": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-evm": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-tron": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-tron-gasfree": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-ton": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-ton-gasless": "^1.0.0-beta.2",
+    "@tetherto/wdk-wallet-solana": "^1.0.0-beta.2",
+    "bare-node-runtime": "^1.1.4",
     "bufferutil": "4.0.9",
     "hrpc": "4.0.1",
     "hyperschema": "1.12.4",
     "text-encoding": "0.7.0",
-    "utf-8-validate": "5.0.10"
+    "utf-8-validate": "5.0.10",
+    "ledger-bitcoin": "^0.2.2"
   },
   "devDependencies": {
     "rimraf": "6.0.1",

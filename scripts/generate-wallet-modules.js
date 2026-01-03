@@ -48,6 +48,8 @@ const WDK = wdkModule.default || wdkModule.WDK || wdkModule;
 // Load wallet modules
 `;
 
+content += `require('bare-node-runtime/global');\n`;
+
 // Generate requires for each wallet module
 const walletManagerVars = [];
 for (const [moduleName, moduleConfig] of Object.entries(walletModulesConfig)) {
@@ -56,7 +58,7 @@ for (const [moduleName, moduleConfig] of Object.entries(walletModulesConfig)) {
   const varName = `WalletManager${moduleName.charAt(0).toUpperCase() + moduleName.slice(1)}`;
   walletManagerVars.push({ varName, networks });
   
-  content += `const ${moduleName}Module = require('${modulePath}');\n`;
+  content += `const ${moduleName}Module = require('${modulePath}', { with: { imports: 'bare-node-runtime/imports' }});\n`;
   content += `const ${varName} = ${moduleName}Module.default || ${moduleName}Module;\n`;
 }
 
