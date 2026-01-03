@@ -1,5 +1,5 @@
 {
-  "name": "@wdk/bare",
+  "name": "@tetherto/pear-wrk-wdk",
   "version": "0.1.1",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,6 @@
     "bufferutil": "4.0.9",
     "hrpc": "4.0.1",
     "hyperschema": "1.12.4",
-    "text-encoding": "0.7.0",
     "utf-8-validate": "5.0.10",
     "ledger-bitcoin": "^0.2.2"
   },
