@@ -6,6 +6,8 @@
     "build:types": "tsc --noEmit",
     "lint": "standard",
     "lint:fix": "standard --fix",
+    "test": "node --test test/**/*.test.js",
+    "test:watch": "node --test --watch test/**/*.test.js",
     "gen:wallet-modules": "node scripts/generate-wallet-modules.js",
     "gen:hrpc": "node scripts/generate-hrpc.js",
     "gen:macos-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && npx bare-pack --target darwin-arm64 --linked --out generated/bundle/wdk-worklet.bundle.js src/wdk-worklet.js",
