@@ -285,11 +285,11 @@ function registerRpcHandlers(rpc, context) {
       validateBase64(init.encryptedSeed, 'encryptedSeed')
     }, 'Init')
     
-    const missingNetworks = requiredNetworks.filter(network => !networkConfigs[network])
+    // const missingNetworks = requiredNetworks.filter(network => !networkConfigs[network])
     
-    if (missingNetworks.length > 0) {
-      throw createErrorWithCode(`Missing network configurations: ${missingNetworks.join(', ')}`, ERROR_CODES.BAD_REQUEST)
-    }
+    // if (missingNetworks.length > 0) {
+    //   throw createErrorWithCode(`Missing network configurations: ${missingNetworks.join(', ')}`, ERROR_CODES.BAD_REQUEST)
+    // }
     
     // Initialize from encrypted seed
     logger.info('Initializing WDK with encrypted seed')

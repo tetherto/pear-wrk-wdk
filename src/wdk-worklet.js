@@ -5,7 +5,7 @@ const logger = require('./utils/logger')
 const HRPC = require('../generated/hrpc')
 
 // RPC handlers
-const { registerRpcHandlers } = require('./rpc-handlers')
+const { registerRpcHandlers } = require('./rpc-handlers', { with: { imports: 'bare-node-runtime/imports' }})
 
 // Handle unhandled promise rejections and exceptions
 if (typeof process !== 'undefined' && process.on) {

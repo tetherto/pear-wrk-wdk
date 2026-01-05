@@ -39,7 +39,7 @@
         "networks": ["solana-devnet"]
       }
     },
-    "requiredNetworks": ["ethereum","sepolia","spark","bitcoin","tron","tron-gasfree","ton","ton-gasless","solana-devnet"],
+    "requiredNetworks": ["ethereum","sepolia","spark","bitcoin-testnet","tron","tron-gasfree","ton","ton-gasless","solana-devnet"],
     "preloadModules": ["@buildonspark/spark-frost-bare-addon"]
   },
   "schema": [
