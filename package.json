@@ -1,5 +1,5 @@
 {
-  "name": "@wdk/bare",
+  "name": "@tetherto/pear-wrk-wdk",
   "version": "0.1.1",
   "main": "index.js",
   "scripts": {
@@ -11,20 +11,30 @@
     "gen:wallet-modules": "node scripts/generate-wallet-modules.js",
     "gen:hrpc": "node scripts/generate-hrpc.js",
     "gen:macos-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --host darwin-arm64 --linked --out generated/bundle/wdk-worklet.bundle.js src/wdk-worklet.js",
-    "gen:mobile-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --host ios-arm64 --host ios-arm64-simulator --host ios-x64-simulator --host android-arm --host android-arm64 --host android-ia32 --host android-x64 --linked --imports ./pack.imports.json --out generated/bundle/wdk-worklet.mobile.bundle.js src/wdk-worklet.js",
+    "gen:mobile-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --host ios-arm64 --host ios-arm64-simulator --host ios-x64-simulator --host android-arm --host android-arm64 --host android-ia32 --host android-x64 --linked --out generated/bundle/wdk-worklet.mobile.bundle.js src/wdk-worklet.js",
     "postinstall": "npm run gen:mobile-bundle"
   },
   "dependencies": {
     "@scure/bip39": "^1.6.0",
-    "@tetherto/wdk": "1.0.0-beta.4",
-    "@tetherto/wdk-wallet-evm-erc-4337": "github:itsdeka/wdk-wallet-evm-erc-4337-1#fix/temp-relay-kit",
-    "@tetherto/wdk-wallet-spark": "1.0.0-beta.6",
-    "bare-pack": "^2.0.0",
+    "@tetherto/wdk": "^1.0.0-beta.5",
+    "@tetherto/wdk-wallet-evm-erc-4337": "^1.0.0-beta.3",
+    "@tetherto/wdk-wallet-spark": "^1.0.0-beta.6",
+    "@tetherto/wdk-wallet-btc": "^1.0.0-beta.4",
+    "@tetherto/wdk-wallet-evm": "^1.0.0-beta.4",
+    "@tetherto/wdk-wallet-tron": "^1.0.0-beta.3",
+    "@tetherto/wdk-wallet-tron-gasfree": "^1.0.0-beta.3",
+    "@tetherto/wdk-wallet-ton": "^1.0.0-beta.6",
+    "@tetherto/wdk-wallet-ton-gasless": "^1.0.0-beta.3",
+    "@tetherto/wdk-wallet-solana": "^1.0.0-beta.4",
+    "@tetherto/wdk-protocol-multisig-safe": "github:quocle108/wdk-protocol-multisig-safe#init",
+    "bare-node-runtime": "^1.1.4", 
     "bufferutil": "^4.1.0",
-    "hrpc": "4.0.1",
-    "hyperschema": "1.12.4",
-    "text-encoding": "0.7.0",
-    "utf-8-validate": "5.0.10"
+    "hrpc": "^4.0.1",
+    "hyperschema": "^1.12.4",
+    "utf-8-validate": "^5.0.10",
+    "ledger-bitcoin": "^0.2.2",
+    "encoding": "^0.1.13",
+    "bare-pack": "^2.0.0"
   },
   "devDependencies": {
     "bare-ipc": "^1.1.1",
