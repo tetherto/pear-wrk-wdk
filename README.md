@@ -69,7 +69,6 @@ The module requires network configurations for all required networks. Configure 
         "networks": ["spark"]
       },
        "evmMultisigSafe": {
-
         "modulePath": "@tetherto/wdk-protocol-multisig-safe",
         "networks": ["ethereum-multisig", "polygon-multisig", "arbitrum-multisig", "sepolia-multisig"]
       }
