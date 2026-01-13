@@ -4,7 +4,7 @@
     "walletModules": {
       "evmErc4337": {
         "modulePath": "@tetherto/wdk-wallet-evm-erc-4337",
-        "networks": ["sepolia"]
+        "networks": ["ethereum", "polygon", "arbitrum", "plasma", "sepolia"]
       },
       "spark": {
         "modulePath": "@tetherto/wdk-wallet-spark",
@@ -12,7 +12,7 @@
       },
       "btc": {
         "modulePath": "@tetherto/wdk-wallet-btc",
-        "networks": ["bitcoin-testnet"]
+        "networks": ["bitcoin"]
       },
       "evm": {
         "modulePath": "@tetherto/wdk-wallet-evm",
@@ -36,10 +36,14 @@
       },
       "solana": {
         "modulePath": "@tetherto/wdk-wallet-solana",
-        "networks": ["solana-devnet"]
+        "networks": ["solana"]
+      },
+      "evmMultisigSafe": {
+        "modulePath": "@tetherto/wdk-protocol-multisig-safe",
+        "networks": ["ethereum-multisig", "sepolia-multisig"]
       }
     },
-    "requiredNetworks": ["ethereum","sepolia","spark","bitcoin-testnet","tron","tron-gasfree","ton","ton-gasless","solana-devnet"],
+    "requiredNetworks": ["ethereum","sepolia","spark","bitcoin","tron","tron-gasfree","ton","ton-gasless","solana","ethereum-multisig","sepolia-multisig"],
     "preloadModules": ["@buildonspark/spark-frost-bare-addon"]
   },
   "schema": [
