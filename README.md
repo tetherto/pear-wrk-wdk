@@ -67,6 +67,11 @@ The module requires network configurations for all required networks. Configure 
       "spark": {
         "modulePath": "@tetherto/wdk-wallet-spark",
         "networks": ["spark"]
+      },
+       "evmMultisigSafe": {
+
+        "modulePath": "@tetherto/wdk-protocol-multisig-safe",
+        "networks": ["ethereum-multisig", "polygon-multisig", "arbitrum-multisig", "sepolia-multisig"]
       }
     },
     "requiredNetworks": ["ethereum", "polygon", "arbitrum", "plasma", "sepolia", "spark"]
@@ -336,6 +341,7 @@ See `test/test-lightning.js` for an example test implementation.
 
 - `@tetherto/wdk-wallet-evm-erc-4337`: EVM ERC-4337 wallet support
 - `@tetherto/wdk-wallet-spark`: Spark network wallet support
+- `@tetherto/wdk-protocol-multisig-safe`: Safe Protocol multisig wallet support
 
 ## License
 

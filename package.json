@@ -19,10 +19,13 @@
     "@tetherto/wdk": "1.0.0-beta.4",
     "@tetherto/wdk-wallet-evm-erc-4337": "github:itsdeka/wdk-wallet-evm-erc-4337-1#fix/temp-relay-kit",
     "@tetherto/wdk-wallet-spark": "1.0.0-beta.6",
+    "@tetherto/wdk-protocol-multisig-safe": "github:quocle108/wdk-protocol-multisig-safe#init",
     "hrpc": "4.0.1",
     "hyperschema": "1.12.4",
     "text-encoding": "0.7.0",
-    "utf-8-validate": "5.0.10"
+    "utf-8-validate": "5.0.10",
+    "bufferutil": "4.1.0",
+    "encoding": "^0.1.13"
   },
   "devDependencies": {
     "rimraf": "6.0.1",
