@@ -20,7 +20,6 @@ if (!fs.existsSync(outputDir)) {
 // Read schema config
 const schemaConfig = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 const walletModulesConfig = schemaConfig.config?.walletModules || {};
-const requiredNetworks = schemaConfig.config?.requiredNetworks || [];
 const preloadModules = schemaConfig.config?.preloadModules || [];
 
 // Generate the file content
@@ -78,8 +77,7 @@ content += `
 // Export everything
 module.exports = {
   WDK,
-  walletManagers,
-  requiredNetworks: ${JSON.stringify(requiredNetworks)}
+  walletManagers
 };
 `;
 
@@ -88,5 +86,4 @@ fs.writeFileSync(outputPath, content, 'utf8');
 console.log(`✓ Generated ${outputPath}`);
 console.log(`  - Preload modules: ${preloadModules.length}`);
 console.log(`  - Wallet modules: ${Object.keys(walletModulesConfig).length}`);
-console.log(`  - Networks: ${requiredNetworks.length}`);
 

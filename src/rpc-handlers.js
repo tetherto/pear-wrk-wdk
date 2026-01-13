@@ -139,11 +139,10 @@ const callWdkMethod = async (context, methodName, network, accountIndex, args = 
  * @param {Object} context.wdk - WDK instance (can be null)
  * @param {Object} context.WDK - WDK class constructor
  * @param {Object} context.walletManagers - Wallet managers map
- * @param {Array} context.requiredNetworks - Required networks array
  * @param {Object} context.wdkLoadError - WDK load error (if any)
  */
 function registerRpcHandlers(rpc, context) {
-  const { WDK, walletManagers, requiredNetworks, wdkLoadError } = context
+  const { WDK, walletManagers, wdkLoadError } = context
   
   // Create a context object that will be passed to handlers
   // This allows handlers to read and update the wdk state
@@ -284,12 +283,6 @@ function registerRpcHandlers(rpc, context) {
       validateBase64(init.encryptionKey, 'encryptionKey')
       validateBase64(init.encryptedSeed, 'encryptedSeed')
     }, 'Init')
-    
-    const missingNetworks = requiredNetworks.filter(network => !networkConfigs[network])
-    
-    if (missingNetworks.length > 0) {
-      throw createErrorWithCode(`Missing network configurations: ${missingNetworks.join(', ')}`, ERROR_CODES.BAD_REQUEST)
-    }
     
     // Initialize from encrypted seed
     logger.info('Initializing WDK with encrypted seed')

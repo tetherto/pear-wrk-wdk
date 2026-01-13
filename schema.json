@@ -43,7 +43,6 @@
         "networks": ["ethereum-multisig", "sepolia-multisig"]
       }
     },
-    "requiredNetworks": ["ethereum","sepolia","spark","bitcoin","tron","tron-gasfree","ton","ton-gasless","solana","ethereum-multisig","sepolia-multisig"],
     "preloadModules": ["@buildonspark/spark-frost-bare-addon"]
   },
   "schema": [
