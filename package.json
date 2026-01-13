@@ -10,8 +10,8 @@
     "test:watch": "node --test --watch test/**/*.test.js",
     "gen:wallet-modules": "node scripts/generate-wallet-modules.js",
     "gen:hrpc": "node scripts/generate-hrpc.js",
-    "gen:macos-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --target darwin-arm64 --linked --out generated/bundle/wdk-worklet.bundle.js src/wdk-worklet.js",
-    "gen:mobile-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --target ios-arm64 --target ios-arm64-simulator --target ios-x64-simulator --target android-arm --target android-arm64 --target android-ia32 --target android-x64 --linked --imports ./pack.imports.json --out generated/bundle/wdk-worklet.mobile.bundle.js src/wdk-worklet.js",
+    "gen:macos-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --host darwin-arm64 --linked --out generated/bundle/wdk-worklet.bundle.js src/wdk-worklet.js",
+    "gen:mobile-bundle": "npm run gen:wallet-modules && npm run gen:hrpc && bare-pack --host ios-arm64 --host ios-arm64-simulator --host ios-x64-simulator --host android-arm --host android-arm64 --host android-ia32 --host android-x64 --linked --imports ./pack.imports.json --out generated/bundle/wdk-worklet.mobile.bundle.js src/wdk-worklet.js",
     "postinstall": "npm run gen:mobile-bundle"
   },
   "dependencies": {
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "bare-ipc": "^1.1.1",
-    "bare-pack": "1.5.1",
+    "bare-pack": "2.0.0",
     "rimraf": "6.0.1",
     "standard": "17.1.2",
     "typescript": "5.8.3"
