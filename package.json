@@ -15,23 +15,24 @@
     "postinstall": "npm run gen:mobile-bundle"
   },
   "dependencies": {
-    "@scure/bip39": "^1.6.0",
+    "@scure/bip39": "1.6.0",
     "@tetherto/wdk": "1.0.0-beta.4",
+    "@tetherto/wdk-protocol-multisig-safe": "github:quocle108/wdk-protocol-multisig-safe#init",
     "@tetherto/wdk-wallet-evm-erc-4337": "github:itsdeka/wdk-wallet-evm-erc-4337-1#fix/temp-relay-kit",
     "@tetherto/wdk-wallet-spark": "1.0.0-beta.6",
-    "@tetherto/wdk-protocol-multisig-safe": "github:quocle108/wdk-protocol-multisig-safe#init",
+    "bufferutil": "4.1.0",
+    "encoding": "0.1.13",
     "hrpc": "4.0.1",
     "hyperschema": "1.12.4",
     "text-encoding": "0.7.0",
-    "utf-8-validate": "5.0.10",
-    "bufferutil": "4.1.0",
-    "encoding": "^0.1.13"
+    "utf-8-validate": "5.0.10"
   },
   "devDependencies": {
+    "bare-ipc": "1.1.1",
+    "bare-pack": "1.5.1",
     "rimraf": "6.0.1",
     "standard": "17.1.2",
-    "typescript": "5.8.3",
-    "bare-ipc": "^1.1.1"
+    "typescript": "5.8.3"
   },
   "exports": {
     ".": {
