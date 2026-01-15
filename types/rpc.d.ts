@@ -56,6 +56,27 @@ export interface CallMethodResponse {
   result?: string | null; // JSON string of method result
 }
 
+export interface WdkInitializeParams {
+  encryptionKey: string;
+  encryptedSeed: string;
+  config: string;
+}
+
+export interface WdkGenerateEntropyParams {
+  wordCount: 12 | 24;
+}
+
+export interface WdkEntropyResult {
+  encryptionKey: string;
+  encryptedSeedBuffer: string;
+  encryptedEntropyBuffer: string;
+}
+
+export interface WdkGetMnemonicParams {
+  encryptedEntropy: string;
+  encryptionKey: string;
+}
+
 /**
  * Network configuration map
  * Keys are network names (e.g., 'ethereum', 'spark')
