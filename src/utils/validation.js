@@ -45,13 +45,13 @@ function validateEnum (value, allowedValues, fieldName) {
  */
 function validateBase64 (value, fieldName) {
   validateNonEmptyString(value, fieldName)
-  
+
   // Basic base64 validation (alphanumeric, +, /, =, and whitespace)
   const base64Regex = /^[A-Za-z0-9+/=\s]*$/
   if (!base64Regex.test(value)) {
     throw new Error(`${fieldName} must be a valid base64-encoded string`)
   }
-  
+
   // Try to decode to ensure it's valid base64
   try {
     Buffer.from(value, 'base64')
@@ -71,7 +71,7 @@ function validateJSON (value, fieldName) {
   if (typeof value !== 'string') {
     throw new Error(`${fieldName} must be a JSON string`)
   }
-  
+
   try {
     return JSON.parse(value)
   } catch (error) {
@@ -87,7 +87,7 @@ function validateJSON (value, fieldName) {
  */
 function validateMnemonic (value, fieldName) {
   validateNonEmptyString(value, fieldName)
-  
+
   const words = value.trim().split(/\s+/)
   if (words.length !== 12 && words.length !== 24) {
     throw new Error(`${fieldName} must contain exactly 12 or 24 words`)
@@ -106,6 +106,44 @@ function validateWordCount (value, fieldName) {
   }
 }
 
+/**
+ * Create an error with a specific error code
+ * @param {string} message - Error message
+ * @param {string} code - Error code
+ * @returns {Error} Error object with code property
+ */
+const createErrorWithCode = (message, code) => {
+  const error = new Error(message)
+  error.code = code
+  return error
+}
+
+/**
+ * Unified validation utility that validates request object and wraps validation errors with error code
+ * @param {any} request - Request to validate
+ * @param {Function} validationFn - Validation function to execute
+ * @param {string} fieldName - Name of the field for error messages (default: 'Request')
+ * @throws {Error} With BAD_REQUEST code if validation fails
+ */
+const validateRequest = (request, validationFn, fieldName = 'Request') => {
+  // Validate that request is a non-null object
+  if (!request || typeof request !== 'object') {
+    const error = new Error(`${fieldName} must be an object`)
+    error.code = ERROR_CODES.BAD_REQUEST
+    throw error
+  }
+
+  // Execute validation function and wrap errors with BAD_REQUEST code
+  try {
+    validationFn()
+  } catch (error) {
+    if (!error.code) {
+      error.code = ERROR_CODES.BAD_REQUEST
+    }
+    throw error
+  }
+}
+
 module.exports = {
   validateNonEmptyString,
   validateNonNegativeInteger,
@@ -113,6 +151,7 @@ module.exports = {
   validateBase64,
   validateJSON,
   validateMnemonic,
-  validateWordCount
+  validateWordCount,
+  createErrorWithCode,
+  validateRequest
 }
-

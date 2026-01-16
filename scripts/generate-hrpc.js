@@ -16,7 +16,6 @@ const HRPCBuilder = require('hrpc')
 const schemaPath = path.join(__dirname, '../schema.json')
 const schemaDir = path.join(__dirname, '../generated/schema')
 const hrpcMessagesPath = path.join(__dirname, '../generated/hrpc/messages.js')
-const hrpcIndexPath = path.join(__dirname, '../generated/hrpc/index.js')
 const hrpcJsonPath = path.join(__dirname, '../src/hrpc/hrpc.json')
 const hrpcDir = path.dirname(hrpcJsonPath)
 
@@ -98,4 +97,3 @@ try {
 }
 
 console.log('Schema generation complete!')
-

@@ -1,5 +1,5 @@
 /**
- *Enumeration for all available error codes
+ * Enumeration for all available error codes
  *
  * @enum {string}
  */

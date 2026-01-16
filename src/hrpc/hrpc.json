@@ -96,6 +96,32 @@
         "stream": false
       },
       "version": 1
+    },
+    {
+      "id": 8,
+      "name": "@wdk-core/registerWallet",
+      "request": {
+        "name": "@wdk-core/registerWallet-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/registerWallet-response",
+        "stream": false
+      },
+      "version": 1
+    },
+    {
+      "id": 9,
+      "name": "@wdk-core/registerProtocol",
+      "request": {
+        "name": "@wdk-core/registerProtocol-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/registerProtocol-response",
+        "stream": false
+      },
+      "version": 1
     }
   ]
 }

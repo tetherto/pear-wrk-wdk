@@ -119,6 +119,12 @@
           "required": false,
           "type": "string",
           "version": 1
+        },
+        {
+          "name": "options",
+          "required": false,
+          "type": "string",
+          "version": 1
         }
       ]
     },
@@ -130,6 +136,65 @@
       "fields": [
         {
           "name": "result",
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "registerWallet-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "config",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "registerWallet-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "status",
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "blockchains",
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "registerProtocol-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "config",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "registerProtocol-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "status",
           "type": "string",
           "version": 1
         }

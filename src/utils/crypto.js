@@ -1,6 +1,8 @@
 // External dependencies
 const crypto = require('bare-crypto')
 
+/** @typedef {import('../../types/rpc').WdkEntropyResult} WdkEntropyResult */
+
 /**
  * Buffer Type Strategy:
  * - Functions accept both Buffer and Uint8Array for flexibility
@@ -17,7 +19,7 @@ const crypto = require('bare-crypto')
  */
 const memzero = (buffer) => {
   if (!buffer) return
-  
+
   if (Buffer.isBuffer(buffer)) {
     buffer.fill(0)
   } else if (buffer instanceof Uint8Array) {
@@ -50,25 +52,25 @@ const generateEncryptionKey = () => {
 const encrypt = (data, keyBase64) => {
   const key = Buffer.from(keyBase64, 'base64')
   const iv = crypto.randomBytes(12) // 96-bit IV for GCM
-  
+
   // Convert data to Buffer if needed
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data)
-  
+
   // Use AES-256-GCM for authenticated encryption
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
   const encrypted = Buffer.concat([cipher.update(dataBuffer), cipher.final()])
   const authTag = cipher.getAuthTag()
-  
+
   // Combine IV + encrypted data + auth tag
   const result = Buffer.concat([iv, encrypted, authTag])
   const resultBase64 = result.toString('base64')
-  
+
   // Zero out sensitive buffers (caller should zero input data buffer)
   memzero(key)
   memzero(iv)
   memzero(encrypted)
   memzero(authTag)
-  
+
   return resultBase64
 }
 
@@ -81,24 +83,24 @@ const encrypt = (data, keyBase64) => {
 const decrypt = (encryptedBase64, keyBase64) => {
   const key = Buffer.from(keyBase64, 'base64')
   const encryptedBuffer = Buffer.from(encryptedBase64, 'base64')
-  
+
   // Extract IV (12 bytes), encrypted data, and auth tag (16 bytes)
   const iv = encryptedBuffer.subarray(0, 12)
   const authTag = encryptedBuffer.subarray(encryptedBuffer.length - 16)
   const encrypted = encryptedBuffer.subarray(12, encryptedBuffer.length - 16)
-  
+
   const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv)
   decipher.setAuthTag(authTag)
-  
+
   const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()])
-  
+
   // Zero out sensitive buffers (but not the decrypted result we're returning)
   memzero(key)
   memzero(encryptedBuffer)
   memzero(iv)
   memzero(authTag)
   memzero(encrypted)
-  
+
   return decrypted
 }
 
@@ -126,24 +128,24 @@ const generateEntropy = (wordCount) => {
  * Encrypt seed and entropy with a new encryption key
  * @param {Uint8Array|Buffer} seed - Seed bytes to encrypt
  * @param {Uint8Array|Buffer} entropy - Entropy bytes to encrypt
- * @returns {Object} Object containing encryptionKey, encryptedSeedBuffer, and encryptedEntropyBuffer
+ * @returns {WdkEntropyResult} Object containing encryptionKey, encryptedSeedBuffer, and encryptedEntropyBuffer
  */
 const encryptSecrets = (seed, entropy) => {
   // Generate encryption key
   const encryptionKey = generateEncryptionKey()
-  
+
   // Convert to buffers if needed
   const seedBuffer = Buffer.isBuffer(seed) ? seed : Buffer.from(seed)
   const entropyBuffer = Buffer.isBuffer(entropy) ? entropy : Buffer.from(entropy)
-  
+
   // Encrypt both secrets
   const encryptedSeedBuffer = encrypt(seedBuffer, encryptionKey)
   const encryptedEntropyBuffer = encrypt(entropyBuffer, encryptionKey)
-  
+
   // Zero out sensitive buffers
   memzero(seedBuffer)
   memzero(entropyBuffer)
-  
+
   return {
     encryptionKey,
     encryptedSeedBuffer,
@@ -159,4 +161,3 @@ module.exports = {
   generateEntropy,
   encryptSecrets
 }
-

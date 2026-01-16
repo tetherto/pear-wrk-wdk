@@ -2,7 +2,7 @@
 
 /**
  * Unit tests for RPC handlers
- * 
+ *
  * Run with: node --test test/rpc-handlers.test.js
  */
 
@@ -31,24 +31,26 @@ describe('RPC Handlers', () => {
   beforeEach(() => {
     // Clear handlers
     mockRpc.handlers = {}
-    
+
     // Import the module (we'll need to mock some dependencies)
     // For now, we'll test the exported functions directly
     const rpcHandlers = require('../src/rpc-handlers')
     registerRpcHandlers = rpcHandlers.registerRpcHandlers
-    
+
     // Create a mock context
     context = {
       wdk: null,
       WDK: class MockWDK {
-        constructor(seed) {
+        constructor (seed) {
           this.seed = seed
           this.wallets = {}
         }
-        registerWallet(network, manager, config) {
+
+        registerWallet (network, manager, config) {
           this.wallets[network] = { manager, config }
         }
-        async getAccount(network, index) {
+
+        async getAccount (network, index) {
           if (!this.wallets[network]) {
             throw new Error(`Network ${network} not registered`)
           }
@@ -57,7 +59,8 @@ describe('RPC Handlers', () => {
             getBalance: async () => ({ balance: '1000000000000000000' })
           }
         }
-        dispose() {
+
+        dispose () {
           this.wallets = {}
         }
       },
@@ -80,7 +83,7 @@ describe('RPC Handlers', () => {
   describe('registerRpcHandlers', () => {
     test('should register all RPC handlers', () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       assert.ok(mockRpc.handlers.workletStart, 'workletStart handler should be registered')
       assert.ok(mockRpc.handlers.generateEntropyAndEncrypt, 'generateEntropyAndEncrypt handler should be registered')
       assert.ok(mockRpc.handlers.getMnemonicFromEntropy, 'getMnemonicFromEntropy handler should be registered')
@@ -103,7 +106,7 @@ describe('RPC Handlers', () => {
     test('should generate entropy and encrypt for 12 words', async () => {
       registerRpcHandlers(mockRpc, context)
       const result = await mockRpc.handlers.generateEntropyAndEncrypt({ wordCount: 12 })
-      
+
       assert.ok(result.encryptionKey, 'encryptionKey should be present')
       assert.ok(result.encryptedSeedBuffer, 'encryptedSeedBuffer should be present')
       assert.ok(result.encryptedEntropyBuffer, 'encryptedEntropyBuffer should be present')
@@ -115,7 +118,7 @@ describe('RPC Handlers', () => {
     test('should generate entropy and encrypt for 24 words', async () => {
       registerRpcHandlers(mockRpc, context)
       const result = await mockRpc.handlers.generateEntropyAndEncrypt({ wordCount: 24 })
-      
+
       assert.ok(result.encryptionKey, 'encryptionKey should be present')
       assert.ok(result.encryptedSeedBuffer, 'encryptedSeedBuffer should be present')
       assert.ok(result.encryptedEntropyBuffer, 'encryptedEntropyBuffer should be present')
@@ -123,7 +126,7 @@ describe('RPC Handlers', () => {
 
     test('should reject invalid word count', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.generateEntropyAndEncrypt({ wordCount: 15 }),
         /wordCount must be 12 or 24/
@@ -132,7 +135,7 @@ describe('RPC Handlers', () => {
 
     test('should reject missing word count', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.generateEntropyAndEncrypt({}),
         /wordCount must be 12 or 24/
@@ -143,16 +146,16 @@ describe('RPC Handlers', () => {
   describe('getMnemonicFromEntropy', () => {
     test('should decrypt entropy and return mnemonic', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       // First generate entropy
       const generated = await mockRpc.handlers.generateEntropyAndEncrypt({ wordCount: 12 })
-      
+
       // Then get mnemonic from encrypted entropy
       const result = await mockRpc.handlers.getMnemonicFromEntropy({
         encryptedEntropy: generated.encryptedEntropyBuffer,
         encryptionKey: generated.encryptionKey
       })
-      
+
       assert.ok(result.mnemonic, 'mnemonic should be present')
       assert.strictEqual(typeof result.mnemonic, 'string')
       const words = result.mnemonic.split(' ')
@@ -161,7 +164,7 @@ describe('RPC Handlers', () => {
 
     test('should reject invalid encrypted entropy', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       // Test with invalid base64 (contains invalid characters)
       await assert.rejects(
         async () => await mockRpc.handlers.getMnemonicFromEntropy({
@@ -171,8 +174,8 @@ describe('RPC Handlers', () => {
         (error) => {
           // Should fail either during validation or decryption
           const errorStr = error.message || String(error)
-          return errorStr.includes('encryptedEntropy') || 
-                 errorStr.includes('base64') || 
+          return errorStr.includes('encryptedEntropy') ||
+                 errorStr.includes('base64') ||
                  errorStr.includes('Invalid') ||
                  errorStr.includes('BAD_REQUEST')
         }
@@ -181,9 +184,9 @@ describe('RPC Handlers', () => {
 
     test('should reject missing encryption key', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       const generated = await mockRpc.handlers.generateEntropyAndEncrypt({ wordCount: 12 })
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.getMnemonicFromEntropy({
           encryptedEntropy: generated.encryptedEntropyBuffer
@@ -196,10 +199,10 @@ describe('RPC Handlers', () => {
   describe('getSeedAndEntropyFromMnemonic', () => {
     test('should convert mnemonic to encrypted seed and entropy', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const result = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
-      
+
       assert.ok(result.encryptionKey, 'encryptionKey should be present')
       assert.ok(result.encryptedSeedBuffer, 'encryptedSeedBuffer should be present')
       assert.ok(result.encryptedEntropyBuffer, 'encryptedEntropyBuffer should be present')
@@ -207,7 +210,7 @@ describe('RPC Handlers', () => {
 
     test('should reject invalid mnemonic', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.getSeedAndEntropyFromMnemonic({
           mnemonic: 'invalid mnemonic'
@@ -218,7 +221,7 @@ describe('RPC Handlers', () => {
 
     test('should reject missing mnemonic', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.getSeedAndEntropyFromMnemonic({}),
         /mnemonic/
@@ -229,38 +232,38 @@ describe('RPC Handlers', () => {
   describe('initializeWDK', () => {
     test('should initialize WDK with valid config', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       // First generate seed and entropy
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
-      
+
       // Initialize WDK
       const config = {
         ethereum: { rpcUrl: 'https://eth.example.com' },
         spark: { rpcUrl: 'https://spark.example.com' }
       }
-      
+
       const result = await mockRpc.handlers.initializeWDK({
         config: JSON.stringify(config),
         encryptionKey: seedData.encryptionKey,
         encryptedSeed: seedData.encryptedSeedBuffer
       })
-      
+
       assert.strictEqual(result.status, 'initialized')
       assert.ok(context.wdk, 'WDK should be initialized')
     })
 
     test('should reject missing network config', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
-      
+
       const config = {
         ethereum: { rpcUrl: 'https://eth.example.com' }
         // Missing spark config
       }
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.initializeWDK({
           config: JSON.stringify(config),
@@ -273,10 +276,10 @@ describe('RPC Handlers', () => {
 
     test('should reject invalid config JSON', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.initializeWDK({
           config: 'invalid json',
@@ -289,12 +292,12 @@ describe('RPC Handlers', () => {
 
     test('should reject missing encryption key', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       const config = {
         ethereum: { rpcUrl: 'https://eth.example.com' },
         spark: { rpcUrl: 'https://spark.example.com' }
       }
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.initializeWDK({
           config: JSON.stringify(config),
@@ -308,7 +311,7 @@ describe('RPC Handlers', () => {
   describe('callMethod', () => {
     test('should call WDK method successfully', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       // Initialize WDK first
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
@@ -321,14 +324,14 @@ describe('RPC Handlers', () => {
         encryptionKey: seedData.encryptionKey,
         encryptedSeed: seedData.encryptedSeedBuffer
       })
-      
+
       // Call a method
       const result = await mockRpc.handlers.callMethod({
         methodName: 'getAddress',
         network: 'ethereum',
         accountIndex: 0
       })
-      
+
       assert.ok(result.result, 'result should be present')
       const parsed = JSON.parse(result.result)
       assert.ok(parsed.address, 'address should be in result')
@@ -336,7 +339,7 @@ describe('RPC Handlers', () => {
 
     test('should reject call when WDK not initialized', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.callMethod({
           methodName: 'getAddress',
@@ -349,7 +352,7 @@ describe('RPC Handlers', () => {
 
     test('should reject invalid method name', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
       const config = {
@@ -361,7 +364,7 @@ describe('RPC Handlers', () => {
         encryptionKey: seedData.encryptionKey,
         encryptedSeed: seedData.encryptedSeedBuffer
       })
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.callMethod({
           methodName: 'nonExistentMethod',
@@ -374,7 +377,7 @@ describe('RPC Handlers', () => {
 
     test('should reject invalid account index', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       await assert.rejects(
         async () => await mockRpc.handlers.callMethod({
           methodName: 'getAddress',
@@ -389,7 +392,7 @@ describe('RPC Handlers', () => {
   describe('dispose', () => {
     test('should dispose WDK instance', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       // Initialize WDK first
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
@@ -402,22 +405,21 @@ describe('RPC Handlers', () => {
         encryptionKey: seedData.encryptionKey,
         encryptedSeed: seedData.encryptedSeedBuffer
       })
-      
+
       assert.ok(context.wdk, 'WDK should be initialized')
-      
+
       // Dispose
       await mockRpc.handlers.dispose()
-      
+
       assert.strictEqual(context.wdk, null, 'WDK should be disposed')
     })
 
     test('should handle dispose when WDK not initialized', async () => {
       registerRpcHandlers(mockRpc, context)
-      
+
       // Should not throw
       await mockRpc.handlers.dispose()
       assert.strictEqual(context.wdk, null)
     })
   })
 })
-

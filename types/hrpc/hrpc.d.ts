@@ -8,7 +8,7 @@ import type {
   WdkInitializeParams,
   WdkGenerateEntropyParams,
   WdkEntropyResult,
-  WdkGetMnemonicParams
+  WdkGetMnemonicParams,
 } from '../rpc';
 
 /**
@@ -34,54 +34,54 @@ export class HRPC {
 
   /**
    * Send a log message
-   * @param args - Log request
    */
   log(args: LogRequest): void;
 
   /**
    * @deprecated
    * Start the worklet
-   * @param args - Worklet start request
-   * @returns Promise resolving to worklet start response
    */
   workletStart(args: WorkletStartRequest): Promise<WorkletStartResponse>;
 
   /**
    * Initialize WDK
-   * @param args - Initialization parameters
    */
   initializeWDK(args: WdkInitializeParams): Promise<{ status: string }>;
 
   /**
    * Generate entropy and encrypt it
-   * @param args - Generation parameters
    */
   generateEntropyAndEncrypt(args: WdkGenerateEntropyParams): Promise<WdkEntropyResult>;
 
   /**
    * Get mnemonic from encrypted entropy
-   * @param args - Parameters
    */
   getMnemonicFromEntropy(args: WdkGetMnemonicParams): Promise<{ mnemonic: string }>;
 
   /**
    * Get encrypted seed and entropy from mnemonic
-   * @param args - Parameters
    */
   getSeedAndEntropyFromMnemonic(args: { mnemonic: string }): Promise<WdkEntropyResult>;
 
   /**
    * Dispose of the worklet
-   * @param args - Dispose request
    */
   dispose(args: DisposeRequest): void;
 
   /**
    * Call a method on a wallet account
-   * @param args - Call method request
-   * @returns Promise resolving to call method response
    */
   callMethod(args: CallMethodRequest): Promise<CallMethodResponse>;
+  
+  /**
+   * Register a new wallet dynamically
+   */
+  registerWallet(args: { config: string }): Promise<{ status: string, blockchains: string }>;
+
+  /**
+   * Register a new protocol dynamically
+   */
+  registerProtocol(args: { config: string }): Promise<{ status: string }>;
 
   /**
    * Register a handler for log messages
@@ -133,6 +133,20 @@ export class HRPC {
    */
   onCallMethod(
     responseFn: (request: CallMethodRequest) => Promise<CallMethodResponse>
+  ): void;
+  
+  /**
+   * Register a handler for wallet registration
+   */
+  onRegisterWallet(
+    responseFn: (request: { config: string }) => Promise<{ status: string, blockchains: string }>
+  ): void;
+
+  /**
+   * Register a handler for protocol registration
+   */
+  onRegisterProtocol(
+    responseFn: (request: { config: string }) => Promise<{ status: string }>
   ): void;
 }
 

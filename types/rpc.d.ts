@@ -1,23 +1,15 @@
-/**
- * Log type enumeration
- */
 export enum LogType {
   INFO = 1,
   ERROR = 2,
-  DEBUG = 3
+  DEBUG = 3,
 }
 
-/**
- * Log request message
- */
 export interface LogRequest {
   type?: LogType;
   data?: string | null;
 }
 
-/**
- * Worklet start request
- */
+/** @deprecated */
 export interface WorkletStartRequest {
   enableDebugLogs?: number;
   seedPhrase?: string | null;
@@ -25,41 +17,72 @@ export interface WorkletStartRequest {
   config: string; // JSON string of network configurations
 }
 
-/**
- * Worklet start response
- */
 export interface WorkletStartResponse {
   status?: string | null;
 }
 
-/**
- * Dispose request (empty)
- */
 export interface DisposeRequest {
   // Empty request
 }
 
-/**
- * Call method request
- */
-export interface CallMethodRequest {
-  methodName: string;
-  network: string;
-  accountIndex: number;
-  args?: string | null; // JSON string of method arguments
+export interface RpcContext {
+  // WDK instance (can be null)
+  wdk: any;
+
+  // WDK class constructor
+  WDK: new (...args: any[]) => any;
+
+  // Wallet managers map
+  walletManagers: Record<string, unknown>;
+
+  // Protocol managers map
+  protocolManagers: Record<string, unknown>;
+
+  // WDK load error (if any)
+  wdkLoadError: any;
 }
 
-/**
- * Call method response
- */
+export interface CallMethodRequest {
+  // The method name to call on the account (e.g., 'getAddress', 'getBalance')
+  methodName: string;
+
+  // Network name (e.g., 'ethereum', 'spark')
+  network: string;
+
+  // Account index
+  accountIndex: number;
+
+  // JSON string of arguments to pass to the method
+  args?: string;
+
+  // JSON string of CallMethodOptions
+  options?: string;
+}
+
 export interface CallMethodResponse {
   result?: string | null; // JSON string of method result
+}
+
+export interface CallMethodOptions {
+  // Optional function to transform the result
+  transformResult: Function;
+
+  // Default value to return if method doesn't exist
+  defaultValue: any;
+
+  // Protocol type (e.g., 'swap', 'bridge', 'lending', 'fiat')
+  protocolType: ProtocolType;
+
+  // Protocol name (e.g., 'USDT0')
+  protocolName: string;
 }
 
 export interface WdkInitializeParams {
   encryptionKey: string;
   encryptedSeed: string;
-  config: string;
+  
+  // JSON string of WdkWorkletConfig
+  config: string; 
 }
 
 export interface WdkGenerateEntropyParams {
@@ -77,6 +100,13 @@ export interface WdkGetMnemonicParams {
   encryptionKey: string;
 }
 
+export enum ProtocolType {
+  SWAP = "swap",
+  BRIDGE = "bridge",
+  LENDING = "lending",
+  FIAT = "fiat",
+}
+
 /**
  * Network configuration map
  * Keys are network names (e.g., 'ethereum', 'spark')
@@ -84,4 +114,16 @@ export interface WdkGetMnemonicParams {
  */
 export interface NetworkConfigs {
   [networkName: string]: unknown;
+}
+
+export interface ProtocolConfigs {
+  [protocolName: string]: {
+    config: unknown;
+    network: string; // Must match networkName in NetworkConfigs
+  };
+}
+
+export interface WdkWorkletConfig {
+  networks: NetworkConfigs;
+  protocols?: ProtocolConfigs;
 }

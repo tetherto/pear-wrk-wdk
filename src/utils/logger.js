@@ -20,9 +20,9 @@ function getLogLevel () {
   if (typeof process === 'undefined' || !process.env) {
     return LOG_LEVELS.INFO
   }
-  
+
   const level = process.env.LOG_LEVEL || (process.env.NODE_ENV === 'development' ? 'DEBUG' : 'INFO')
-  
+
   switch (level.toUpperCase()) {
     case 'DEBUG':
       return LOG_LEVELS.DEBUG
@@ -54,7 +54,7 @@ const logger = {
       console.debug('[DEBUG]', ...args)
     }
   },
-  
+
   /**
    * Log info message
    * @param {...any} args - Arguments to log
@@ -64,7 +64,7 @@ const logger = {
       console.log('[INFO]', ...args)
     }
   },
-  
+
   /**
    * Log warning message
    * @param {...any} args - Arguments to log
@@ -74,7 +74,7 @@ const logger = {
       console.warn('[WARN]', ...args)
     }
   },
-  
+
   /**
    * Log error message
    * @param {...any} args - Arguments to log
@@ -87,4 +87,3 @@ const logger = {
 }
 
 module.exports = logger
-

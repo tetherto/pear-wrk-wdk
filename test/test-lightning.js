@@ -2,10 +2,10 @@
 
 /**
  * Test script to generate a Lightning invoice using the worklet
- * 
+ *
  * Usage:
  *   bare test/test-lightning.js
- * 
+ *
  * Or with a custom seed phrase:
  *   bare test/test-lightning.js "word1 word2 ... word12"
  */
@@ -52,7 +52,7 @@ try {
   process.exit(1)
 }
 
-async function testLightningInvoice() {
+async function testLightningInvoice () {
   try {
     console.log('⚡ Testing Lightning Invoice Generation\n')
     console.log(`Using seed phrase: ${seedPhrase.split(' ').slice(0, 3).join(' ')}... (${seedPhrase.split(' ').length} words)\n`)
@@ -60,7 +60,7 @@ async function testLightningInvoice() {
     // Step 1: Initialize the worklet
     console.log('📝 Step 1: Initializing worklet...')
     const initResult = await hrpc.workletStart({
-      seedPhrase: seedPhrase,
+      seedPhrase,
       config: JSON.stringify(networkConfigs)
     })
     console.log('✓ Worklet initialized:', initResult)
@@ -69,7 +69,7 @@ async function testLightningInvoice() {
     // Step 2: Generate Lightning invoice
     console.log('⚡ Step 2: Generating Lightning invoice...')
     console.log('   (This uses the Spark network to create a Lightning invoice)\n')
-    
+
     const result = await hrpc.getAddress({
       network: 'lightning',
       accountIndex: 0
@@ -86,7 +86,6 @@ async function testLightningInvoice() {
     console.log('✓ Worklet disposed\n')
 
     console.log('✅ Test completed successfully!')
-    
   } catch (error) {
     console.error('\n❌ Error during test:')
     console.error(error.message)
@@ -94,14 +93,14 @@ async function testLightningInvoice() {
       console.error('\nStack trace:')
       console.error(error.stack)
     }
-    
+
     // Try to cleanup on error
     try {
       hrpc.dispose({})
     } catch (e) {
       // Ignore cleanup errors
     }
-    
+
     process.exit(1)
   }
 }
@@ -111,5 +110,3 @@ testLightningInvoice().catch((error) => {
   console.error('Fatal error:', error)
   process.exit(1)
 })
-
-

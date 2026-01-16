@@ -7,7 +7,7 @@
 // This allows tests to run in Node.js without requiring Bare runtime
 if (typeof require !== 'undefined') {
   const nodeCrypto = require('crypto')
-  
+
   // Create a mock bare-crypto that uses Node's crypto
   const mockBareCrypto = {
     randomBytes: (size) => nodeCrypto.randomBytes(size),
@@ -26,11 +26,11 @@ if (typeof require !== 'undefined') {
       return decipher
     }
   }
-  
+
   // Override require for bare-crypto in test environment
   const Module = require('module')
   const originalRequire = Module.prototype.require
-  
+
   Module.prototype.require = function (id) {
     if (id === 'bare-crypto') {
       return mockBareCrypto
@@ -38,4 +38,3 @@ if (typeof require !== 'undefined') {
     return originalRequire.apply(this, arguments)
   }
 }
-

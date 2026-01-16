@@ -16,4 +16,3 @@ function safeStringify (obj) {
 module.exports = {
   safeStringify
 }
-

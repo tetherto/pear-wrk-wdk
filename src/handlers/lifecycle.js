@@ -1,0 +1,155 @@
+const ERROR_CODES = require('../exceptions/error-codes')
+const { decrypt } = require('../utils/crypto')
+const logger = require('../utils/logger')
+const {
+  validateBase64,
+  validateJSON,
+  validateNonEmptyString,
+  validateRequest,
+  createErrorWithCode
+} = require('../utils/validation')
+
+/** @typedef {import('../../types/rpc').WdkInitializeParams} WdkInitializeParams */
+/** @typedef {import('../../types/rpc').RpcContext} RpcContext */
+/** @typedef {import('../../types/rpc').WdkWorkletConfig} WdkWorkletConfig */
+
+/**
+ *
+ * @param {WdkInitializeParams} init
+ * @param {RpcContext} context
+ * @returns {Promise<{ status: string }>}
+ */
+async function initializeWdkHandler (init, context) {
+  const { WDK, walletManagers, wdk, wdkLoadError, protocolManagers } = context
+
+  // Validate request object (validation of fields happens below)
+  if (!init || typeof init !== 'object') {
+    throw createErrorWithCode(
+      'Init must be an object',
+      ERROR_CODES.BAD_REQUEST
+    )
+  }
+
+  if (!WDK) {
+    const errorMsg = wdkLoadError
+      ? `WDK failed to load: ${wdkLoadError.message}\nStack: ${wdkLoadError.stack || 'No stack trace'}`
+      : 'WDK not loaded - unknown error during initialization'
+    throw createErrorWithCode(errorMsg, ERROR_CODES.WDK_MANAGER_INIT)
+  }
+
+  if (wdk) {
+    logger.info('Disposing existing WDK instance...')
+    wdk.dispose()
+  }
+
+  /** @type {WdkWorkletConfig} */
+  let workletConfig
+  validateRequest(
+    init,
+    () => {
+      validateNonEmptyString(init.config, 'config')
+      workletConfig = validateJSON(init.config, 'config')
+
+      // Validate encrypted seed and encryption key
+      if (!init.encryptionKey || !init.encryptedSeed) {
+        throw createErrorWithCode(
+          '(encryptionKey + encryptedSeed) must be provided',
+          ERROR_CODES.BAD_REQUEST
+        )
+      }
+      validateBase64(init.encryptionKey, 'encryptionKey')
+      validateBase64(init.encryptedSeed, 'encryptedSeed')
+    },
+    'Init'
+  )
+
+  if (
+    !workletConfig ||
+    !workletConfig.networks ||
+    typeof workletConfig.networks !== 'object' ||
+    Object.keys(workletConfig.networks).length === 0
+  ) {
+    throw createErrorWithCode(
+      'At least one network configuration must be provided',
+      ERROR_CODES.BAD_REQUEST
+    )
+  }
+
+  logger.info('Initializing WDK with encrypted seed')
+  let decryptedSeedBuffer
+  try {
+    decryptedSeedBuffer = decrypt(init.encryptedSeed, init.encryptionKey)
+  } catch (error) {
+    throw createErrorWithCode(
+      `Failed to decrypt seed: ${error.message}`,
+      ERROR_CODES.BAD_REQUEST
+    )
+  }
+
+  context.wdk = new WDK(decryptedSeedBuffer)
+
+  for (const [networkName, config] of Object.entries(workletConfig.networks)) {
+    if (config && typeof config === 'object') {
+      const walletManager = walletManagers[networkName]
+
+      if (!walletManager) {
+        throw createErrorWithCode(
+          `No wallet manager found for network: ${networkName}`,
+          ERROR_CODES.WDK_MANAGER_INIT
+        )
+      }
+
+      logger.info(`Registering ${networkName} wallet`)
+      context.wdk.registerWallet(networkName, walletManager, config)
+    }
+  }
+
+  if (
+    workletConfig.protocols &&
+    Object.keys(workletConfig.protocols).length > 0
+  ) {
+    for (const [protocolName, protocolConfig] of Object.entries(
+      workletConfig.protocols
+    )) {
+      const protocolManager = protocolManagers[protocolName]
+      if (!protocolManager) {
+        throw createErrorWithCode(
+          `No protocol manager found for protocol: ${protocolName}`,
+          ERROR_CODES.WDK_MANAGER_INIT
+        )
+      }
+      if (!walletManagers[protocolConfig.network]) {
+        throw createErrorWithCode(
+          `No wallet manager found for network: ${protocolConfig.network}`,
+          ERROR_CODES.BAD_REQUEST
+        )
+      }
+      logger.info(`Registering ${protocolName} protocol`)
+      context.wdk.registerProtocol(
+        protocolConfig.network,
+        protocolName,
+        protocolManager,
+        protocolConfig.config
+      )
+    }
+  }
+  logger.info('WDK initialization complete')
+  return { status: 'initialized' }
+}
+
+/**
+ *
+ * @param {any} request
+ * @param {RpcContext} context
+ */
+async function disposeWdkHandler (request, context) {
+  if (context.wdk) {
+    context.wdk.dispose()
+    context.wdk = null
+  }
+}
+
+module.exports = {
+  initializeWdkHandler,
+  disposeWdkHandler
+}
