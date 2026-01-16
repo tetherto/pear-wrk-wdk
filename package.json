@@ -21,10 +21,12 @@
     "@tetherto/wdk-wallet-spark": "1.0.0-beta.6",
     "bare-pack": "^2.0.0",
     "bufferutil": "^4.1.0",
+    "@tetherto/wdk-protocol-multisig-safe": "github:quocle108/wdk-protocol-multisig-safe#init",
     "hrpc": "4.0.1",
     "hyperschema": "1.12.4",
     "text-encoding": "0.7.0",
-    "utf-8-validate": "5.0.10"
+    "utf-8-validate": "5.0.10",
+    "encoding": "^0.1.13"
   },
   "devDependencies": {
     "bare-ipc": "^1.1.1",
