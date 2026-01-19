@@ -14,6 +14,7 @@
   },
   "files": [
     "index.js",
+    "worklet.js",
     "src",
     "types",
     "generated",
@@ -36,6 +37,10 @@
     ".": {
       "types": "./types/index.d.ts",
       "default": "./index.js"
+    },
+    "./worklet": {
+      "types": "./types/index.d.ts",
+      "default": "./worklet.js"
     },
     "./package.json": "./package.json",
     "./hrpc": {
