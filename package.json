@@ -23,7 +23,6 @@
   ],
   "dependencies": {
     "@scure/bip39": "^1.6.0",
-    "bare-node-runtime": "^1.1.4", 
     "hrpc": "^4.0.1",
     "hyperschema": "^1.12.4"
   },
