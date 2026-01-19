@@ -9,8 +9,16 @@
     "test": "node --test test/**/*.test.js",
     "test:watch": "node --test --watch test/**/*.test.js",
     "gen:hrpc": "node scripts/generate-hrpc.js",
+    "prepare": "npm run gen:hrpc",
     "prepublish": "npm run gen:hrpc"
   },
+  "files": [
+    "index.js",
+    "types",
+    "generated",
+    "package.json",
+    "README.md"
+  ],
   "dependencies": {
     "@scure/bip39": "^1.6.0",
     "bare-node-runtime": "^1.1.4", 
