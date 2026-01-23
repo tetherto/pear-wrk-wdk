@@ -112,19 +112,15 @@ export enum ProtocolType {
  * Keys are network names (e.g., 'ethereum', 'spark')
  * Values are network-specific configuration objects
  */
-export interface NetworkConfigs {
-  [blockchain: string]: {
-    blockchain: string;
-    config: unknown;
-  };
+export interface NetworkConfig {
+  blockchain: string;
+  config: unknown;
 }
 
-export interface ProtocolConfigs {
-  [protocolName: string]: {
-    config: unknown;
-    blockchain: string;
-    protocolName: string;
-  };
+export interface ProtocolConfig {
+  blockchain: string;
+  protocolName: string;
+  config: unknown;
 }
 
 /**
@@ -157,6 +153,10 @@ export interface ProtocolConfigs {
  * }
  */
 export interface WdkWorkletConfig {
-  networks: NetworkConfigs;
-  protocols?: ProtocolConfigs;
+  networks: {
+    [blockchain: string]: NetworkConfig
+  };
+  protocols?: {
+    [protocolName: string]: ProtocolConfig
+  };
 }
