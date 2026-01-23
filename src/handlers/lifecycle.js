@@ -88,8 +88,10 @@ async function initializeWdkHandler (init, context) {
 
   context.wdk = new WDK(decryptedSeedBuffer)
 
-  for (const [networkName, config] of Object.entries(workletConfig.networks)) {
-    if (config && typeof config === 'object') {
+  for (const networkConfig of Object.values(workletConfig.networks)) {
+    const networkName = networkConfig.blockchain
+    
+    if (networkConfig.config && typeof networkConfig.config === 'object') {
       const walletManager = walletManagers[networkName]
 
       if (!walletManager) {
@@ -100,7 +102,7 @@ async function initializeWdkHandler (init, context) {
       }
 
       logger.info(`Registering ${networkName} wallet`)
-      context.wdk.registerWallet(networkName, walletManager, config)
+      context.wdk.registerWallet(networkName, walletManager, networkConfig.config)
     }
   }
 
@@ -108,25 +110,26 @@ async function initializeWdkHandler (init, context) {
     workletConfig.protocols &&
     Object.keys(workletConfig.protocols).length > 0
   ) {
-    for (const [protocolName, protocolConfig] of Object.entries(
-      workletConfig.protocols
-    )) {
+    for (const protocolConfig of Object.values(workletConfig.protocols)) {
+      const protocolName = protocolConfig.protocolName
       const protocolManager = protocolManagers[protocolName]
+
       if (!protocolManager) {
         throw createErrorWithCode(
           `No protocol manager found for protocol: ${protocolName}`,
           ERROR_CODES.WDK_MANAGER_INIT
         )
       }
-      if (!walletManagers[protocolConfig.network]) {
+
+      if (!walletManagers[protocolConfig.blockchain]) {
         throw createErrorWithCode(
-          `No wallet manager found for network: ${protocolConfig.network}`,
+          `No wallet manager found for network: ${protocolConfig.blockchain}`,
           ERROR_CODES.BAD_REQUEST
         )
       }
       logger.info(`Registering ${protocolName} protocol`)
       context.wdk.registerProtocol(
-        protocolConfig.network,
+        protocolConfig.blockchain,
         protocolName,
         protocolManager,
         protocolConfig.config

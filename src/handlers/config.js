@@ -48,8 +48,10 @@ async function registerWalletHandler (request, context) {
   }
 
   const registeredBlockchains = []
-  for (const [networkName, config] of Object.entries(networkConfigs)) {
-    if (config && typeof config === 'object') {
+  for (const networkConfig of Object.values(networkConfigs)) {
+    const networkName = networkConfig.blockchain
+
+    if (networkConfig.config && typeof networkConfig.config === 'object') {
       const walletManager = walletManagers[networkName]
 
       if (!walletManager) {
@@ -60,7 +62,7 @@ async function registerWalletHandler (request, context) {
       }
 
       logger.info(`Registering ${networkName} wallet dynamically`)
-      wdk.registerWallet(networkName, walletManager, config)
+      wdk.registerWallet(networkName, walletManager, networkConfig.config)
       registeredBlockchains.push(networkName)
     }
   }
@@ -89,7 +91,7 @@ async function registerProtocolHandler (request, context) {
   const { wdk, protocolManagers, walletManagers } = context
 
   /** @type {ProtocolConfigs} */
-  const protocols = validateJSON(workletConfig, 'config')
+  const protocolConfigs = validateJSON(workletConfig, 'config')
 
   if (!wdk) {
     throw createErrorWithCode(
@@ -98,7 +100,9 @@ async function registerProtocolHandler (request, context) {
     )
   }
 
-  for (const [protocolName, protocolConfig] of Object.entries(protocols)) {
+  for (const protocolConfig of Object.values(protocolConfigs)) {
+    const protocolName = protocolConfig.protocolName
+    
     if (protocolConfig && typeof protocolConfig === 'object') {
       const protocolManager = protocolManagers[protocolName]
 
@@ -109,7 +113,7 @@ async function registerProtocolHandler (request, context) {
         )
       }
 
-      if (!walletManagers[protocolConfig.network]) {
+      if (!walletManagers[protocolConfig.blockchain]) {
         throw createErrorWithCode(
           `No wallet manager found for network: ${protocolConfig.network}`,
           ERROR_CODES.BAD_REQUEST
@@ -121,7 +125,7 @@ async function registerProtocolHandler (request, context) {
       )
 
       wdk.registerProtocol(
-        protocolConfig.network,
+        protocolConfig.blockchain,
         protocolName,
         protocolManager,
         protocolConfig.config

@@ -113,16 +113,49 @@ export enum ProtocolType {
  * Values are network-specific configuration objects
  */
 export interface NetworkConfigs {
-  [networkName: string]: unknown;
+  [blockchain: string]: {
+    blockchain: string;
+    config: unknown;
+  };
 }
 
 export interface ProtocolConfigs {
   [protocolName: string]: {
     config: unknown;
-    network: string; // Must match networkName in NetworkConfigs
+    blockchain: string;
+    protocolName: string;
   };
 }
 
+/**
+ * Worklet configuration object
+ * 
+ * Example:
+ * {
+ *   networks: {
+ *     ethereum: {
+ *       blockchain: 'ethereum',
+ *       config: { ... }
+ *     },
+ *     bitcoin: {
+ *       blockchain: 'bitcoin',
+ *       config: { ... }
+ *     }
+ *   },
+ *   protocols: {
+ *     aaveLending: {
+ *       protocolName: 'aaveLending',
+ *       blockchain: 'ethereum',
+ *       config: { ... }
+ *     },
+ *     uniswap: {
+ *       protocolName: 'uniswap',
+ *       blockchain: 'polygon',
+ *       config: { ... }
+ *     }
+ *   }
+ * }
+ */
 export interface WdkWorkletConfig {
   networks: NetworkConfigs;
   protocols?: ProtocolConfigs;
