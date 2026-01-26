@@ -102,7 +102,7 @@ async function registerProtocolHandler (request, context) {
 
   for (const protocolConfig of Object.values(protocolConfigs)) {
     const protocolName = protocolConfig.protocolName
-    
+
     if (protocolConfig && typeof protocolConfig === 'object') {
       const protocolManager = protocolManagers[protocolName]
 

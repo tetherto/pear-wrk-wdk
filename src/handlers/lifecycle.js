@@ -90,7 +90,7 @@ async function initializeWdkHandler (init, context) {
 
   for (const networkConfig of Object.values(workletConfig.networks)) {
     const networkName = networkConfig.blockchain
-    
+
     if (networkConfig.config && typeof networkConfig.config === 'object') {
       const walletManager = walletManagers[networkName]
 

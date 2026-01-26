@@ -1,358 +1,157 @@
-# @wdk/bare
+# @tetherto/pear-wrk-wdk
 
-A secure wallet development kit worklet for handling cryptographic operations including seed phrase generation, encryption, and wallet initialization. This module provides a worklet environment for wallet operations using the WDK (Wallet Development Kit) framework.
+The foundational infrastructure for running the Tether Wallet Development Kit (WDK) inside a **Bare Worklet**.
 
-## Overview
+This package provides the primitives—RPC handlers, lifecycle management, and secure secret storage—to host WDK modules in a separate thread. This architecture allows you to run a full Javascript-based wallet stack anywhere the Bare runtime is embedded (Mobile, Desktop, Server, or Embedded devices) while keeping heavy cryptographic operations isolated from your main application thread.
 
-This module provides a secure worklet implementation that handles:
+## What is a Bare Worklet?
 
-- **Seed Phrase Generation**: Generate BIP39-compliant mnemonic phrases (12 or 24 words)
-- **Encryption**: AES-256-GCM encryption for sensitive data (seeds, entropy)
-- **Wallet Initialization**: Initialize and manage multiple wallet networks
-- **RPC Communication**: HRPC-based communication interface for wallet operations
+A **Bare Worklet** is a lightweight, isolated JavaScript environment (similar to a thread) running within the Bare runtime. Unlike standard Node.js workers, Worklets are designed for the Pear ecosystem to provide high-performance, non-blocking execution contexts.
 
-## Installation
+In the context of a wallet, the Worklet acts as a "security enclave" running in the background. It holds the private keys in memory and performs signing operations, while your main application (the UI) simply sends requests to it.
 
-```bash
-npm install @wdk/bare
-```
+## Why Use This?
+
+The WDK is written in JavaScript, making it highly portable. However, cryptographic operations and network requests can be resource-intensive.
+
+This package enables a **Worklet Architecture** where:
+*   **Write Once, Run Anywhere**: You define your wallet logic (WDK setup) once in JavaScript.
+*   **Thread Isolation**: The wallet runs in a dedicated Bare background thread, preventing UI freezes or main-process blocking on any platform.
+*   **Secure & Standardized**: It provides a pre-built HRPC (Hyper RPC) bridge to communicate securely between your Host Application and the Wallet Worklet.
 
 ## Architecture
 
-The module runs as a worklet in a Bare runtime environment, providing isolation for sensitive cryptographic operations. It uses:
+This package acts as the infrastructure layer for your worklet, handling the "plumbing" so you can focus on the wallet logic.
 
-- **HRPC**: For RPC communication between the worklet and host
-- **Bare IPC**: For inter-process communication
-- **@scure/bip39**: For BIP39 mnemonic phrase operations
-- **bare-crypto**: For cryptographic operations (AES-256-GCM)
+```mermaid
+graph TD
+    subgraph "Host Application"
+        direction TB
+        Host[Main App / UI]
+        Client[HRPC Client]
+    end
 
-## Setup
+    subgraph "Bare Worklet (Background Thread)"
+        direction TB
+        Entry[worklet.js Entry]
+        Infra["@tetherto/pear-wrk-wdk"]
+        WDK[WDK Core & Modules]
+    end
 
-### Prerequisites
-
-- Node.js (with Bare runtime support)
-- Network configurations for required networks (see Configuration)
-
-### Initial Setup
-
-1. Install dependencies:
-```bash
-npm install
+    Host --> Client
+    Client <== IPC/HRPC ==> Entry
+    Entry --> Infra
+    Entry --> WDK
 ```
 
-2. Generate required files:
-```bash
-npm run gen:wallet-modules
-npm run gen:hrpc
-```
+## Implementation Guide
 
-3. Build bundles (optional):
-```bash
-npm run gen:macos-bundle    # For macOS
-npm run gen:mobile-bundle   # For mobile platforms
-```
+While this package provides the core infrastructure, you typically don't need to implement everything manually. We provide high-level tooling to generate the worklet and consume it easily.
 
-## Configuration
+### Recommended: Automated Tooling
 
-The module requires network configurations for all required networks. Configure networks in the `schema.json` file:
+> **Note**: You likely do not need to install `@tetherto/pear-wrk-wdk` directly. It is a low-level dependency used internally by the higher-level libraries.
 
-```json
-{
-  "config": {
-    "walletModules": {
-      "evmErc4337": {
-        "modulePath": "@tetherto/wdk-wallet-evm-erc-4337",
-        "networks": ["ethereum", "polygon", "arbitrum", "plasma", "sepolia"]
-      },
-      "spark": {
-        "modulePath": "@tetherto/wdk-wallet-spark",
-        "networks": ["spark"]
-      }
-    },
-    "requiredNetworks": ["ethereum", "polygon", "arbitrum", "plasma", "sepolia", "spark"]
-  }
-}
-```
+1.  **Generate the Worklet**: Install **[`@tetherto/wdk-worklet-bundler`](#)** (usually as a dev dependency). It provides a CLI to automatically generate the worklet entry file based on your WDK modules configuration.
+2.  **Connect in your App**: Install **[`@tetherto/wdk-react-native-core`](#)** (or other platform-specific core libraries). This provides ready-to-use hooks to interact with the worklet without needing to manually manage the HRPC connection or the worklet lifecycle.
 
-## API Documentation
+### Manual Implementation (For Custom Setups)
 
-### RPC Methods
+If you are building a custom integration (e.g., for Desktop, Server, or a custom Bare embedding) and cannot use the pre-built tools, you can implement the architecture manually using the primitives in this package.
 
-#### `workletStart`
+#### 1. The Worklet Entry (Background Context)
 
-Initialize the worklet (no longer initializes WDK - use `initializeWDK` instead).
-
-**Request:**
-```typescript
-{
-  enableDebugLogs?: number;
-  seedPhrase?: string;
-  seedBuffer?: string;
-  config: string; // JSON string of network configurations
-}
-```
-
-**Response:**
-```typescript
-{
-  status: string;
-}
-```
-
-#### `initializeWDK`
-
-Initialize the WDK with encrypted seed and network configurations.
-
-**Request:**
-```typescript
-{
-  encryptionKey: string;      // Base64-encoded encryption key
-  encryptedSeed: string;     // Base64-encoded encrypted seed
-  config: string;             // JSON string of network configurations
-}
-```
-
-**Response:**
-```typescript
-{
-  status: string;
-}
-```
-
-#### `generateEntropyAndEncrypt`
-
-Generate entropy and create encrypted seed and entropy buffers.
-
-**Request:**
-```typescript
-{
-  wordCount: number; // 12 or 24
-}
-```
-
-**Response:**
-```typescript
-{
-  encryptionKey: string;           // Base64-encoded encryption key
-  encryptedSeedBuffer: string;      // Base64-encoded encrypted seed
-  encryptedEntropyBuffer: string;   // Base64-encoded encrypted entropy
-}
-```
-
-#### `getMnemonicFromEntropy`
-
-Retrieve mnemonic phrase from encrypted entropy.
-
-**Request:**
-```typescript
-{
-  encryptedEntropy: string;  // Base64-encoded encrypted entropy
-  encryptionKey: string;     // Base64-encoded encryption key
-}
-```
-
-**Response:**
-```typescript
-{
-  mnemonic: string; // BIP39 mnemonic phrase
-}
-```
-
-#### `getSeedAndEntropyFromMnemonic`
-
-Convert mnemonic phrase to encrypted seed and entropy.
-
-**Request:**
-```typescript
-{
-  mnemonic: string; // BIP39 mnemonic phrase (12 or 24 words)
-}
-```
-
-**Response:**
-```typescript
-{
-  encryptionKey: string;           // Base64-encoded encryption key
-  encryptedSeedBuffer: string;    // Base64-encoded encrypted seed
-  encryptedEntropyBuffer: string; // Base64-encoded encrypted entropy
-}
-```
-
-#### `callMethod`
-
-Call any method on a WDK account.
-
-**Request:**
-```typescript
-{
-  methodName: string;    // Method name to call
-  network: string;       // Network name (e.g., 'ethereum', 'spark')
-  accountIndex: number;   // Account index
-  args?: string;         // Optional JSON string of arguments
-}
-```
-
-**Response:**
-```typescript
-{
-  result: string; // JSON string of result
-}
-```
-
-#### `dispose`
-
-Dispose of the WDK instance and clean up resources.
-
-**Request:** (empty)
-
-**Response:** (none)
-
-## Usage Example
+Create an entry file (e.g., `src/worklet.js`) for your background thread. This file configures *which* WDK modules are available. This script runs inside the Bare worklet environment.
 
 ```javascript
-const { bundle, HRPC } = require('@wdk/bare')
+/* src/worklet.js */
+const { registerRpcHandlers } = require('@tetherto/pear-wrk-wdk/worklet')
+const { WDK } = require('@tetherto/wdk')
+
+// Import the specific wallet managers you need
+const EvmWalletManager = require('@tetherto/wdk-wallet-evm')
+const SparkWalletManager = require('@tetherto/wdk-wallet-spark')
+
+// Define the context
+// This tells the infrastructure which modules to expose to the host
+const context = {
+  WDK, 
+  walletManagers: {
+    ethereum: EvmWalletManager,
+    spark: SparkWalletManager
+  },
+  protocolManagers: {}, // e.g. AAVE, Uniswap adapters
+  requiredNetworks: ['ethereum', 'spark'],
+  wdk: null // Initialized via RPC later
+}
+
+// Bind the standard WDK RPC handlers to the provided RPC server
+module.exports = (rpc) => {
+  registerRpcHandlers(rpc, context)
+}
+```
+
+#### 2. The Host Client (Main Context)
+
+In your main application (whether it's a CLI, a Mobile App, or a Desktop App), you connect to the worklet using the `HRPC` client.
+
+```javascript
+const { HRPC } = require('@tetherto/pear-wrk-wdk')
 const IPC = require('bare-ipc')
 
-// Create IPC connection
-const [workletPort, clientPort] = IPC.open()
-const workletIPC = workletPort.connect()
-const clientIPC = clientPort.connect()
+// Initialize the connection to the worklet
+// The specific IPC setup depends on how you embed Bare (e.g. bare-kit, pear)
+const ipc = new IPC() 
+const hrpc = new HRPC(ipc)
 
-// Provide BareKit global
-global.BareKit = { IPC: workletIPC }
+// 1. Secrets Management (Happens inside the worklet)
+// Generates entropy and encrypts it in memory immediately
+const secrets = await hrpc.generateEntropyAndEncrypt({ wordCount: 12 })
 
-// Load the worklet bundle
-require(bundle)
-
-// Create HRPC client
-const hrpc = new HRPC(clientIPC)
-
-// Initialize worklet
-await hrpc.workletStart({
-  config: JSON.stringify(networkConfigs)
-})
-
-// Generate entropy and encrypt
-const { encryptionKey, encryptedSeedBuffer, encryptedEntropyBuffer } = 
-  await hrpc.generateEntropyAndEncrypt({ wordCount: 12 })
-
-// Initialize WDK
+// 2. Initialize the WDK
 await hrpc.initializeWDK({
-  encryptionKey,
-  encryptedSeed: encryptedSeedBuffer,
-  config: JSON.stringify(networkConfigs)
+  encryptionKey: secrets.encryptionKey,
+  encryptedSeed: secrets.encryptedSeedBuffer,
+  config: JSON.stringify({
+    networks: {
+      ethereum: { 
+        blockchain: 'ethereum', 
+        config: { rpcUrl: 'https://...' } 
+      }
+    }
+  })
 })
 
-// Call a method
-const result = await hrpc.callMethod({
+// 3. Execute Wallet Methods
+// The call is serialized, sent to the worklet, executed, and returned
+const address = await hrpc.callMethod({
   methodName: 'getAddress',
   network: 'ethereum',
   accountIndex: 0
 })
-
-// Cleanup
-await hrpc.dispose({})
 ```
 
-## Security Considerations
+## API Reference
 
-### Memory Security
+### Secrets & Security
+*   **`generateEntropyAndEncrypt(wordCount)`**: Generates BIP39 mnemonics and encrypts them immediately in the worklet memory. Returns only the encrypted buffer and key to the host.
+*   **`getMnemonicFromEntropy(encryptedEntropy, key)`**: Decrypts and returns the mnemonic.
+*   **`getSeedAndEntropyFromMnemonic(mnemonic)`**: Migrates an existing mnemonic into the secure encrypted storage format.
 
-- **Sensitive Data Zeroing**: All sensitive buffers (seeds, entropy, keys) are zeroed after use using `memzero()` function
-- **Encryption**: All sensitive data is encrypted using AES-256-GCM before storage or transmission
-- **Isolation**: The worklet runs in an isolated environment, providing additional security
+### WDK Lifecycle
+*   **`initializeWDK(params)`**: Boots up the WDK instance inside the worklet with the provided network config and encrypted seed.
+*   **`dispose()`**: Tears down the WDK instance and clears sensitive memory.
 
-### Error Handling
+### Wallet Interaction
+*   **`callMethod(params)`**: The primary gateway for all wallet actions.
+    *   `methodName`: The WDK method to call (e.g., `sendTransaction`, `signMessage`).
+    *   `network`: The target blockchain (e.g., `ethereum`).
+    *   `args`: Arguments for the method.
 
-- **Error Sanitization**: Error messages are sanitized in production mode to prevent information leakage
-- **Structured Errors**: Errors include error codes for proper categorization
-- **Development Mode**: Stack traces are only included in development mode
-
-### Input Validation
-
-- All RPC handlers include comprehensive input validation
-- Base64 strings are validated before decryption
-- JSON strings are validated before parsing
-- Network names, method names, and account indices are validated
-
-### Best Practices
-
-1. **Never log sensitive data**: The logger automatically filters sensitive information
-2. **Use encrypted storage**: Always store seeds and entropy in encrypted form
-3. **Zero memory after use**: The module automatically zeros sensitive buffers, but be aware of copies
-4. **Validate all inputs**: Input validation is built-in, but validate on the client side too
-5. **Handle errors properly**: Use error codes to handle different error types appropriately
-
-## Error Codes
-
-The module uses the following error codes:
-
-- `UNKNOWN`: Unknown or unclassified error
-- `BAD_REQUEST`: Invalid input or request format
-- `WDK_MANAGER_INIT`: Error during WDK initialization
-- `ACCOUNT_BALANCES`: Error related to account operations
-
-## Logging
-
-The module uses a logging utility with log levels:
-
-- `DEBUG`: Detailed debugging information
-- `INFO`: General informational messages
-- `WARN`: Warning messages
-- `ERROR`: Error messages
-
-Set log level via environment variable:
-```bash
-LOG_LEVEL=DEBUG node your-script.js
-```
-
-## Development
-
-### Scripts
-
-- `npm run build:types` - Build TypeScript type definitions
-- `npm run lint` - Run linter
-- `npm run lint:fix` - Fix linting issues
-- `npm run gen:wallet-modules` - Generate wallet modules file
-- `npm run gen:hrpc` - Generate HRPC files
-- `npm run gen:macos-bundle` - Generate macOS bundle
-- `npm run gen:mobile-bundle` - Generate mobile bundle
-
-### Testing
-
-See `test/test-lightning.js` for an example test implementation.
-
-## Dependencies
-
-### Core Dependencies
-
-- `@scure/bip39`: BIP39 mnemonic phrase operations
-- `@tetherto/wdk`: Wallet Development Kit core
-- `hrpc`: RPC communication protocol
-- `hyperschema`: Schema definition and validation
-- `bare-crypto`: Cryptographic operations
-
-### Wallet Modules
-
-- `@tetherto/wdk-wallet-evm-erc-4337`: EVM ERC-4337 wallet support
-- `@tetherto/wdk-wallet-spark`: Spark network wallet support
+### Dynamic Registration
+*   **`registerWallet(config)`**: Add support for a new blockchain network at runtime.
+*   **`registerProtocol(config)`**: Add support for a new protocol (e.g., DeFi adapter) at runtime.
 
 ## License
 
 Apache-2.0
-
-## Author
-
-Tether
-
-## Contributing
-
-When contributing to this module:
-
-1. Follow the existing code style (Standard JS)
-2. Add input validation for all new RPC handlers
-3. Use the logging utility instead of console.log
-4. Zero out sensitive memory after use
-5. Add appropriate error codes for new error types
-6. Update this README for any API changes
-
