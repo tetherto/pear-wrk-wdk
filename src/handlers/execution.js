@@ -131,7 +131,12 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
 
   logger.info('Args:', args)
 
-  const result = await account[methodName](args)
+  // Support array args for multi-parameter methods (e.g., transfer(options, config))
+  // - Array: spread as positional arguments -> method(arg1, arg2, ...)
+  // - Non-array (object/primitive): pass as single argument -> method(args)
+  // - null/undefined: call with no arguments -> method()
+  const argsArray = Array.isArray(args) ? args : (args !== null && args !== undefined ? [args] : [])
+  const result = await account[methodName](...argsArray)
 
   if (options?.transformResult) {
     return options.transformResult(result)
