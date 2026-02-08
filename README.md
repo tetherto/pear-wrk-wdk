@@ -139,13 +139,17 @@ const address = await hrpc.callMethod({
 *   **`getSeedAndEntropyFromMnemonic(mnemonic)`**: Migrates an existing mnemonic into the secure encrypted storage format.
 
 ### WDK Lifecycle
-*   **`initializeWDK(params)`**: Boots up the WDK instance inside the worklet with the provided network config and encrypted seed.
+*   **`initializeWDK(params)`**: Boots up the WDK instance inside the worklet.
+    *   `encryptionKey`: The key to decrypt the seed (returned by `generateEntropyAndEncrypt`).
+    *   `encryptedSeed`: The encrypted seed buffer (returned by `generateEntropyAndEncrypt`).
+    *   `config`: JSON stringified configuration object (must contain `networks`).
 *   **`dispose()`**: Tears down the WDK instance and clears sensitive memory.
 
 ### Wallet Interaction
 *   **`callMethod(params)`**: The primary gateway for all wallet actions.
     *   `methodName`: The WDK method to call (e.g., `sendTransaction`, `signMessage`).
     *   `network`: The target blockchain (e.g., `ethereum`).
+    *   `accountIndex`: The index of the account to use (e.g., `0`).
     *   `args`: Arguments for the method.
 
 ### Dynamic Registration
