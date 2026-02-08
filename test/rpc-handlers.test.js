@@ -21,6 +21,8 @@ const mockRpc = {
   onGetSeedAndEntropyFromMnemonic: function (handler) { this.handlers.getSeedAndEntropyFromMnemonic = handler },
   onInitializeWDK: function (handler) { this.handlers.initializeWDK = handler },
   onCallMethod: function (handler) { this.handlers.callMethod = handler },
+  onRegisterWallet: function (handler) { this.handlers.registerWallet = handler },
+  onRegisterProtocol: function (handler) { this.handlers.registerProtocol = handler },
   onDispose: function (handler) { this.handlers.dispose = handler }
 }
 
@@ -239,8 +241,10 @@ describe('RPC Handlers', () => {
 
       // Initialize WDK
       const config = {
-        ethereum: { rpcUrl: 'https://eth.example.com' },
-        spark: { rpcUrl: 'https://spark.example.com' }
+        networks: {
+          ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } },
+          spark: { blockchain: 'spark', config: { rpcUrl: 'https://spark.example.com' } }
+        }
       }
 
       const result = await mockRpc.handlers.initializeWDK({
@@ -260,8 +264,7 @@ describe('RPC Handlers', () => {
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
 
       const config = {
-        ethereum: { rpcUrl: 'https://eth.example.com' }
-        // Missing spark config
+        networks: {}
       }
 
       await assert.rejects(
@@ -270,7 +273,7 @@ describe('RPC Handlers', () => {
           encryptionKey: seedData.encryptionKey,
           encryptedSeed: seedData.encryptedSeedBuffer
         }),
-        /Missing network configurations/
+        /At least one network configuration must be provided/
       )
     })
 
@@ -294,8 +297,10 @@ describe('RPC Handlers', () => {
       registerRpcHandlers(mockRpc, context)
 
       const config = {
-        ethereum: { rpcUrl: 'https://eth.example.com' },
-        spark: { rpcUrl: 'https://spark.example.com' }
+        networks: {
+          ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } },
+          spark: { blockchain: 'spark', config: { rpcUrl: 'https://spark.example.com' } }
+        }
       }
 
       await assert.rejects(
@@ -316,8 +321,10 @@ describe('RPC Handlers', () => {
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
       const config = {
-        ethereum: { rpcUrl: 'https://eth.example.com' },
-        spark: { rpcUrl: 'https://spark.example.com' }
+        networks: {
+          ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } },
+          spark: { blockchain: 'spark', config: { rpcUrl: 'https://spark.example.com' } }
+        }
       }
       await mockRpc.handlers.initializeWDK({
         config: JSON.stringify(config),
@@ -356,8 +363,10 @@ describe('RPC Handlers', () => {
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
       const config = {
-        ethereum: { rpcUrl: 'https://eth.example.com' },
-        spark: { rpcUrl: 'https://spark.example.com' }
+        networks: {
+          ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } },
+          spark: { blockchain: 'spark', config: { rpcUrl: 'https://spark.example.com' } }
+        }
       }
       await mockRpc.handlers.initializeWDK({
         config: JSON.stringify(config),
@@ -397,8 +406,10 @@ describe('RPC Handlers', () => {
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
       const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
       const config = {
-        ethereum: { rpcUrl: 'https://eth.example.com' },
-        spark: { rpcUrl: 'https://spark.example.com' }
+        networks: {
+          ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } },
+          spark: { blockchain: 'spark', config: { rpcUrl: 'https://spark.example.com' } }
+        }
       }
       await mockRpc.handlers.initializeWDK({
         config: JSON.stringify(config),

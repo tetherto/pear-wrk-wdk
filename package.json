@@ -9,8 +9,8 @@
     "test": "node --test test/**/*.test.js",
     "test:watch": "node --test --watch test/**/*.test.js",
     "gen:hrpc": "node scripts/generate-hrpc.js",
-    "prepare": "npm run gen:hrpc",
-    "prepublish": "npm run gen:hrpc"
+    "gen:schema": "npm run gen:hrpc",
+    "prepare": "npm run gen:hrpc"
   },
   "files": [
     "index.js",
