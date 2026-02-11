@@ -2,4 +2,6 @@
 /.idea
 .DS_Store
 *.bundle.js
-generated/
+generated/bundle/
+generated/schema/
+generated/wallet-modules.js
