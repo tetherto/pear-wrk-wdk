@@ -434,7 +434,8 @@ class WdkManager {
 
     const erc20Abi = ['function approve(address spender, uint256 amount) external returns (bool)']
 
-    const contract = new this._imports.ethers.Contract(token, erc20Abi)
+    const { ethers } = await import('ethers')
+    const contract = new ethers.Contract(token, erc20Abi)
 
     return {
       to: token,
