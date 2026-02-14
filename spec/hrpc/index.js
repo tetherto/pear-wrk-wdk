@@ -75,6 +75,10 @@ class HRPC {
     ])
     this._rpc = new RPC(stream, async (req) => {
       const command = methods.get(req.command)
+      if (command === undefined) {
+        req.error(new Error('Unknown command: ' + req.command))
+        return
+      }
       const responseEncoding = this._responseEncodings.get(command)
       const requestEncoding = this._requestEncodings.get(command)
       if (this._requestIsSend(command)) {
