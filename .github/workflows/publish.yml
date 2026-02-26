@@ -41,16 +41,6 @@ jobs:
         run: npm install -g bare
 
       - run: npm run gen:schema
-      - run: npm run gen:bundle
-
-      - name: Upload bundle artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: worklet-bundle
-          path: |
-            bundle/worklet.bundle.mjs
-            bundle/worklet.bundle.d.mts
-          if-no-files-found: error
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')

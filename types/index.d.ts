@@ -1,11 +1,20 @@
-export { default } from "./src/wdk-core/wdk-manager.js";
-export { default as HRPC } from "./spec/hrpc/index.js";
-export { default as bundle } from "./bundle/worklet.bundle.mjs";
-export type FeeRates = import("@tetherto/wdk-wallet").FeeRates;
-export type TransferOptions = import("@tetherto/wdk-wallet").TransferOptions;
-export type TransferResult = import("@tetherto/wdk-wallet").TransferResult;
-export type IWalletAccount = import("@tetherto/wdk-wallet").IWalletAccount;
-export type Seed = import("./src/wdk-core/wdk-manager.js").Seed;
-export type Seeds = import("./src/wdk-core/wdk-manager.js").Seeds;
-export type WdkConfig = import("./src/wdk-core/wdk-manager.js").WdkConfig;
-export type TransferConfig = import("./src/wdk-core/wdk-manager.js").TransferConfig;
+import { RpcContext } from './rpc';
+
+export { HRPC } from './hrpc/hrpc';
+export * from './rpc';
+
+/**
+ * Register all RPC handlers with the provided RPC instance
+ */
+export function registerRpcHandlers(rpc: any, context: RpcContext): void;
+
+export const utils: {
+  crypto: typeof import('./utils/crypto');
+  logger: typeof import('./utils/logger').default;
+  validation: typeof import('./utils/validation');
+};
+
+export const exceptions: {
+  errorCodes: typeof import('./exceptions/error-codes').default;
+  rpcExceptionPayload: typeof import('./exceptions/rpc-exception');
+};
