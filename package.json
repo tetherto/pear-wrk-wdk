@@ -48,5 +48,9 @@
     }
   },
   "author": "Tether",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tetherto/pear-wrk-wdk.git"
+  }
 }
