@@ -1,6 +1,6 @@
 # @tetherto/pear-wrk-wdk
 
-The foundational infrastructure for running the Tether Wallet Development Kit (WDK) inside a **Bare Worklet**.
+The foundational infrastructure for running the Tether Wallet Development Kit (WDK) inside a **Bare Worklet**. 
 
 This package provides the primitives—RPC handlers, lifecycle management, and secure secret storage—to host WDK modules in a separate thread. This architecture allows you to run a full Javascript-based wallet stack anywhere the Bare runtime is embedded (Mobile, Desktop, Server, or Embedded devices) while keeping heavy cryptographic operations isolated from your main application thread.
 
