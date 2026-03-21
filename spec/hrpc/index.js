@@ -34,7 +34,85 @@ const methods = new Map([
   ['@wdk-core/getTransactionReceipt', 13],
   [13, '@wdk-core/getTransactionReceipt'],
   ['@wdk-core/dispose', 14],
-  [14, '@wdk-core/dispose']
+  [14, '@wdk-core/dispose'],
+  ['@wdk-core/rgbCreateUtxos', 15],
+  [15, '@wdk-core/rgbCreateUtxos'],
+  ['@wdk-core/rgbIssueAsset', 16],
+  [16, '@wdk-core/rgbIssueAsset'],
+  ['@wdk-core/rgbListAssets', 17],
+  [17, '@wdk-core/rgbListAssets'],
+  ['@wdk-core/rgbRefresh', 18],
+  [18, '@wdk-core/rgbRefresh'],
+  ['@wdk-core/rgbBlindReceive', 19],
+  [19, '@wdk-core/rgbBlindReceive'],
+  ['@wdk-core/rgbWitnessReceive', 20],
+  [20, '@wdk-core/rgbWitnessReceive'],
+  ['@wdk-core/rgbSend', 21],
+  [21, '@wdk-core/rgbSend'],
+  ['@wdk-core/rgbGetAssetBalance', 22],
+  [22, '@wdk-core/rgbGetAssetBalance'],
+  ['@wdk-core/rgbListTransfers', 23],
+  [23, '@wdk-core/rgbListTransfers'],
+  ['@wdk-core/rgbListTransactions', 24],
+  [24, '@wdk-core/rgbListTransactions'],
+  ['@wdk-core/rgbSendBtc', 25],
+  [25, '@wdk-core/rgbSendBtc'],
+  ['@wdk-core/rgbIssueAssetCfa', 26],
+  [26, '@wdk-core/rgbIssueAssetCfa'],
+  ['@wdk-core/rgbIssueAssetUda', 27],
+  [27, '@wdk-core/rgbIssueAssetUda'],
+  ['@wdk-core/rgbInflate', 28],
+  [28, '@wdk-core/rgbInflate'],
+  ['@wdk-core/rgbListUnspents', 29],
+  [29, '@wdk-core/rgbListUnspents'],
+  ['@wdk-core/rgbEstimateFee', 30],
+  [30, '@wdk-core/rgbEstimateFee'],
+  ['@wdk-core/rgbSync', 31],
+  [31, '@wdk-core/rgbSync'],
+  ['@wdk-core/rgbCreateBackup', 32],
+  [32, '@wdk-core/rgbCreateBackup'],
+  ['@wdk-core/rgbRestoreFromBackup', 33],
+  [33, '@wdk-core/rgbRestoreFromBackup'],
+  ['@wdk-core/rgbBackupInfo', 34],
+  [34, '@wdk-core/rgbBackupInfo'],
+  ['@wdk-core/rgbSignMessage', 35],
+  [35, '@wdk-core/rgbSignMessage'],
+  ['@wdk-core/rgbVerifyMessage', 36],
+  [36, '@wdk-core/rgbVerifyMessage'],
+  ['@wdk-core/rgbSendBegin', 37],
+  [37, '@wdk-core/rgbSendBegin'],
+  ['@wdk-core/rgbSendEnd', 38],
+  [38, '@wdk-core/rgbSendEnd'],
+  ['@wdk-core/rgbCreateLightningInvoice', 39],
+  [39, '@wdk-core/rgbCreateLightningInvoice'],
+  ['@wdk-core/rgbPayLightningInvoice', 40],
+  [40, '@wdk-core/rgbPayLightningInvoice'],
+  ['@wdk-core/rgbOnchainReceive', 41],
+  [41, '@wdk-core/rgbOnchainReceive'],
+  ['@wdk-core/rgbOnchainSend', 42],
+  [42, '@wdk-core/rgbOnchainSend'],
+  ['@wdk-core/rgbListLightningPayments', 43],
+  [43, '@wdk-core/rgbListLightningPayments'],
+  ['@wdk-core/rgbCreateUtxosBegin', 44],
+  [44, '@wdk-core/rgbCreateUtxosBegin'],
+  ['@wdk-core/rgbCreateUtxosEnd', 45],
+  [45, '@wdk-core/rgbCreateUtxosEnd'],
+  ['@wdk-core/rgbSendBtcBegin', 46],
+  [46, '@wdk-core/rgbSendBtcBegin'],
+  ['@wdk-core/rgbSendBtcEnd', 47],
+  [47, '@wdk-core/rgbSendBtcEnd'],
+  ['@wdk-core/rgbDecodeInvoice', 48],
+  [48, '@wdk-core/rgbDecodeInvoice'],
+  ['@wdk-core/rgbFinalizePsbt', 49],
+  [49, '@wdk-core/rgbFinalizePsbt'],
+  ['@wdk-core/rgbInvoiceNew', 50],
+  [50, '@wdk-core/rgbInvoiceNew'],
+  ['@wdk-core/rgbInvoiceData', 51],
+  [51, '@wdk-core/rgbInvoiceData'],
+  ['@wdk-core/rgbInvoiceString', 52],
+  [52, '@wdk-core/rgbInvoiceString'],
+  ['@wdk-core/rgbSignPsbt', 53],
+  [53, '@wdk-core/rgbSignPsbt']
 ])
 
 class HRPC {
@@ -56,7 +134,46 @@ class HRPC {
       ['@wdk-core/abstractedSendTransaction', getEncoding('@wdk-core/abstractedSendTransaction-request')],
       ['@wdk-core/abstractedAccountQuoteTransfer', getEncoding('@wdk-core/abstractedAccountQuoteTransfer-request')],
       ['@wdk-core/getTransactionReceipt', getEncoding('@wdk-core/getTransactionReceipt-request')],
-      ['@wdk-core/dispose', getEncoding('@wdk-core/dispose-request')]
+      ['@wdk-core/dispose', getEncoding('@wdk-core/dispose-request')],
+      ['@wdk-core/rgbCreateUtxos', getEncoding('@wdk-core/rgbCreateUtxos-request')],
+      ['@wdk-core/rgbIssueAsset', getEncoding('@wdk-core/rgbIssueAsset-request')],
+      ['@wdk-core/rgbListAssets', getEncoding('@wdk-core/rgbListAssets-request')],
+      ['@wdk-core/rgbRefresh', getEncoding('@wdk-core/rgbRefresh-request')],
+      ['@wdk-core/rgbBlindReceive', getEncoding('@wdk-core/rgbBlindReceive-request')],
+      ['@wdk-core/rgbWitnessReceive', getEncoding('@wdk-core/rgbWitnessReceive-request')],
+      ['@wdk-core/rgbSend', getEncoding('@wdk-core/rgbSend-request')],
+      ['@wdk-core/rgbGetAssetBalance', getEncoding('@wdk-core/rgbGetAssetBalance-request')],
+      ['@wdk-core/rgbListTransfers', getEncoding('@wdk-core/rgbListTransfers-request')],
+      ['@wdk-core/rgbListTransactions', getEncoding('@wdk-core/rgbListTransactions-request')],
+      ['@wdk-core/rgbSendBtc', getEncoding('@wdk-core/rgbSendBtc-request')],
+      ['@wdk-core/rgbIssueAssetCfa', getEncoding('@wdk-core/rgbIssueAssetCfa-request')],
+      ['@wdk-core/rgbIssueAssetUda', getEncoding('@wdk-core/rgbIssueAssetUda-request')],
+      ['@wdk-core/rgbInflate', getEncoding('@wdk-core/rgbInflate-request')],
+      ['@wdk-core/rgbListUnspents', getEncoding('@wdk-core/rgbListUnspents-request')],
+      ['@wdk-core/rgbEstimateFee', getEncoding('@wdk-core/rgbEstimateFee-request')],
+      ['@wdk-core/rgbSync', getEncoding('@wdk-core/rgbSync-request')],
+      ['@wdk-core/rgbCreateBackup', getEncoding('@wdk-core/rgbCreateBackup-request')],
+      ['@wdk-core/rgbRestoreFromBackup', getEncoding('@wdk-core/rgbRestoreFromBackup-request')],
+      ['@wdk-core/rgbBackupInfo', getEncoding('@wdk-core/rgbBackupInfo-request')],
+      ['@wdk-core/rgbSignMessage', getEncoding('@wdk-core/rgbSignMessage-request')],
+      ['@wdk-core/rgbVerifyMessage', getEncoding('@wdk-core/rgbVerifyMessage-request')],
+      ['@wdk-core/rgbSendBegin', getEncoding('@wdk-core/rgbSendBegin-request')],
+      ['@wdk-core/rgbSendEnd', getEncoding('@wdk-core/rgbSendEnd-request')],
+      ['@wdk-core/rgbCreateLightningInvoice', getEncoding('@wdk-core/rgbCreateLightningInvoice-request')],
+      ['@wdk-core/rgbPayLightningInvoice', getEncoding('@wdk-core/rgbPayLightningInvoice-request')],
+      ['@wdk-core/rgbOnchainReceive', getEncoding('@wdk-core/rgbOnchainReceive-request')],
+      ['@wdk-core/rgbOnchainSend', getEncoding('@wdk-core/rgbOnchainSend-request')],
+      ['@wdk-core/rgbListLightningPayments', getEncoding('@wdk-core/rgbListLightningPayments-request')],
+      ['@wdk-core/rgbCreateUtxosBegin', getEncoding('@wdk-core/rgbCreateUtxosBegin-request')],
+      ['@wdk-core/rgbCreateUtxosEnd', getEncoding('@wdk-core/rgbCreateUtxosEnd-request')],
+      ['@wdk-core/rgbSendBtcBegin', getEncoding('@wdk-core/rgbSendBtcBegin-request')],
+      ['@wdk-core/rgbSendBtcEnd', getEncoding('@wdk-core/rgbSendBtcEnd-request')],
+      ['@wdk-core/rgbDecodeInvoice', getEncoding('@wdk-core/rgbDecodeInvoice-request')],
+      ['@wdk-core/rgbFinalizePsbt', getEncoding('@wdk-core/rgbFinalizePsbt-request')],
+      ['@wdk-core/rgbInvoiceNew', getEncoding('@wdk-core/rgbInvoiceNew-request')],
+      ['@wdk-core/rgbInvoiceData', getEncoding('@wdk-core/rgbInvoiceData-request')],
+      ['@wdk-core/rgbInvoiceString', getEncoding('@wdk-core/rgbInvoiceString-request')],
+      ['@wdk-core/rgbSignPsbt', getEncoding('@wdk-core/rgbSignPsbt-request')]
     ])
     this._responseEncodings = new Map([
       ['@wdk-core/workletStart', getEncoding('@wdk-core/workletStart-response')],
@@ -71,7 +188,46 @@ class HRPC {
       ['@wdk-core/getApproveTransaction', getEncoding('@wdk-core/getApproveTransaction-response')],
       ['@wdk-core/abstractedSendTransaction', getEncoding('@wdk-core/abstractedSendTransaction-response')],
       ['@wdk-core/abstractedAccountQuoteTransfer', getEncoding('@wdk-core/abstractedAccountQuoteTransfer-response')],
-      ['@wdk-core/getTransactionReceipt', getEncoding('@wdk-core/getTransactionReceipt-response')]
+      ['@wdk-core/getTransactionReceipt', getEncoding('@wdk-core/getTransactionReceipt-response')],
+      ['@wdk-core/rgbCreateUtxos', getEncoding('@wdk-core/rgbCreateUtxos-response')],
+      ['@wdk-core/rgbIssueAsset', getEncoding('@wdk-core/rgbIssueAsset-response')],
+      ['@wdk-core/rgbListAssets', getEncoding('@wdk-core/rgbListAssets-response')],
+      ['@wdk-core/rgbRefresh', getEncoding('@wdk-core/rgbRefresh-response')],
+      ['@wdk-core/rgbBlindReceive', getEncoding('@wdk-core/rgbBlindReceive-response')],
+      ['@wdk-core/rgbWitnessReceive', getEncoding('@wdk-core/rgbWitnessReceive-response')],
+      ['@wdk-core/rgbSend', getEncoding('@wdk-core/rgbSend-response')],
+      ['@wdk-core/rgbGetAssetBalance', getEncoding('@wdk-core/rgbGetAssetBalance-response')],
+      ['@wdk-core/rgbListTransfers', getEncoding('@wdk-core/rgbListTransfers-response')],
+      ['@wdk-core/rgbListTransactions', getEncoding('@wdk-core/rgbListTransactions-response')],
+      ['@wdk-core/rgbSendBtc', getEncoding('@wdk-core/rgbSendBtc-response')],
+      ['@wdk-core/rgbIssueAssetCfa', getEncoding('@wdk-core/rgbIssueAssetCfa-response')],
+      ['@wdk-core/rgbIssueAssetUda', getEncoding('@wdk-core/rgbIssueAssetUda-response')],
+      ['@wdk-core/rgbInflate', getEncoding('@wdk-core/rgbInflate-response')],
+      ['@wdk-core/rgbListUnspents', getEncoding('@wdk-core/rgbListUnspents-response')],
+      ['@wdk-core/rgbEstimateFee', getEncoding('@wdk-core/rgbEstimateFee-response')],
+      ['@wdk-core/rgbSync', getEncoding('@wdk-core/rgbSync-response')],
+      ['@wdk-core/rgbCreateBackup', getEncoding('@wdk-core/rgbCreateBackup-response')],
+      ['@wdk-core/rgbRestoreFromBackup', getEncoding('@wdk-core/rgbRestoreFromBackup-response')],
+      ['@wdk-core/rgbBackupInfo', getEncoding('@wdk-core/rgbBackupInfo-response')],
+      ['@wdk-core/rgbSignMessage', getEncoding('@wdk-core/rgbSignMessage-response')],
+      ['@wdk-core/rgbVerifyMessage', getEncoding('@wdk-core/rgbVerifyMessage-response')],
+      ['@wdk-core/rgbSendBegin', getEncoding('@wdk-core/rgbSendBegin-response')],
+      ['@wdk-core/rgbSendEnd', getEncoding('@wdk-core/rgbSendEnd-response')],
+      ['@wdk-core/rgbCreateLightningInvoice', getEncoding('@wdk-core/rgbCreateLightningInvoice-response')],
+      ['@wdk-core/rgbPayLightningInvoice', getEncoding('@wdk-core/rgbPayLightningInvoice-response')],
+      ['@wdk-core/rgbOnchainReceive', getEncoding('@wdk-core/rgbOnchainReceive-response')],
+      ['@wdk-core/rgbOnchainSend', getEncoding('@wdk-core/rgbOnchainSend-response')],
+      ['@wdk-core/rgbListLightningPayments', getEncoding('@wdk-core/rgbListLightningPayments-response')],
+      ['@wdk-core/rgbCreateUtxosBegin', getEncoding('@wdk-core/rgbCreateUtxosBegin-response')],
+      ['@wdk-core/rgbCreateUtxosEnd', getEncoding('@wdk-core/rgbCreateUtxosEnd-response')],
+      ['@wdk-core/rgbSendBtcBegin', getEncoding('@wdk-core/rgbSendBtcBegin-response')],
+      ['@wdk-core/rgbSendBtcEnd', getEncoding('@wdk-core/rgbSendBtcEnd-response')],
+      ['@wdk-core/rgbDecodeInvoice', getEncoding('@wdk-core/rgbDecodeInvoice-response')],
+      ['@wdk-core/rgbFinalizePsbt', getEncoding('@wdk-core/rgbFinalizePsbt-response')],
+      ['@wdk-core/rgbInvoiceNew', getEncoding('@wdk-core/rgbInvoiceNew-response')],
+      ['@wdk-core/rgbInvoiceData', getEncoding('@wdk-core/rgbInvoiceData-response')],
+      ['@wdk-core/rgbInvoiceString', getEncoding('@wdk-core/rgbInvoiceString-response')],
+      ['@wdk-core/rgbSignPsbt', getEncoding('@wdk-core/rgbSignPsbt-response')]
     ])
     this._rpc = new RPC(stream, async (req) => {
       const command = methods.get(req.command)
@@ -195,6 +351,162 @@ class HRPC {
     return this._callSync('@wdk-core/dispose', args)
   }
 
+  async rgbCreateUtxos (args) {
+    return this._call('@wdk-core/rgbCreateUtxos', args)
+  }
+
+  async rgbIssueAsset (args) {
+    return this._call('@wdk-core/rgbIssueAsset', args)
+  }
+
+  async rgbListAssets (args) {
+    return this._call('@wdk-core/rgbListAssets', args)
+  }
+
+  async rgbRefresh (args) {
+    return this._call('@wdk-core/rgbRefresh', args)
+  }
+
+  async rgbBlindReceive (args) {
+    return this._call('@wdk-core/rgbBlindReceive', args)
+  }
+
+  async rgbWitnessReceive (args) {
+    return this._call('@wdk-core/rgbWitnessReceive', args)
+  }
+
+  async rgbSend (args) {
+    return this._call('@wdk-core/rgbSend', args)
+  }
+
+  async rgbGetAssetBalance (args) {
+    return this._call('@wdk-core/rgbGetAssetBalance', args)
+  }
+
+  async rgbListTransfers (args) {
+    return this._call('@wdk-core/rgbListTransfers', args)
+  }
+
+  async rgbListTransactions (args) {
+    return this._call('@wdk-core/rgbListTransactions', args)
+  }
+
+  async rgbSendBtc (args) {
+    return this._call('@wdk-core/rgbSendBtc', args)
+  }
+
+  async rgbIssueAssetCfa (args) {
+    return this._call('@wdk-core/rgbIssueAssetCfa', args)
+  }
+
+  async rgbIssueAssetUda (args) {
+    return this._call('@wdk-core/rgbIssueAssetUda', args)
+  }
+
+  async rgbInflate (args) {
+    return this._call('@wdk-core/rgbInflate', args)
+  }
+
+  async rgbListUnspents (args) {
+    return this._call('@wdk-core/rgbListUnspents', args)
+  }
+
+  async rgbEstimateFee (args) {
+    return this._call('@wdk-core/rgbEstimateFee', args)
+  }
+
+  async rgbSync (args) {
+    return this._call('@wdk-core/rgbSync', args)
+  }
+
+  async rgbCreateBackup (args) {
+    return this._call('@wdk-core/rgbCreateBackup', args)
+  }
+
+  async rgbRestoreFromBackup (args) {
+    return this._call('@wdk-core/rgbRestoreFromBackup', args)
+  }
+
+  async rgbBackupInfo (args) {
+    return this._call('@wdk-core/rgbBackupInfo', args)
+  }
+
+  async rgbSignMessage (args) {
+    return this._call('@wdk-core/rgbSignMessage', args)
+  }
+
+  async rgbVerifyMessage (args) {
+    return this._call('@wdk-core/rgbVerifyMessage', args)
+  }
+
+  async rgbSendBegin (args) {
+    return this._call('@wdk-core/rgbSendBegin', args)
+  }
+
+  async rgbSendEnd (args) {
+    return this._call('@wdk-core/rgbSendEnd', args)
+  }
+
+  async rgbCreateLightningInvoice (args) {
+    return this._call('@wdk-core/rgbCreateLightningInvoice', args)
+  }
+
+  async rgbPayLightningInvoice (args) {
+    return this._call('@wdk-core/rgbPayLightningInvoice', args)
+  }
+
+  async rgbOnchainReceive (args) {
+    return this._call('@wdk-core/rgbOnchainReceive', args)
+  }
+
+  async rgbOnchainSend (args) {
+    return this._call('@wdk-core/rgbOnchainSend', args)
+  }
+
+  async rgbListLightningPayments (args) {
+    return this._call('@wdk-core/rgbListLightningPayments', args)
+  }
+
+  async rgbCreateUtxosBegin (args) {
+    return this._call('@wdk-core/rgbCreateUtxosBegin', args)
+  }
+
+  async rgbCreateUtxosEnd (args) {
+    return this._call('@wdk-core/rgbCreateUtxosEnd', args)
+  }
+
+  async rgbSendBtcBegin (args) {
+    return this._call('@wdk-core/rgbSendBtcBegin', args)
+  }
+
+  async rgbSendBtcEnd (args) {
+    return this._call('@wdk-core/rgbSendBtcEnd', args)
+  }
+
+  async rgbDecodeInvoice (args) {
+    return this._call('@wdk-core/rgbDecodeInvoice', args)
+  }
+
+  async rgbFinalizePsbt (args) {
+    return this._call('@wdk-core/rgbFinalizePsbt', args)
+  }
+
+  async rgbInvoiceNew (args) {
+    return this._call('@wdk-core/rgbInvoiceNew', args)
+  }
+
+  async rgbInvoiceData (args) {
+    return this._call('@wdk-core/rgbInvoiceData', args)
+  }
+
+  async rgbInvoiceString (args) {
+    return this._call('@wdk-core/rgbInvoiceString', args)
+  }
+
+  async rgbSignPsbt (args) {
+    return this._call('@wdk-core/rgbSignPsbt', args)
+  }
+
   onLog (responseFn) {
     this._handlers['@wdk-core/log'] = responseFn
   }
@@ -253,6 +565,162 @@ class HRPC {
 
   onDispose (responseFn) {
     this._handlers['@wdk-core/dispose'] = responseFn
+  }
+
+  onRgbCreateUtxos (responseFn) {
+    this._handlers['@wdk-core/rgbCreateUtxos'] = responseFn
+  }
+
+  onRgbIssueAsset (responseFn) {
+    this._handlers['@wdk-core/rgbIssueAsset'] = responseFn
+  }
+
+  onRgbListAssets (responseFn) {
+    this._handlers['@wdk-core/rgbListAssets'] = responseFn
+  }
+
+  onRgbRefresh (responseFn) {
+    this._handlers['@wdk-core/rgbRefresh'] = responseFn
+  }
+
+  onRgbBlindReceive (responseFn) {
+    this._handlers['@wdk-core/rgbBlindReceive'] = responseFn
+  }
+
+  onRgbWitnessReceive (responseFn) {
+    this._handlers['@wdk-core/rgbWitnessReceive'] = responseFn
+  }
+
+  onRgbSend (responseFn) {
+    this._handlers['@wdk-core/rgbSend'] = responseFn
+  }
+
+  onRgbGetAssetBalance (responseFn) {
+    this._handlers['@wdk-core/rgbGetAssetBalance'] = responseFn
+  }
+
+  onRgbListTransfers (responseFn) {
+    this._handlers['@wdk-core/rgbListTransfers'] = responseFn
+  }
+
+  onRgbListTransactions (responseFn) {
+    this._handlers['@wdk-core/rgbListTransactions'] = responseFn
+  }
+
+  onRgbSendBtc (responseFn) {
+    this._handlers['@wdk-core/rgbSendBtc'] = responseFn
+  }
+
+  onRgbIssueAssetCfa (responseFn) {
+    this._handlers['@wdk-core/rgbIssueAssetCfa'] = responseFn
+  }
+
+  onRgbIssueAssetUda (responseFn) {
+    this._handlers['@wdk-core/rgbIssueAssetUda'] = responseFn
+  }
+
+  onRgbInflate (responseFn) {
+    this._handlers['@wdk-core/rgbInflate'] = responseFn
+  }
+
+  onRgbListUnspents (responseFn) {
+    this._handlers['@wdk-core/rgbListUnspents'] = responseFn
+  }
+
+  onRgbEstimateFee (responseFn) {
+    this._handlers['@wdk-core/rgbEstimateFee'] = responseFn
+  }
+
+  onRgbSync (responseFn) {
+    this._handlers['@wdk-core/rgbSync'] = responseFn
+  }
+
+  onRgbCreateBackup (responseFn) {
+    this._handlers['@wdk-core/rgbCreateBackup'] = responseFn
+  }
+
+  onRgbRestoreFromBackup (responseFn) {
+    this._handlers['@wdk-core/rgbRestoreFromBackup'] = responseFn
+  }
+
+  onRgbBackupInfo (responseFn) {
+    this._handlers['@wdk-core/rgbBackupInfo'] = responseFn
+  }
+
+  onRgbSignMessage (responseFn) {
+    this._handlers['@wdk-core/rgbSignMessage'] = responseFn
+  }
+
+  onRgbVerifyMessage (responseFn) {
+    this._handlers['@wdk-core/rgbVerifyMessage'] = responseFn
+  }
+
+  onRgbSendBegin (responseFn) {
+    this._handlers['@wdk-core/rgbSendBegin'] = responseFn
+  }
+
+  onRgbSendEnd (responseFn) {
+    this._handlers['@wdk-core/rgbSendEnd'] = responseFn
+  }
+
+  onRgbCreateLightningInvoice (responseFn) {
+    this._handlers['@wdk-core/rgbCreateLightningInvoice'] = responseFn
+  }
+
+  onRgbPayLightningInvoice (responseFn) {
+    this._handlers['@wdk-core/rgbPayLightningInvoice'] = responseFn
+  }
+
+  onRgbOnchainReceive (responseFn) {
+    this._handlers['@wdk-core/rgbOnchainReceive'] = responseFn
+  }
+
+  onRgbOnchainSend (responseFn) {
+    this._handlers['@wdk-core/rgbOnchainSend'] = responseFn
+  }
+
+  onRgbListLightningPayments (responseFn) {
+    this._handlers['@wdk-core/rgbListLightningPayments'] = responseFn
+  }
+
+  onRgbCreateUtxosBegin (responseFn) {
+    this._handlers['@wdk-core/rgbCreateUtxosBegin'] = responseFn
+  }
+
+  onRgbCreateUtxosEnd (responseFn) {
+    this._handlers['@wdk-core/rgbCreateUtxosEnd'] = responseFn
+  }
+
+  onRgbSendBtcBegin (responseFn) {
+    this._handlers['@wdk-core/rgbSendBtcBegin'] = responseFn
+  }
+
+  onRgbSendBtcEnd (responseFn) {
+    this._handlers['@wdk-core/rgbSendBtcEnd'] = responseFn
+  }
+
+  onRgbDecodeInvoice (responseFn) {
+    this._handlers['@wdk-core/rgbDecodeInvoice'] = responseFn
+  }
+
+  onRgbFinalizePsbt (responseFn) {
+    this._handlers['@wdk-core/rgbFinalizePsbt'] = responseFn
+  }
+
+  onRgbInvoiceNew (responseFn) {
+    this._handlers['@wdk-core/rgbInvoiceNew'] = responseFn
+  }
+
+  onRgbInvoiceData (responseFn) {
+    this._handlers['@wdk-core/rgbInvoiceData'] = responseFn
+  }
+
+  onRgbInvoiceString (responseFn) {
+    this._handlers['@wdk-core/rgbInvoiceString'] = responseFn
+  }
+
+  onRgbSignPsbt (responseFn) {
+    this._handlers['@wdk-core/rgbSignPsbt'] = responseFn
   }
 
   _requestIsStream (command) {

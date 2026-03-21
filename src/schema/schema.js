@@ -322,6 +322,83 @@ schemaNs.register({
   fields: []
 })
 
+/**
+ * RGB: Create UTXOs
+ */
+schemaNs.register({
+  name: 'rgbCreateUtxos-request',
+  fields: [
+    { name: 'accountIndex', type: 'uint', required: true },
+    { name: 'upTo', type: 'uint', required: false },
+    { name: 'num', type: 'uint', required: false },
+    { name: 'size', type: 'uint', required: false },
+    { name: 'feeRate', type: 'uint', required: false }
+  ]
+})
+
+schemaNs.register({
+  name: 'rgbCreateUtxos-response',
+  fields: [
+    { name: 'created', type: 'uint' }
+  ]
+})
+
+/**
+ * RGB: Issue Asset (NIA - Non-Inflatable Asset)
+ */
+schemaNs.register({
+  name: 'rgbIssueAsset-request',
+  fields: [
+    { name: 'accountIndex', type: 'uint', required: true },
+    { name: 'ticker', type: 'string', required: true },
+    { name: 'name', type: 'string', required: true },
+    { name: 'amounts', type: 'string', required: true },
+    { name: 'precision', type: 'uint', required: true }
+  ]
+})
+
+schemaNs.register({
+  name: 'rgbIssueAsset-response',
+  fields: [
+    { name: 'assetId', type: 'string' },
+    { name: 'details', type: 'string' }
+  ]
+})
+
+/**
+ * RGB: List Assets
+ */
+schemaNs.register({
+  name: 'rgbListAssets-request',
+  fields: [
+    { name: 'accountIndex', type: 'uint', required: true }
+  ]
+})
+
+schemaNs.register({
+  name: 'rgbListAssets-response',
+  fields: [
+    { name: 'assets', type: 'string' }
+  ]
+})
+
+/**
+ * RGB: Refresh Wallet
+ */
+schemaNs.register({
+  name: 'rgbRefresh-request',
+  fields: [
+    { name: 'accountIndex', type: 'uint', required: true }
+  ]
+})
+
+schemaNs.register({
+  name: 'rgbRefresh-response',
+  fields: [
+    { name: 'status', type: 'string' }
+  ]
+})
+
 Hyperschema.toDisk(schema)
 
 // Load and build interface
@@ -410,5 +487,27 @@ ns.register({
   name: 'dispose',
   request: { name: '@wdk-core/dispose-request', send: true }
 })
+
+ns.register({
+  name: 'rgbCreateUtxos',
+  request: { name: '@wdk-core/rgbCreateUtxos-request', stream: false },
+  response: { name: '@wdk-core/rgbCreateUtxos-response', stream: false }
+})
+ns.register({
+  name: 'rgbIssueAsset',
+  request: { name: '@wdk-core/rgbIssueAsset-request', stream: false },
+  response: { name: '@wdk-core/rgbIssueAsset-response', stream: false }
+})
+ns.register({
+  name: 'rgbListAssets',
+  request: { name: '@wdk-core/rgbListAssets-request', stream: false },
+  response: { name: '@wdk-core/rgbListAssets-response', stream: false }
+})
+ns.register({
+  name: 'rgbRefresh',
+  request: { name: '@wdk-core/rgbRefresh-request', stream: false },
+  response: { name: '@wdk-core/rgbRefresh-response', stream: false }
+})
+
 // Save interface to disk
 HRPCBuilder.toDisk(builder)

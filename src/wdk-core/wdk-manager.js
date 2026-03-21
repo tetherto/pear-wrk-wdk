@@ -84,7 +84,8 @@ const Blockchain = {
   Ton: 'ton',
   Tron: 'tron',
   Bitcoin: 'bitcoin',
-  Solana: 'solana'
+  Solana: 'solana',
+  Rgb: 'rgb'
 }
 
 const EVM_BLOCKCHAINS = [
@@ -443,6 +444,403 @@ class WdkManager {
     }
   }
 
+  /**
+   * RGB: Create UTXOs for RGB asset allocation.
+   * @param {number} accountIndex
+   * @param {Object} options
+   * @returns {Promise<number>} Number of UTXOs created
+   */
+  async rgbCreateUtxos (accountIndex, options = {}) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.createUtxos(options)
+  }
+
+  /**
+   * RGB: Issue a Non-Inflatable Asset (NIA).
+   * @param {number} accountIndex
+   * @param {Object} options - { ticker, name, amounts, precision }
+   * @returns {Promise<Object>} The issued asset
+   */
+  async rgbIssueAsset (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.issueAssetNia(options)
+  }
+
+  /**
+   * RGB: List all assets in the wallet.
+   * @param {number} accountIndex
+   * @returns {Promise<Object>} The assets list
+   */
+  async rgbListAssets (accountIndex) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.listAssets()
+  }
+
+  /**
+   * RGB: Refresh wallet state from the indexer.
+   * @param {number} accountIndex
+   * @returns {Promise<void>}
+   */
+  async rgbRefresh (accountIndex) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.refreshWallet()
+  }
+
+  /**
+   * RGB: Generate a blind receive invoice.
+   * @param {number} accountIndex
+   * @param {Object} options - { assetId?, amount?, transportEndpoints? }
+   * @returns {Promise<Object>} Invoice receive data
+   */
+  async rgbBlindReceive (accountIndex, options = {}) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.receiveAsset({ ...options, witness: false })
+  }
+
+  /**
+   * RGB: Generate a witness receive invoice.
+   * @param {number} accountIndex
+   * @param {Object} options - { assetId?, amount?, transportEndpoints? }
+   * @returns {Promise<Object>} Invoice receive data
+   */
+  async rgbWitnessReceive (accountIndex, options = {}) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.receiveAsset({ ...options, witness: true })
+  }
+
+  /**
+   * RGB: Send an RGB asset transfer.
+   * @param {number} accountIndex
+   * @param {Object} options - { token, recipient, amount, feeRate?, minConfirmations? }
+   * @returns {Promise<Object>} Transfer result { hash, fee }
+   */
+  async rgbSend (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.transfer(options)
+  }
+
+  /**
+   * RGB: Get asset balance.
+   * @param {number} accountIndex
+   * @param {string} assetId
+   * @returns {Promise<bigint>} Asset balance
+   */
+  async rgbGetAssetBalance (accountIndex, assetId) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.getTokenBalance(assetId)
+  }
+
+  /**
+   * RGB: List transfers.
+   * @param {number} accountIndex
+   * @param {string} [assetId] - Optional asset ID filter
+   * @returns {Promise<Array>} Transfers
+   */
+  async rgbListTransfers (accountIndex, assetId) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.getTransfers({ assetId })
+  }
+
+  /**
+   * RGB: List transactions.
+   * @param {number} accountIndex
+   * @returns {Promise<Array>} Transactions
+   */
+  async rgbListTransactions (accountIndex) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.listTransactions()
+  }
+
+  /**
+   * RGB: Send BTC from the RGB wallet.
+   * @param {number} accountIndex
+   * @param {Object} options - { to, value, feeRate? }
+   * @returns {Promise<Object>} Transaction result { hash, fee }
+   */
+  async rgbSendBtc (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.sendTransaction(options)
+  }
+
+  /**
+   * RGB: Issue a Collectible Fungible Asset (CFA).
+   * @param {number} accountIndex
+   * @param {Object} options - { name, precision, amounts, details?, filePath? }
+   * @returns {Promise<Object>} The issued asset
+   */
+  async rgbIssueAssetCfa (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return await wallet.issueAssetCfa(options)
+  }
+
+  /**
+   * RGB: Issue a Unique Digital Asset (UDA).
+   * @param {number} accountIndex
+   * @param {Object} options - { ticker, name, precision, details?, mediaFilePath?, attachmentsFilePaths? }
+   * @returns {Promise<Object>} The issued asset
+   */
+  async rgbIssueAssetUda (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return await wallet.issueAssetUda(options)
+  }
+
+  /**
+   * RGB: Inflate (re-issue) an existing asset.
+   * @param {number} accountIndex
+   * @param {Object} options - { assetId, amounts, feeRate?, minConfirmations? }
+   * @returns {Promise<Object>} Inflate result
+   */
+  async rgbInflate (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return await wallet.inflate(options)
+  }
+
+  /**
+   * RGB: List unspent outputs.
+   * @param {number} accountIndex
+   * @returns {Promise<Array>} Unspent outputs
+   */
+  async rgbListUnspents (accountIndex) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.listUnspents()
+  }
+
+  /**
+   * RGB: Estimate fee rate.
+   * @param {number} accountIndex
+   * @param {number} blocks - Target confirmation blocks (default: 6)
+   * @returns {Promise<number>} Fee rate
+   */
+  async rgbEstimateFee (accountIndex, blocks) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return wallet.estimateFeeRate(blocks || 6)
+  }
+
+  /**
+   * RGB: Sync wallet state.
+   * @param {number} accountIndex
+   * @returns {Promise<void>}
+   */
+  async rgbSync (accountIndex) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.syncWallet()
+  }
+
+  /**
+   * RGB: Create encrypted wallet backup.
+   * @param {number} accountIndex
+   * @param {Object} options - { password, backupPath }
+   * @returns {Promise<Object>} Backup result
+   */
+  async rgbCreateBackup (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.createBackup(options)
+  }
+
+  /**
+   * RGB: Restore wallet from backup.
+   * @param {number} accountIndex
+   * @param {Object} params - { password, backupFilePath, dataDir }
+   * @returns {Promise<Object>} Restore result
+   */
+  async rgbRestoreFromBackup (accountIndex, params) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.restoreFromBackup(params)
+  }
+
+  /**
+   * RGB: Get backup info.
+   * @param {number} accountIndex
+   * @returns {Promise<Object>} Backup info
+   */
+  async rgbBackupInfo (accountIndex) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return wallet.backupInfo()
+  }
+
+  /**
+   * RGB: Sign a message.
+   * @param {number} accountIndex
+   * @param {string} message
+   * @returns {Promise<string>} Signature
+   */
+  async rgbSignMessage (accountIndex, message) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.sign(message)
+  }
+
+  /**
+   * RGB: Verify a message signature.
+   * @param {number} accountIndex
+   * @param {string} message
+   * @param {string} signature
+   * @returns {Promise<boolean>} Whether the signature is valid
+   */
+  async rgbVerifyMessage (accountIndex, message, signature) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.verify(message, signature)
+  }
+
+  /**
+   * RGB: Begin a send operation (returns PSBT).
+   * @param {number} accountIndex
+   * @param {Object} options - { invoice, assetId, amount, feeRate?, minConfirmations? }
+   * @returns {Promise<string>} PSBT string
+   */
+  async rgbSendBegin (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.sendBegin(options)
+  }
+
+  /**
+   * RGB: Finalize a send operation with signed PSBT.
+   * @param {number} accountIndex
+   * @param {Object} options - { signedPsbt }
+   * @returns {Promise<Object>} Send result
+   */
+  async rgbSendEnd (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.sendEnd(options)
+  }
+
+  // ============================================================================
+  // UTEXO Protocol Methods (Phase 5)
+  // These require UTEXOWallet integration and UTEXO Gateway API credentials.
+  // Currently stubbed — will throw until:
+  //   1. UTEXOWallet is added alongside WalletManager (additive composition)
+  //   2. UTEXO Gateway API credentials are configured
+  //   3. The gateway endpoints are reachable from the worklet
+  // ============================================================================
+
+  /**
+   * RGB/UTEXO: Create a Lightning invoice.
+   * @param {number} accountIndex
+   * @param {Object} options - { amount, description?, expiry? }
+   * @returns {Promise<Object>} Lightning invoice data
+   */
+  async rgbCreateLightningInvoice (accountIndex, options) {
+    // TODO: Requires UTEXOWallet integration
+    // const utexoWallet = await this._getUtexoWallet(accountIndex)
+    // return await utexoWallet.createLightningInvoice(options)
+    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning invoices.')
+  }
+
+  /**
+   * RGB/UTEXO: Pay a Lightning invoice.
+   * @param {number} accountIndex
+   * @param {Object} options - { invoice, amount? }
+   * @returns {Promise<Object>} Payment result
+   */
+  async rgbPayLightningInvoice (accountIndex, options) {
+    // TODO: Requires UTEXOWallet integration
+    // const utexoWallet = await this._getUtexoWallet(accountIndex)
+    // return await utexoWallet.payLightningInvoice(options)
+    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning payments.')
+  }
+
+  /**
+   * RGB/UTEXO: Receive via onchain bridge.
+   * @param {number} accountIndex
+   * @param {Object} options - { amount?, assetId? }
+   * @returns {Promise<Object>} Receive address/invoice
+   */
+  async rgbOnchainReceive (accountIndex, options = {}) {
+    // TODO: Requires UTEXOWallet integration
+    // const utexoWallet = await this._getUtexoWallet(accountIndex)
+    // return await utexoWallet.onchainReceive(options)
+    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable onchain bridge.')
+  }
+
+  /**
+   * RGB/UTEXO: Send via onchain bridge.
+   * @param {number} accountIndex
+   * @param {Object} options - { to, amount, assetId? }
+   * @returns {Promise<Object>} Send result
+   */
+  async rgbOnchainSend (accountIndex, options) {
+    // TODO: Requires UTEXOWallet integration
+    // const utexoWallet = await this._getUtexoWallet(accountIndex)
+    // return await utexoWallet.onchainSend(options)
+    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable onchain bridge.')
+  }
+
+  /**
+   * RGB/UTEXO: List Lightning payments.
+   * @param {number} accountIndex
+   * @returns {Promise<Array>} Lightning payment history
+   */
+  async rgbListLightningPayments (accountIndex) {
+    // TODO: Requires UTEXOWallet integration
+    // const utexoWallet = await this._getUtexoWallet(accountIndex)
+    // return await utexoWallet.listLightningPayments()
+    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning payment history.')
+  }
+
+  async rgbCreateUtxosBegin (accountIndex, options = {}) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.createUtxosBegin(options)
+  }
+
+  async rgbCreateUtxosEnd (accountIndex, signedPsbt) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.createUtxosEnd({ signedPsbt })
+  }
+
+  async rgbSendBtcBegin (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return wallet.sendBtcBegin(options)
+  }
+
+  async rgbSendBtcEnd (accountIndex, signedPsbt) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return wallet.sendBtcEnd({ signedPsbt })
+  }
+
+  async rgbDecodeInvoice (invoiceString) {
+    // Decode uses rgb-lib-bare's Invoice class directly
+    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const invoice = new Invoice(invoiceString)
+    const data = invoice.invoiceData()
+    return data
+  }
+
+  async rgbFinalizePsbt (accountIndex, signedPsbt) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return wallet.finalizePsbt(signedPsbt)
+  }
+
+  async rgbSignPsbt (accountIndex, unsignedPsbt) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return await account.signPsbt(unsignedPsbt)
+  }
+
+  async rgbInvoiceNew (invoiceString) {
+    // Create Invoice object — invoiceString is an existing RGB invoice
+    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const invoice = new Invoice(invoiceString)
+    return { invoice: invoice.toString() }
+  }
+
+  async rgbInvoiceData (invoiceString) {
+    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const invoice = new Invoice(invoiceString)
+    return invoice.invoiceData()
+  }
+
+  async rgbInvoiceString (invoiceString) {
+    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const invoice = new Invoice(invoiceString)
+    return invoice.toString()
+  }
+
   /** Disposes all the wallet accounts, erasing their private keys from the memory. */
   dispose () {
     for (const blockchain in this._wallets) {
@@ -491,6 +889,10 @@ class WdkManager {
         const { default: WalletManagerSolana } = await import('@wdk/wallet-solana')
 
         this._wallets.solana = new WalletManagerSolana(seed, config.solana)
+      } else if (blockchain === 'rgb') {
+        const { default: WalletManagerRgb } = await import('@utexo/wdk-wallet-rgb')
+
+        this._wallets.rgb = new WalletManagerRgb(seed, config.rgb)
       }
     }
 

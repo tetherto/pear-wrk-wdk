@@ -12,6 +12,8 @@
     "postinstall": "npm run gen:mobile-bundle"
   },
   "dependencies": {
+    "@utexo/rgb-lib-bare": "file:../packages/rgb-lib-bare",
+    "@utexo/wdk-wallet-rgb": "file:../wdk-wallet-rgb",
     "@wdk/wallet": "https://github.com/tetherto/wdk-wallet#ee0f6046b6128d0a096f18cc6ca7845ca4cedb12",
     "@wdk/wallet-btc": "https://github.com/tetherto/wdk-wallet-btc#ed35de0b49344bb07736fc296a28b8465a8e8a6e",
     "@wdk/wallet-evm": "https://github.com/tetherto/wdk-wallet-evm#74e281ea63f7df6e2590580bba988daeda021df6",
@@ -22,13 +24,21 @@
     "@wdk/wallet-tron": "https://github.com/tetherto/wdk-wallet-tron#ec076473a5b8340599e005ab5ece8c8d246b3965",
     "@wdk/wallet-tron-gasfree": "https://github.com/tetherto/wdk-wallet-tron-gasfree#fd57ed375801ae281e98c6882ea0f2ad4c2b30f5",
     "bare-ipc": "1.1.1",
+    "bare-os": "^3.8.0",
     "encoding": "npm:bare-encoding@1.0.0",
     "hrpc": "4.0.1",
     "hyperschema": "1.12.4",
     "os": "npm:bare-os@3.6.1"
   },
   "devDependencies": {
+    "bare-buffer": "^3.6.0",
+    "bare-crypto": "^1.13.4",
+    "bare-fs": "^4.5.5",
+    "bare-pipe": "^4.1.5",
+    "bare-tcp": "^2.2.7",
+    "bare-tls": "^2.2.1",
     "rimraf": "6.0.1",
+    "sodium-native": "^5.0.6",
     "standard": "17.1.2",
     "typescript": "5.8.3"
   },

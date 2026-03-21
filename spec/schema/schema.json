@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "schema": [
     {
       "name": "log-type-enum",
@@ -699,6 +699,167 @@
       "compact": false,
       "flagsPosition": -1,
       "fields": []
+    },
+    {
+      "name": "rgbCreateUtxos-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 1,
+      "fields": [
+        {
+          "name": "accountIndex",
+          "required": true,
+          "type": "uint",
+          "version": 2
+        },
+        {
+          "name": "upTo",
+          "required": false,
+          "type": "uint",
+          "version": 2
+        },
+        {
+          "name": "num",
+          "required": false,
+          "type": "uint",
+          "version": 2
+        },
+        {
+          "name": "size",
+          "required": false,
+          "type": "uint",
+          "version": 2
+        },
+        {
+          "name": "feeRate",
+          "required": false,
+          "type": "uint",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbCreateUtxos-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "created",
+          "type": "uint",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbIssueAsset-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "accountIndex",
+          "required": true,
+          "type": "uint",
+          "version": 2
+        },
+        {
+          "name": "ticker",
+          "required": true,
+          "type": "string",
+          "version": 2
+        },
+        {
+          "name": "name",
+          "required": true,
+          "type": "string",
+          "version": 2
+        },
+        {
+          "name": "amounts",
+          "required": true,
+          "type": "string",
+          "version": 2
+        },
+        {
+          "name": "precision",
+          "required": true,
+          "type": "uint",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbIssueAsset-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "assetId",
+          "type": "string",
+          "version": 2
+        },
+        {
+          "name": "details",
+          "type": "string",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbListAssets-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "accountIndex",
+          "required": true,
+          "type": "uint",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbListAssets-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "assets",
+          "type": "string",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbRefresh-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "accountIndex",
+          "required": true,
+          "type": "uint",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "name": "rgbRefresh-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "status",
+          "type": "string",
+          "version": 2
+        }
+      ]
     }
   ]
 }

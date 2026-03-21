@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "schema": [
     {
       "id": 0,
@@ -187,6 +187,58 @@
         "send": true
       },
       "version": 1
+    },
+    {
+      "id": 15,
+      "name": "@wdk-core/rgbCreateUtxos",
+      "request": {
+        "name": "@wdk-core/rgbCreateUtxos-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbCreateUtxos-response",
+        "stream": false
+      },
+      "version": 2
+    },
+    {
+      "id": 16,
+      "name": "@wdk-core/rgbIssueAsset",
+      "request": {
+        "name": "@wdk-core/rgbIssueAsset-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbIssueAsset-response",
+        "stream": false
+      },
+      "version": 2
+    },
+    {
+      "id": 17,
+      "name": "@wdk-core/rgbListAssets",
+      "request": {
+        "name": "@wdk-core/rgbListAssets-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbListAssets-response",
+        "stream": false
+      },
+      "version": 2
+    },
+    {
+      "id": 18,
+      "name": "@wdk-core/rgbRefresh",
+      "request": {
+        "name": "@wdk-core/rgbRefresh-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbRefresh-response",
+        "stream": false
+      },
+      "version": 2
     }
   ]
 }
