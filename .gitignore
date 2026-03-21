@@ -1,5 +1,6 @@
 /node_modules
 /.idea
 .DS_Store
-/bundle
+# Bundle committed for reproducibility (pre-built by bare-pack)
+# /bundle
 package-lock.json
