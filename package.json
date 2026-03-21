@@ -11,7 +11,7 @@
     "gen:schema": "node src/schema/schema.js"
   },
   "dependencies": {
-    "@utexo/rgb-lib-bare": "https://github.com/Jainakin/rgb-lib-bare#3c4354cdf1d2940d0eb5bee7ecec2a71ad19f6fc",
+    "@utexo/rgb-lib-bare": "https://github.com/Jainakin/rgb-lib-bare#4511003ae4af1c9dbf4aa3b3c7e5abb18d193f38",
     "@utexo/wdk-wallet-rgb": "https://github.com/Jainakin/wdk-wallet-rgb#cc8fdf8127b48fb9ac19fa3c5febfcb0d66e3283",
     "@wdk/wallet": "https://github.com/tetherto/wdk-wallet#ee0f6046b6128d0a096f18cc6ca7845ca4cedb12",
     "@wdk/wallet-btc": "https://github.com/tetherto/wdk-wallet-btc#ed35de0b49344bb07736fc296a28b8465a8e8a6e",
