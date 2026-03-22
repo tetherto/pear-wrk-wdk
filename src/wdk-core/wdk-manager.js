@@ -118,6 +118,8 @@ class WdkManager {
     /** @private */
     this._imports = { }
 
+    /** @private @type {Object | null} */
+    this._utexoWallet = null
   }
 
   /**
@@ -639,7 +641,7 @@ class WdkManager {
    */
   async rgbCreateBackup (accountIndex, options) {
     // File-based backup via WalletAccountRgb.
-    // VSS backup requires UTEXOWallet on the RN side (HTTP-based).
+    // VSS backup uses rgb-lib native VssBackupClient (Rust HTTP, not JS).
     const account = await this.getAccount('rgb', accountIndex)
     return account.createBackup(options)
   }
@@ -652,7 +654,6 @@ class WdkManager {
    */
   async rgbRestoreFromBackup (accountIndex, params) {
     // File-based restore via WalletAccountRgb.
-    // VSS restore requires UTEXOWallet on the RN side (HTTP-based).
     const account = await this.getAccount('rgb', accountIndex)
     return account.restoreFromBackup(params)
   }
@@ -714,23 +715,41 @@ class WdkManager {
   }
 
   // ============================================================================
-  // UTEXO Protocol Methods (Lightning, Onchain Bridge, VSS)
+  // UTEXO Protocol Methods (Lightning, Onchain Bridge)
   //
-  // ARCHITECTURE NOTE: These methods require UTEXOWallet from @utexo/rgb-sdk,
-  // which uses axios/http2 for UTEXO Gateway HTTP calls. The bare worklet
-  // environment does NOT support Node.js http2/axios modules, so UTEXOWallet
-  // cannot run inside the worklet.
+  // These use UTEXOWallet from @utexo/rgb-sdk which provides Lightning and
+  // onchain bridge operations via the UTEXO Gateway. Authentication is
+  // signature-based — no API keys or credentials needed.
   //
-  // CORRECT IMPLEMENTATION PATH:
-  // UTEXOWallet must be instantiated on the React Native side (not the worklet)
-  // and its methods called directly from RN. The worklet only handles rgb-lib
-  // operations (which use the native addon, not HTTP).
-  //
-  // For now these methods throw descriptive errors. To enable them:
-  // 1. Instantiate UTEXOWallet in the RN layer (wdk-react-native-provider)
-  // 2. Call utexoWallet.createLightningInvoice() etc. from RN directly
-  // 3. Authentication is signature-based (no API keys needed)
+  // axios was replaced with fetch in rgb-sdk so UTEXOWallet can now run
+  // inside the bare worklet environment.
   // ============================================================================
+
+  /**
+   * Returns a lazily-initialized UTEXOWallet instance.
+   * @private
+   * @returns {Promise<Object>}
+   */
+  async _getUtexoWallet () {
+    if (!this._utexoWallet) {
+      const { UTEXOWallet } = await import('@utexo/rgb-sdk')
+
+      const seed = (typeof this._seed === 'string' || this._seed instanceof Uint8Array)
+        ? this._seed
+        : this._seed.rgb
+
+      const rgbConfig = this._config.rgb || {}
+      const options = {
+        network: rgbConfig.network || 'testnet'
+      }
+      if (rgbConfig.dataDir) options.dataDir = rgbConfig.dataDir
+      if (rgbConfig.vssServerUrl) options.vssServerUrl = rgbConfig.vssServerUrl
+
+      this._utexoWallet = new UTEXOWallet(seed, options)
+      await this._utexoWallet.initialize()
+    }
+    return this._utexoWallet
+  }
 
   /**
    * RGB/UTEXO: Create a Lightning invoice.
@@ -739,7 +758,8 @@ class WdkManager {
    * @returns {Promise<Object>} Lightning invoice data
    */
   async rgbCreateLightningInvoice (accountIndex, options) {
-    throw new Error('Lightning operations require UTEXOWallet on the RN side. See UTEXO Protocol Methods comment in wdk-manager.js.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.createLightningInvoice(options)
   }
 
   /**
@@ -749,7 +769,8 @@ class WdkManager {
    * @returns {Promise<Object>} Payment result
    */
   async rgbPayLightningInvoice (accountIndex, options) {
-    throw new Error('Lightning operations require UTEXOWallet on the RN side. See UTEXO Protocol Methods comment in wdk-manager.js.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.payLightningInvoice(options)
   }
 
   /**
@@ -759,7 +780,8 @@ class WdkManager {
    * @returns {Promise<Object>} Receive address/invoice
    */
   async rgbOnchainReceive (accountIndex, options = {}) {
-    throw new Error('Bridge operations require UTEXOWallet on the RN side. See UTEXO Protocol Methods comment in wdk-manager.js.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.onchainReceive(options)
   }
 
   /**
@@ -769,7 +791,8 @@ class WdkManager {
    * @returns {Promise<Object>} Send result
    */
   async rgbOnchainSend (accountIndex, options) {
-    throw new Error('Bridge operations require UTEXOWallet on the RN side. See UTEXO Protocol Methods comment in wdk-manager.js.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.onchainSend(options)
   }
 
   /**
@@ -778,7 +801,8 @@ class WdkManager {
    * @returns {Promise<Array>} Lightning payment history
    */
   async rgbListLightningPayments (accountIndex) {
-    throw new Error('Lightning operations require UTEXOWallet on the RN side. See UTEXO Protocol Methods comment in wdk-manager.js.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.listOnchainTransfers()
   }
 
   async rgbCreateUtxosBegin (accountIndex, options = {}) {
