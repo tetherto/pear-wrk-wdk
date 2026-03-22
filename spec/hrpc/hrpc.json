@@ -239,6 +239,251 @@
         "stream": false
       },
       "version": 2
+    },
+    {
+      "id": 19,
+      "name": "@wdk-core/rgbBlindReceive",
+      "request": { "name": "@wdk-core/rgbBlindReceive-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbBlindReceive-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 20,
+      "name": "@wdk-core/rgbWitnessReceive",
+      "request": { "name": "@wdk-core/rgbWitnessReceive-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbWitnessReceive-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 21,
+      "name": "@wdk-core/rgbSend",
+      "request": { "name": "@wdk-core/rgbSend-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSend-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 22,
+      "name": "@wdk-core/rgbGetAssetBalance",
+      "request": { "name": "@wdk-core/rgbGetAssetBalance-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbGetAssetBalance-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 23,
+      "name": "@wdk-core/rgbListTransfers",
+      "request": { "name": "@wdk-core/rgbListTransfers-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbListTransfers-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 24,
+      "name": "@wdk-core/rgbListTransactions",
+      "request": { "name": "@wdk-core/rgbListTransactions-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbListTransactions-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 25,
+      "name": "@wdk-core/rgbSendBtc",
+      "request": { "name": "@wdk-core/rgbSendBtc-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSendBtc-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 26,
+      "name": "@wdk-core/rgbIssueAssetCfa",
+      "request": { "name": "@wdk-core/rgbIssueAssetCfa-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbIssueAssetCfa-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 27,
+      "name": "@wdk-core/rgbIssueAssetUda",
+      "request": { "name": "@wdk-core/rgbIssueAssetUda-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbIssueAssetUda-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 28,
+      "name": "@wdk-core/rgbInflate",
+      "request": { "name": "@wdk-core/rgbInflate-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbInflate-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 29,
+      "name": "@wdk-core/rgbListUnspents",
+      "request": { "name": "@wdk-core/rgbListUnspents-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbListUnspents-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 30,
+      "name": "@wdk-core/rgbEstimateFee",
+      "request": { "name": "@wdk-core/rgbEstimateFee-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbEstimateFee-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 31,
+      "name": "@wdk-core/rgbSync",
+      "request": { "name": "@wdk-core/rgbSync-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSync-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 32,
+      "name": "@wdk-core/rgbCreateBackup",
+      "request": { "name": "@wdk-core/rgbCreateBackup-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbCreateBackup-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 33,
+      "name": "@wdk-core/rgbRestoreFromBackup",
+      "request": { "name": "@wdk-core/rgbRestoreFromBackup-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbRestoreFromBackup-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 34,
+      "name": "@wdk-core/rgbBackupInfo",
+      "request": { "name": "@wdk-core/rgbBackupInfo-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbBackupInfo-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 35,
+      "name": "@wdk-core/rgbSignMessage",
+      "request": { "name": "@wdk-core/rgbSignMessage-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSignMessage-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 36,
+      "name": "@wdk-core/rgbVerifyMessage",
+      "request": { "name": "@wdk-core/rgbVerifyMessage-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbVerifyMessage-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 37,
+      "name": "@wdk-core/rgbSendBegin",
+      "request": { "name": "@wdk-core/rgbSendBegin-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSendBegin-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 38,
+      "name": "@wdk-core/rgbSendEnd",
+      "request": { "name": "@wdk-core/rgbSendEnd-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSendEnd-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 39,
+      "name": "@wdk-core/rgbCreateLightningInvoice",
+      "request": { "name": "@wdk-core/rgbCreateLightningInvoice-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbCreateLightningInvoice-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 40,
+      "name": "@wdk-core/rgbPayLightningInvoice",
+      "request": { "name": "@wdk-core/rgbPayLightningInvoice-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbPayLightningInvoice-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 41,
+      "name": "@wdk-core/rgbOnchainReceive",
+      "request": { "name": "@wdk-core/rgbOnchainReceive-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbOnchainReceive-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 42,
+      "name": "@wdk-core/rgbOnchainSend",
+      "request": { "name": "@wdk-core/rgbOnchainSend-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbOnchainSend-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 43,
+      "name": "@wdk-core/rgbListLightningPayments",
+      "request": { "name": "@wdk-core/rgbListLightningPayments-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbListLightningPayments-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 44,
+      "name": "@wdk-core/rgbCreateUtxosBegin",
+      "request": { "name": "@wdk-core/rgbCreateUtxosBegin-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbCreateUtxosBegin-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 45,
+      "name": "@wdk-core/rgbCreateUtxosEnd",
+      "request": { "name": "@wdk-core/rgbCreateUtxosEnd-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbCreateUtxosEnd-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 46,
+      "name": "@wdk-core/rgbSendBtcBegin",
+      "request": { "name": "@wdk-core/rgbSendBtcBegin-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSendBtcBegin-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 47,
+      "name": "@wdk-core/rgbSendBtcEnd",
+      "request": { "name": "@wdk-core/rgbSendBtcEnd-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSendBtcEnd-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 48,
+      "name": "@wdk-core/rgbDecodeInvoice",
+      "request": { "name": "@wdk-core/rgbDecodeInvoice-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbDecodeInvoice-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 49,
+      "name": "@wdk-core/rgbFinalizePsbt",
+      "request": { "name": "@wdk-core/rgbFinalizePsbt-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbFinalizePsbt-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 50,
+      "name": "@wdk-core/rgbInvoiceNew",
+      "request": { "name": "@wdk-core/rgbInvoiceNew-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbInvoiceNew-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 51,
+      "name": "@wdk-core/rgbInvoiceData",
+      "request": { "name": "@wdk-core/rgbInvoiceData-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbInvoiceData-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 52,
+      "name": "@wdk-core/rgbInvoiceString",
+      "request": { "name": "@wdk-core/rgbInvoiceString-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbInvoiceString-response", "stream": false },
+      "version": 2
+    },
+    {
+      "id": 53,
+      "name": "@wdk-core/rgbSignPsbt",
+      "request": { "name": "@wdk-core/rgbSignPsbt-request", "stream": false },
+      "response": { "name": "@wdk-core/rgbSignPsbt-response", "stream": false },
+      "version": 2
     }
   ]
 }
