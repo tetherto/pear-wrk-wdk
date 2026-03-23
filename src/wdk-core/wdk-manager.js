@@ -117,6 +117,9 @@ class WdkManager {
 
     /** @private */
     this._imports = { }
+
+    /** @private @type {Object | null} */
+    this._utexoWallet = null
   }
 
   /**
@@ -637,6 +640,8 @@ class WdkManager {
    * @returns {Promise<Object>} Backup result
    */
   async rgbCreateBackup (accountIndex, options) {
+    // File-based backup via WalletAccountRgb.
+    // VSS backup uses rgb-lib native VssBackupClient (Rust HTTP, not JS).
     const account = await this.getAccount('rgb', accountIndex)
     return account.createBackup(options)
   }
@@ -648,6 +653,7 @@ class WdkManager {
    * @returns {Promise<Object>} Restore result
    */
   async rgbRestoreFromBackup (accountIndex, params) {
+    // File-based restore via WalletAccountRgb.
     const account = await this.getAccount('rgb', accountIndex)
     return account.restoreFromBackup(params)
   }
@@ -709,13 +715,41 @@ class WdkManager {
   }
 
   // ============================================================================
-  // UTEXO Protocol Methods (Phase 5)
-  // These require UTEXOWallet integration and UTEXO Gateway API credentials.
-  // Currently stubbed — will throw until:
-  //   1. UTEXOWallet is added alongside WalletManager (additive composition)
-  //   2. UTEXO Gateway API credentials are configured
-  //   3. The gateway endpoints are reachable from the worklet
+  // UTEXO Protocol Methods (Lightning, Onchain Bridge)
+  //
+  // These use UTEXOWallet from @utexo/rgb-sdk which provides Lightning and
+  // onchain bridge operations via the UTEXO Gateway. Authentication is
+  // signature-based — no API keys or credentials needed.
+  //
+  // axios was replaced with fetch in rgb-sdk so UTEXOWallet can now run
+  // inside the bare worklet environment.
   // ============================================================================
+
+  /**
+   * Returns a lazily-initialized UTEXOWallet instance.
+   * @private
+   * @returns {Promise<Object>}
+   */
+  async _getUtexoWallet () {
+    if (!this._utexoWallet) {
+      const { UTEXOWallet } = await import('@utexo/rgb-sdk')
+
+      const seed = (typeof this._seed === 'string' || this._seed instanceof Uint8Array)
+        ? this._seed
+        : this._seed.rgb
+
+      const rgbConfig = this._config.rgb || {}
+      const options = {
+        network: rgbConfig.network || 'testnet'
+      }
+      if (rgbConfig.dataDir) options.dataDir = rgbConfig.dataDir
+      if (rgbConfig.vssServerUrl) options.vssServerUrl = rgbConfig.vssServerUrl
+
+      this._utexoWallet = new UTEXOWallet(seed, options)
+      await this._utexoWallet.initialize()
+    }
+    return this._utexoWallet
+  }
 
   /**
    * RGB/UTEXO: Create a Lightning invoice.
@@ -724,10 +758,8 @@ class WdkManager {
    * @returns {Promise<Object>} Lightning invoice data
    */
   async rgbCreateLightningInvoice (accountIndex, options) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.createLightningInvoice(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning invoices.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.createLightningInvoice(options)
   }
 
   /**
@@ -737,10 +769,8 @@ class WdkManager {
    * @returns {Promise<Object>} Payment result
    */
   async rgbPayLightningInvoice (accountIndex, options) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.payLightningInvoice(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning payments.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.payLightningInvoice(options)
   }
 
   /**
@@ -750,10 +780,8 @@ class WdkManager {
    * @returns {Promise<Object>} Receive address/invoice
    */
   async rgbOnchainReceive (accountIndex, options = {}) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.onchainReceive(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable onchain bridge.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.onchainReceive(options)
   }
 
   /**
@@ -763,10 +791,8 @@ class WdkManager {
    * @returns {Promise<Object>} Send result
    */
   async rgbOnchainSend (accountIndex, options) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.onchainSend(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable onchain bridge.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.onchainSend(options)
   }
 
   /**
@@ -775,10 +801,8 @@ class WdkManager {
    * @returns {Promise<Array>} Lightning payment history
    */
   async rgbListLightningPayments (accountIndex) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.listLightningPayments()
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning payment history.')
+    const utexoWallet = await this._getUtexoWallet()
+    return await utexoWallet.listOnchainTransfers()
   }
 
   async rgbCreateUtxosBegin (accountIndex, options = {}) {
@@ -929,6 +953,7 @@ class WdkManager {
 
     return this._account_abstraction_wallets[blockchain]
   }
+
 }
 
 module.exports = {

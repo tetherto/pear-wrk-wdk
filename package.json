@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@utexo/rgb-lib-bare": "https://github.com/Jainakin/rgb-lib-bare#cfe0a855d42d14c714970c0a489988aca2afff4f",
-    "@utexo/wdk-wallet-rgb": "https://github.com/Jainakin/wdk-wallet-rgb#ecf8391",
+    "@utexo/wdk-wallet-rgb": "https://github.com/Jainakin/wdk-wallet-rgb#5f19a10",
     "@wdk/wallet": "https://github.com/tetherto/wdk-wallet#ee0f6046b6128d0a096f18cc6ca7845ca4cedb12",
     "@wdk/wallet-btc": "https://github.com/tetherto/wdk-wallet-btc#ed35de0b49344bb07736fc296a28b8465a8e8a6e",
     "@wdk/wallet-evm": "https://github.com/tetherto/wdk-wallet-evm#74e281ea63f7df6e2590580bba988daeda021df6",
