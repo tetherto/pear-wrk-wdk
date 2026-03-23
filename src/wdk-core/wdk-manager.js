@@ -709,76 +709,36 @@ class WdkManager {
   }
 
   // ============================================================================
-  // UTEXO Protocol Methods (Phase 5)
-  // These require UTEXOWallet integration and UTEXO Gateway API credentials.
-  // Currently stubbed — will throw until:
-  //   1. UTEXOWallet is added alongside WalletManager (additive composition)
-  //   2. UTEXO Gateway API credentials are configured
-  //   3. The gateway endpoints are reachable from the worklet
+  // UTEXO Bridge Methods (Lightning & Onchain)
+  //
+  // These route through WalletAccountRgb which handles the UTEXO Gateway
+  // bridge API (signature-based auth) + rgb-lib wallet operations directly.
+  // Same pattern as every other chain — all logic lives in the wallet package.
   // ============================================================================
 
-  /**
-   * RGB/UTEXO: Create a Lightning invoice.
-   * @param {number} accountIndex
-   * @param {Object} options - { amount, description?, expiry? }
-   * @returns {Promise<Object>} Lightning invoice data
-   */
   async rgbCreateLightningInvoice (accountIndex, options) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.createLightningInvoice(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning invoices.')
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.createLightningInvoice(options)
   }
 
-  /**
-   * RGB/UTEXO: Pay a Lightning invoice.
-   * @param {number} accountIndex
-   * @param {Object} options - { invoice, amount? }
-   * @returns {Promise<Object>} Payment result
-   */
   async rgbPayLightningInvoice (accountIndex, options) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.payLightningInvoice(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning payments.')
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.payLightningInvoice(options)
   }
 
-  /**
-   * RGB/UTEXO: Receive via onchain bridge.
-   * @param {number} accountIndex
-   * @param {Object} options - { amount?, assetId? }
-   * @returns {Promise<Object>} Receive address/invoice
-   */
   async rgbOnchainReceive (accountIndex, options = {}) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.onchainReceive(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable onchain bridge.')
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.onchainReceive(options)
   }
 
-  /**
-   * RGB/UTEXO: Send via onchain bridge.
-   * @param {number} accountIndex
-   * @param {Object} options - { to, amount, assetId? }
-   * @returns {Promise<Object>} Send result
-   */
   async rgbOnchainSend (accountIndex, options) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.onchainSend(options)
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable onchain bridge.')
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.onchainSend(options)
   }
 
-  /**
-   * RGB/UTEXO: List Lightning payments.
-   * @param {number} accountIndex
-   * @returns {Promise<Array>} Lightning payment history
-   */
   async rgbListLightningPayments (accountIndex) {
-    // TODO: Requires UTEXOWallet integration
-    // const utexoWallet = await this._getUtexoWallet(accountIndex)
-    // return await utexoWallet.listLightningPayments()
-    throw new Error('UTEXO Gateway not configured. Provide API credentials to enable Lightning payment history.')
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.listLightningPayments()
   }
 
   async rgbCreateUtxosBegin (accountIndex, options = {}) {
