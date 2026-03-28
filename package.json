@@ -15,6 +15,7 @@
   "files": [
     "index.js",
     "worklet.js",
+    "jsonrpc.js",
     "src",
     "types",
     "generated",
@@ -40,6 +41,9 @@
     "./worklet": {
       "types": "./types/index.d.ts",
       "default": "./worklet.js"
+    },
+    "./jsonrpc": {
+      "default": "./jsonrpc.js"
     },
     "./package.json": "./package.json",
     "./hrpc": {
