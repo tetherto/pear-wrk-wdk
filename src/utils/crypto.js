@@ -15,7 +15,7 @@ const crypto = require('bare-crypto')
  * Securely zero out sensitive memory (memzero)
  * Note: In JavaScript/V8, this may not be fully effective due to garbage collection
  * and memory management, but it's still good practice for security-sensitive code.
- * @param {Buffer|Uint8Array|ArrayBuffer} buffer - Buffer to zero out
+ * @param {Buffer | Uint8Array | ArrayBuffer} buffer - Buffer to zero out
  */
 const memzero = (buffer) => {
   if (!buffer) return
@@ -45,19 +45,23 @@ const generateEncryptionKey = () => {
 
 /**
  * Encrypt data using AES-256-GCM
- * @param {Uint8Array|Buffer} data - Data to encrypt
- * @param {string} keyBase64 - Base64-encoded encryption key
+ * @param {Uint8Array | Buffer} data - Data to encrypt
+ * @param {Buffer | string} key - Encryption key as Buffer or Base64-encoded string
  * @returns {string} Base64-encoded encrypted data with IV and auth tag
  */
-const encrypt = (data, keyBase64) => {
-  const key = Buffer.from(keyBase64, 'base64')
+const encrypt = (data, key) => {
   const iv = crypto.randomBytes(12) // 96-bit IV for GCM
 
-  // Convert data to Buffer if needed
-  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data)
+  // Convert key to Buffer if string (only zero the internal copy)
+  const keyIsString = typeof key === 'string'
+  const keyBuffer = keyIsString ? Buffer.from(key, 'base64') : key
+
+  // Convert data to Buffer if needed (only zero the internal copy)
+  const dataIsCopy = !Buffer.isBuffer(data)
+  const dataBuffer = dataIsCopy ? Buffer.from(data) : data
 
   // Use AES-256-GCM for authenticated encryption
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
+  const cipher = crypto.createCipheriv('aes-256-gcm', keyBuffer, iv)
   const encrypted = Buffer.concat([cipher.update(dataBuffer), cipher.final()])
   const authTag = cipher.getAuthTag()
 
@@ -65,11 +69,13 @@ const encrypt = (data, keyBase64) => {
   const result = Buffer.concat([iv, encrypted, authTag])
   const resultBase64 = result.toString('base64')
 
-  // Zero out sensitive buffers (caller should zero input data buffer)
-  memzero(key)
+  // Zero out sensitive buffers; caller is responsible for zeroing key/data Buffers they own
   memzero(iv)
   memzero(encrypted)
   memzero(authTag)
+  memzero(result)
+  if (keyIsString) memzero(keyBuffer)
+  if (dataIsCopy) memzero(dataBuffer)
 
   return resultBase64
 }
@@ -77,11 +83,14 @@ const encrypt = (data, keyBase64) => {
 /**
  * Decrypt data using AES-256-GCM
  * @param {string} encryptedBase64 - Base64-encoded encrypted data with IV and auth tag
- * @param {string} keyBase64 - Base64-encoded encryption key
+ * @param {Buffer | string} key - Encryption key as Buffer or Base64-encoded string
  * @returns {Buffer} Decrypted data
  */
-const decrypt = (encryptedBase64, keyBase64) => {
-  const key = Buffer.from(keyBase64, 'base64')
+const decrypt = (encryptedBase64, key) => {
+  // Convert key to Buffer if string (only zero the internal copy)
+  const keyIsString = typeof key === 'string'
+  const keyBuffer = keyIsString ? Buffer.from(key, 'base64') : key
+
   const encryptedBuffer = Buffer.from(encryptedBase64, 'base64')
 
   // Extract IV (12 bytes), encrypted data, and auth tag (16 bytes)
@@ -89,17 +98,15 @@ const decrypt = (encryptedBase64, keyBase64) => {
   const authTag = encryptedBuffer.subarray(encryptedBuffer.length - 16)
   const encrypted = encryptedBuffer.subarray(12, encryptedBuffer.length - 16)
 
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv)
+  const decipher = crypto.createDecipheriv('aes-256-gcm', keyBuffer, iv)
   decipher.setAuthTag(authTag)
 
   const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()])
 
-  // Zero out sensitive buffers (but not the decrypted result we're returning)
-  memzero(key)
+  // Zero out sensitive buffers; caller is responsible for zeroing key Buffer they own
+  // iv/authTag/encrypted are subarrays of encryptedBuffer — zeroing it covers all three
   memzero(encryptedBuffer)
-  memzero(iv)
-  memzero(authTag)
-  memzero(encrypted)
+  if (keyIsString) memzero(keyBuffer)
 
   return decrypted
 }
@@ -126,25 +133,26 @@ const generateEntropy = (wordCount) => {
 
 /**
  * Encrypt seed and entropy with a new encryption key
- * @param {Uint8Array|Buffer} seed - Seed bytes to encrypt
- * @param {Uint8Array|Buffer} entropy - Entropy bytes to encrypt
+ * @param {Uint8Array | Buffer} seed - Seed bytes to encrypt
+ * @param {Uint8Array | Buffer} entropy - Entropy bytes to encrypt
  * @returns {WdkEntropyResult} Object containing encryptionKey, encryptedSeedBuffer, and encryptedEntropyBuffer
  */
 const encryptSecrets = (seed, entropy) => {
-  // Generate encryption key
-  const encryptionKey = generateEncryptionKey()
+  const encryptionKeyBuffer = crypto.randomBytes(32)
 
-  // Convert to buffers if needed
   const seedBuffer = Buffer.isBuffer(seed) ? seed : Buffer.from(seed)
   const entropyBuffer = Buffer.isBuffer(entropy) ? entropy : Buffer.from(entropy)
 
-  // Encrypt both secrets
-  const encryptedSeedBuffer = encrypt(seedBuffer, encryptionKey)
-  const encryptedEntropyBuffer = encrypt(entropyBuffer, encryptionKey)
+  const encryptedSeedBuffer = encrypt(seedBuffer, encryptionKeyBuffer)
+  const encryptedEntropyBuffer = encrypt(entropyBuffer, encryptionKeyBuffer)
 
-  // Zero out sensitive buffers
   memzero(seedBuffer)
   memzero(entropyBuffer)
+  if (seed !== seedBuffer) memzero(seed)
+  if (entropy !== entropyBuffer) memzero(entropy)
+
+  const encryptionKey = encryptionKeyBuffer.toString('base64')
+  memzero(encryptionKeyBuffer)
 
   return {
     encryptionKey,

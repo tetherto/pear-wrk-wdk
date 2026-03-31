@@ -26,11 +26,6 @@ async function generateEntropyAndEncryptHandler (request) {
   const { encryptionKey, encryptedSeedBuffer, encryptedEntropyBuffer } =
     encryptSecrets(seedBuffer, entropyBuffer)
 
-  // Important: Zero out sensitive buffers
-  memzero(entropy)
-  memzero(seedBuffer)
-  memzero(entropyBuffer)
-
   return {
     encryptionKey,
     encryptedSeedBuffer,
