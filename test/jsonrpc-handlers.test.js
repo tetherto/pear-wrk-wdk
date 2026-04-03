@@ -364,4 +364,54 @@ describe('JSON-RPC Transport', () => {
       assert.strictEqual(resp.id, 77)
     })
   })
+
+  describe('duplicate request ID protection', () => {
+    test('should reject a duplicate concurrent request id', async () => {
+      ipc.emit('data', frameMessage({ jsonrpc: '2.0', id: 1, method: 'getSeedAndEntropyFromMnemonic', params: { mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about' } }))
+      ipc.emit('data', frameMessage({ jsonrpc: '2.0', id: 1, method: 'workletStart', params: {} }))
+
+      await waitForResponse(ipc, 2)
+      const responses = ipc.getAllResponses()
+
+      const successResp = responses.find((r) => r.result)
+      const errorResp = responses.find((r) => r.error)
+
+      assert.ok(successResp, 'first request should succeed')
+      assert.ok(errorResp, 'duplicate request should return error')
+      assert.strictEqual(errorResp.error.code, 'DUPLICATE_REQUEST')
+      assert.ok(errorResp.error.message.includes('already being processed'))
+    })
+
+    test('should allow reuse of an id after the previous request completes', async () => {
+      ipc.emit('data', frameMessage({ jsonrpc: '2.0', id: 5, method: 'workletStart', params: {} }))
+      await waitForResponse(ipc, 1)
+
+      const first = ipc.getLastResponse()
+      assert.strictEqual(first.id, 5)
+      assert.ok(first.result)
+
+      ipc.emit('data', frameMessage({ jsonrpc: '2.0', id: 5, method: 'workletStart', params: {} }))
+      await waitForResponse(ipc, 2)
+
+      const responses = ipc.getAllResponses()
+      assert.strictEqual(responses.length, 2)
+      assert.ok(responses[1].result, 'reused id should succeed after previous request completed')
+      assert.strictEqual(responses[1].id, 5)
+    })
+
+    test('should allow different ids to be processed concurrently', async () => {
+      ipc.emit('data', frameMessage({ jsonrpc: '2.0', id: 20, method: 'workletStart', params: {} }))
+      ipc.emit('data', frameMessage({ jsonrpc: '2.0', id: 21, method: 'workletStart', params: {} }))
+
+      await waitForResponse(ipc, 2)
+      const responses = ipc.getAllResponses()
+
+      assert.strictEqual(responses.length, 2)
+      assert.ok(responses[0].result, 'first concurrent request should succeed')
+      assert.ok(responses[1].result, 'second concurrent request should succeed')
+
+      const ids = responses.map((r) => r.id).sort()
+      assert.deepStrictEqual(ids, [20, 21])
+    })
+  })
 })

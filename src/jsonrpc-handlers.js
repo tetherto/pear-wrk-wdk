@@ -39,6 +39,7 @@ function registerJsonRpcHandlers (ipc, context) {
   }
 
   let readBuffer = Buffer.alloc(0)
+  const inflightRequests = new Set()
 
   function writeFramed (data) {
     const length = Buffer.allocUnsafe(4)
@@ -72,6 +73,21 @@ function registerJsonRpcHandlers (ipc, context) {
 
   async function handleJsonRpcMessage (message) {
     const { id, method, params } = message
+
+    if (inflightRequests.has(id)) {
+      const response = safeStringify({
+        jsonrpc: '2.0',
+        id,
+        error: {
+          message: `Request with id ${id} is already being processed`,
+          code: ERROR_CODES.DUPLICATE_REQUEST
+        }
+      })
+      writeFramed(Buffer.from(response))
+      return
+    }
+
+    inflightRequests.add(id)
 
     try {
       let result
@@ -160,6 +176,8 @@ function registerJsonRpcHandlers (ipc, context) {
         error: errorResponse
       })
       writeFramed(Buffer.from(response))
+    } finally {
+      inflightRequests.delete(id)
     }
   }
 
