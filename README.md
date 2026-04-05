@@ -52,8 +52,8 @@ While this package provides the core infrastructure, you typically don't need to
 
 > **Note**: You likely do not need to install `@tetherto/pear-wrk-wdk` directly. It is a low-level dependency used internally by the higher-level libraries.
 
-1.  **Generate the Worklet**: Install **[`@tetherto/wdk-worklet-bundler`](#)** (usually as a dev dependency). It provides a CLI to automatically generate the worklet entry file based on your WDK modules configuration.
-2.  **Connect in your App**: Install **[`@tetherto/wdk-react-native-core`](#)** (or other platform-specific core libraries). This provides ready-to-use hooks to interact with the worklet without needing to manually manage the HRPC connection or the worklet lifecycle.
+1.  **Generate the Worklet**: Install **[`@tetherto/wdk-worklet-bundler`](https://github.com/tetherto/wdk-worklet-bundler)** (usually as a dev dependency). It provides a CLI to automatically generate the worklet entry file based on your WDK modules configuration.
+2.  **Connect in your App**: Install **[`@tetherto/wdk-react-native-core`](https://github.com/tetherto/wdk-react-native-core)** (or other platform-specific core libraries). This provides ready-to-use hooks to interact with the worklet without needing to manually manage the HRPC connection or the worklet lifecycle.
 
 ### Manual Implementation (For Custom Setups)
 
@@ -134,14 +134,14 @@ const address = await hrpc.callMethod({
 ## API Reference
 
 ### Secrets & Security
-*   **`generateEntropyAndEncrypt(wordCount)`**: Generates BIP39 mnemonics and encrypts them immediately in the worklet memory. Returns only the encrypted buffer and key to the host.
+*   **`generateEntropyAndEncrypt(wordCount)`**: Generates BIP39 mnemonics and encrypts them immediately in the worklet memory. Returns `encryptionKey`, `encryptedSeedBuffer`, and `encryptedEntropyBuffer`.
 *   **`getMnemonicFromEntropy(encryptedEntropy, key)`**: Decrypts and returns the mnemonic.
 *   **`getSeedAndEntropyFromMnemonic(mnemonic)`**: Migrates an existing mnemonic into the secure encrypted storage format.
 
 ### WDK Lifecycle
 *   **`initializeWDK(params)`**: Boots up the WDK instance inside the worklet.
     *   `encryptionKey`: The key to decrypt the seed (returned by `generateEntropyAndEncrypt`).
-    *   `encryptedSeed`: The encrypted seed buffer (returned by `generateEntropyAndEncrypt`).
+    *   `encryptedSeedBuffer`: The encrypted seed buffer (returned by `generateEntropyAndEncrypt`).
     *   `config`: JSON stringified configuration object (must contain `networks`).
 *   **`dispose()`**: Tears down the WDK instance and clears sensitive memory.
 
@@ -150,7 +150,8 @@ const address = await hrpc.callMethod({
     *   `methodName`: The WDK method to call (e.g., `sendTransaction`, `signMessage`).
     *   `network`: The target blockchain (e.g., `ethereum`).
     *   `accountIndex`: The index of the account to use (e.g., `0`).
-    *   `args`: Arguments for the method.
+    *   `args`: Arguments for the method (JSON-stringified).
+    *   `options`: Additional options for the method (JSON-stringified).
 
 ### Dynamic Registration
 *   **`registerWallet(config)`**: Add support for a new blockchain network at runtime.
