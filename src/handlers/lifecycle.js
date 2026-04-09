@@ -199,7 +199,7 @@ async function resetWdkWallets (params, context) {
       ERROR_CODES.WDK_MANAGER_INIT
     )
   }
-  
+
   const targetChains = Object.values(workletConfig.networks)
     .filter(networkConfig => networkConfig.config && typeof networkConfig.config === 'object')
     .map(networkConfig => networkConfig.blockchain)

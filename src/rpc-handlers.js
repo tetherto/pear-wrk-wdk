@@ -78,7 +78,7 @@ function registerRpcHandlers (rpc, context) {
   rpc.onRegisterProtocol(withErrorHandling(withContext(registerProtocolHandler)))
 
   rpc.onDispose(withErrorHandling(withContext(disposeWdkHandler)))
-  
+
   rpc.onResetWdkWallets(withErrorHandling(withContext(resetWdkWallets)))
 }
 
