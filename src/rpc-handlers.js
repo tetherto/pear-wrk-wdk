@@ -1,4 +1,4 @@
-const { generateEntropyAndEncryptHandler, getMnemonicFromEntropyHandler, getSeedAndEntropyFromMnemonicHandler, initializeWdkHandler, disposeWdkHandler, registerWalletHandler, registerProtocolHandler, callMethodHandler } = require('./handlers')
+const { generateEntropyAndEncryptHandler, getMnemonicFromEntropyHandler, getSeedAndEntropyFromMnemonicHandler, initializeWdkHandler, resetWdkWallets, disposeWdkHandler, registerWalletHandler, registerProtocolHandler, callMethodHandler } = require('./handlers')
 const rpcException = require('./exceptions/rpc-exception')
 
 /** @typedef {import('../types/rpc').RpcContext} RpcContext */
@@ -78,6 +78,8 @@ function registerRpcHandlers (rpc, context) {
   rpc.onRegisterProtocol(withErrorHandling(withContext(registerProtocolHandler)))
 
   rpc.onDispose(withErrorHandling(withContext(disposeWdkHandler)))
+
+  rpc.onResetWdkWallets(withErrorHandling(withContext(resetWdkWallets)))
 }
 
 module.exports = {

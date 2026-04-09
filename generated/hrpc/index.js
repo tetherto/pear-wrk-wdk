@@ -25,7 +25,9 @@ const methods = new Map([
   ['@wdk-core/registerWallet', 8],
   [8, '@wdk-core/registerWallet'],
   ['@wdk-core/registerProtocol', 9],
-  [9, '@wdk-core/registerProtocol']
+  [9, '@wdk-core/registerProtocol'],
+  ['@wdk-core/resetWdkWallets', 10],
+  [10, '@wdk-core/resetWdkWallets']
 ])
 
 class HRPC {
@@ -42,7 +44,8 @@ class HRPC {
       ['@wdk-core/initializeWDK', getEncoding('@wdk-core/initializeWDK-request')],
       ['@wdk-core/getSeedAndEntropyFromMnemonic', getEncoding('@wdk-core/getSeedAndEntropyFromMnemonic-request')],
       ['@wdk-core/registerWallet', getEncoding('@wdk-core/registerWallet-request')],
-      ['@wdk-core/registerProtocol', getEncoding('@wdk-core/registerProtocol-request')]
+      ['@wdk-core/registerProtocol', getEncoding('@wdk-core/registerProtocol-request')],
+      ['@wdk-core/resetWdkWallets', getEncoding('@wdk-core/resetWdkWallets-request')]
     ])
     this._responseEncodings = new Map([
       ['@wdk-core/workletStart', getEncoding('@wdk-core/workletStart-response')],
@@ -52,7 +55,8 @@ class HRPC {
       ['@wdk-core/initializeWDK', getEncoding('@wdk-core/initializeWDK-response')],
       ['@wdk-core/getSeedAndEntropyFromMnemonic', getEncoding('@wdk-core/getSeedAndEntropyFromMnemonic-response')],
       ['@wdk-core/registerWallet', getEncoding('@wdk-core/registerWallet-response')],
-      ['@wdk-core/registerProtocol', getEncoding('@wdk-core/registerProtocol-response')]
+      ['@wdk-core/registerProtocol', getEncoding('@wdk-core/registerProtocol-response')],
+      ['@wdk-core/resetWdkWallets', getEncoding('@wdk-core/resetWdkWallets-response')]
     ])
     this._rpc = new RPC(stream, async (req) => {
       const command = methods.get(req.command)
@@ -190,6 +194,10 @@ class HRPC {
     return this._call('@wdk-core/registerProtocol', args)
   }
 
+  async resetWdkWallets(args) {
+    return this._call('@wdk-core/resetWdkWallets', args)
+  }
+
   onLog(responseFn) {
     this._handlers['@wdk-core/log'] = responseFn
   }
@@ -228,6 +236,10 @@ class HRPC {
 
   onRegisterProtocol(responseFn) {
     this._handlers['@wdk-core/registerProtocol'] = responseFn
+  }
+
+  onResetWdkWallets(responseFn) {
+    this._handlers['@wdk-core/resetWdkWallets'] = responseFn
   }
 
   _requestIsStream(command) {

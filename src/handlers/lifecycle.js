@@ -10,6 +10,7 @@ const {
 } = require('../utils/validation')
 
 /** @typedef {import('../../types/rpc').WdkInitializeParams} WdkInitializeParams */
+/** @typedef {import('../../types/rpc').WdkResetWalletParams} WdkResetWalletParams */
 /** @typedef {import('../../types/rpc').RpcContext} RpcContext */
 /** @typedef {import('../../types/rpc').WdkWorkletConfig} WdkWorkletConfig */
 
@@ -155,6 +156,79 @@ async function initializeWdkHandler (init, context) {
 
 /**
  *
+ * @param {WdkResetWalletParams} params
+ * @param {RpcContext} context
+ * @returns {Promise<{ status: string }>}
+ */
+async function resetWdkWallets (params, context) {
+  const { walletManagers, wdk } = context
+
+  if (!params || typeof params !== 'object') {
+    throw createErrorWithCode(
+      'Params must be an object',
+      ERROR_CODES.BAD_REQUEST
+    )
+  }
+
+  /** @type {Omit<WdkWorkletConfig, 'protocols'>} */
+  let workletConfig
+  validateRequest(
+    params,
+    () => {
+      validateNonEmptyString(params.config, 'config')
+      workletConfig = validateJSON(params.config, 'config')
+    },
+    'Worklet config'
+  )
+
+  if (
+    !workletConfig ||
+    !workletConfig.networks ||
+    typeof workletConfig.networks !== 'object' ||
+    Object.keys(workletConfig.networks).length === 0
+  ) {
+    throw createErrorWithCode(
+      'At least one network configuration must be provided',
+      ERROR_CODES.BAD_REQUEST
+    )
+  }
+
+  if (!wdk) {
+    throw createErrorWithCode(
+      'WDK must be initialized with a seed before module reset.',
+      ERROR_CODES.WDK_MANAGER_INIT
+    )
+  }
+
+  const targetChains = Object.values(workletConfig.networks)
+    .filter(networkConfig => networkConfig.config && typeof networkConfig.config === 'object')
+    .map(networkConfig => networkConfig.blockchain)
+  wdk.dispose(targetChains)
+
+  for (const networkConfig of Object.values(workletConfig.networks)) {
+    const networkName = networkConfig.blockchain
+
+    if (networkConfig.config && typeof networkConfig.config === 'object') {
+      const walletManager = walletManagers[networkName]
+
+      if (!walletManager) {
+        throw createErrorWithCode(
+          `No wallet manager found for network: ${networkName}`,
+          ERROR_CODES.WDK_MANAGER_INIT
+        )
+      }
+
+      logger.info(`Registering ${networkName} wallet`)
+      wdk.registerWallet(networkName, walletManager, networkConfig.config)
+    }
+  }
+
+  logger.info('WDK wallet reset completed for', targetChains)
+  return { status: 'reset' }
+}
+
+/**
+ *
  * @param {any} request
  * @param {RpcContext} context
  */
@@ -167,5 +241,6 @@ async function disposeWdkHandler (request, context) {
 
 module.exports = {
   initializeWdkHandler,
-  disposeWdkHandler
+  disposeWdkHandler,
+  resetWdkWallets
 }

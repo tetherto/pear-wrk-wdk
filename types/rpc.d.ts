@@ -85,6 +85,11 @@ export interface WdkInitializeParams {
   config: string; 
 }
 
+export interface WdkResetWalletParams {
+  // JSON string of WdkWorkletConfig
+  config: string
+}
+
 export interface WdkGenerateEntropyParams {
   wordCount: 12 | 24;
 }
