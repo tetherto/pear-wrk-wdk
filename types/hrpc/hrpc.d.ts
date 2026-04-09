@@ -48,6 +48,8 @@ export class HRPC {
    * Initialize WDK
    */
   initializeWDK(args: WdkInitializeParams): Promise<{ status: string }>;
+  
+  resetWdkWallets(args: WdkResetWalletParams): Promise<{ status: string }>;
 
   /**
    * Generate entropy and encrypt it
