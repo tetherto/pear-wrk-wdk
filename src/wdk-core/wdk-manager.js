@@ -708,39 +708,6 @@ class WdkManager {
     return account.sendEnd(options)
   }
 
-  // ============================================================================
-  // UTEXO Bridge Methods (Lightning & Onchain)
-  //
-  // These route through WalletAccountRgb which handles the UTEXO Gateway
-  // bridge API (signature-based auth) + rgb-lib wallet operations directly.
-  // Same pattern as every other chain — all logic lives in the wallet package.
-  // ============================================================================
-
-  async rgbCreateLightningInvoice (accountIndex, options) {
-    const account = await this.getAccount('rgb', accountIndex)
-    return account.createLightningInvoice(options)
-  }
-
-  async rgbPayLightningInvoice (accountIndex, options) {
-    const account = await this.getAccount('rgb', accountIndex)
-    return account.payLightningInvoice(options)
-  }
-
-  async rgbOnchainReceive (accountIndex, options = {}) {
-    const account = await this.getAccount('rgb', accountIndex)
-    return account.onchainReceive(options)
-  }
-
-  async rgbOnchainSend (accountIndex, options) {
-    const account = await this.getAccount('rgb', accountIndex)
-    return account.onchainSend(options)
-  }
-
-  async rgbListLightningPayments (accountIndex) {
-    const account = await this.getAccount('rgb', accountIndex)
-    return account.listLightningPayments()
-  }
-
   async rgbCreateUtxosBegin (accountIndex, options = {}) {
     const account = await this.getAccount('rgb', accountIndex)
     return account.createUtxosBegin(options)

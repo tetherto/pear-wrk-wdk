@@ -424,66 +424,6 @@ rpc.onRgbSendEnd(async payload => {
 
 /*****************
  *
- * UTEXO PROTOCOL (Phase 5 — Stubbed, needs Gateway API credentials)
- *
- *****************/
-rpc.onRgbCreateLightningInvoice(async payload => {
-  try {
-    const options = { amount: payload.amount }
-    if (payload.description) options.description = payload.description
-    if (payload.expiry) options.expiry = payload.expiry
-    const result = await wdk.rgbCreateLightningInvoice(payload.accountIndex, options)
-    return { invoice: result?.invoice || '', paymentHash: result?.paymentHash || '' }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
-rpc.onRgbPayLightningInvoice(async payload => {
-  try {
-    const options = { invoice: payload.invoice }
-    if (payload.amount) options.amount = payload.amount
-    const result = await wdk.rgbPayLightningInvoice(payload.accountIndex, options)
-    return { paymentHash: result?.paymentHash || '', status: result?.status || 'unknown' }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
-rpc.onRgbOnchainReceive(async payload => {
-  try {
-    const options = {}
-    if (payload.amount) options.amount = payload.amount
-    if (payload.assetId) options.assetId = payload.assetId
-    const result = await wdk.rgbOnchainReceive(payload.accountIndex, options)
-    return { address: result?.address || '', invoice: result?.invoice || '' }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
-rpc.onRgbOnchainSend(async payload => {
-  try {
-    const options = { to: payload.to, amount: payload.amount }
-    if (payload.assetId) options.assetId = payload.assetId
-    const result = await wdk.rgbOnchainSend(payload.accountIndex, options)
-    return { hash: result?.hash || '', status: result?.status || 'unknown' }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
-rpc.onRgbListLightningPayments(async payload => {
-  try {
-    const payments = await wdk.rgbListLightningPayments(payload.accountIndex)
-    return { payments: JSON.stringify(payments) }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
-/*****************
- *
  * ADVANCED: PSBT, UTXO Begin/End, Invoice, Decode
  *
  *****************/
