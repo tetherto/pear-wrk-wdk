@@ -450,26 +450,6 @@ rpc.onRgbCreateUtxosEnd(async payload => {
   }
 })
 
-rpc.onRgbSendBtcBegin(async payload => {
-  try {
-    const options = { address: payload.address, amount: payload.amount }
-    if (payload.feeRate) options.feeRate = payload.feeRate
-    const psbt = await wdk.rgbSendBtcBegin(payload.accountIndex, options)
-    return { psbt: psbt || '' }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
-rpc.onRgbSendBtcEnd(async payload => {
-  try {
-    const result = await wdk.rgbSendBtcEnd(payload.accountIndex, payload.signedPsbt)
-    return { txid: result?.txid || result || '' }
-  } catch (error) {
-    throw new Error(rpcException.stringifyError(error))
-  }
-})
-
 rpc.onRgbDecodeInvoice(async payload => {
   try {
     const data = await wdk.rgbDecodeInvoice(payload.invoice)
