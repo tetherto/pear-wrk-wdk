@@ -718,6 +718,16 @@ class WdkManager {
     return account.createUtxosEnd({ signedPsbt })
   }
 
+  async rgbSendBtcBegin (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.sendBtcBegin(options)
+  }
+
+  async rgbSendBtcEnd (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    return account.sendBtcEnd(options)
+  }
+
   async rgbDecodeInvoice (invoiceString) {
     // Decode uses rgb-lib-bare's Invoice class directly
     const { Invoice } = await import('@utexo/rgb-lib-bare')

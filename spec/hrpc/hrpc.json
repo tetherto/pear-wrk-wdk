@@ -527,6 +527,32 @@
       "version": 2
     },
     {
+      "id": 46,
+      "name": "@wdk-core/rgbSendBtcBegin",
+      "request": {
+        "name": "@wdk-core/rgbSendBtcBegin-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbSendBtcBegin-response",
+        "stream": false
+      },
+      "version": 2
+    },
+    {
+      "id": 47,
+      "name": "@wdk-core/rgbSendBtcEnd",
+      "request": {
+        "name": "@wdk-core/rgbSendBtcEnd-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbSendBtcEnd-response",
+        "stream": false
+      },
+      "version": 2
+    },
+    {
       "id": 48,
       "name": "@wdk-core/rgbDecodeInvoice",
       "request": {
