@@ -240,7 +240,7 @@ rpc.onRgbSend(async payload => {
 rpc.onRgbGetAssetBalance(async payload => {
   try {
     const balance = await wdk.rgbGetAssetBalance(payload.accountIndex, payload.assetId)
-    return { balance: balance.toString() }
+    return { balance: JSON.stringify(balance) }
   } catch (error) {
     throw new Error(rpcException.stringifyError(error))
   }
