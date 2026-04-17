@@ -2,6 +2,7 @@
 // Schema Version: 2
 /* eslint-disable camelcase */
 /* eslint-disable quotes */
+/* eslint-disable space-before-function-paren */
 
 const { c } = require('hyperschema/runtime')
 
@@ -32,23 +33,21 @@ const encoding0 = {
 
 // @wdk-core/log-request
 const encoding1 = {
-  preencode (state, m) {
+  preencode(state, m) {
     state.end++ // max flag is 2 so always one byte
 
     if (m.type) encoding0.preencode(state, m.type)
     if (m.data) c.string.preencode(state, m.data)
   },
-  encode (state, m) {
-    const flags =
-      (m.type ? 1 : 0) |
-      (m.data ? 2 : 0)
+  encode(state, m) {
+    const flags = (m.type ? 1 : 0) | (m.data ? 2 : 0)
 
     c.uint.encode(state, flags)
 
     if (m.type) encoding0.encode(state, m.type)
     if (m.data) c.string.encode(state, m.data)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -60,7 +59,7 @@ const encoding1 = {
 
 // @wdk-core/workletStart-request
 const encoding2 = {
-  preencode (state, m) {
+  preencode(state, m) {
     state.end++ // max flag is 4 so always one byte
 
     if (m.enableDebugLogs) c.uint.preencode(state, m.enableDebugLogs)
@@ -68,11 +67,8 @@ const encoding2 = {
     if (m.seedBuffer) c.string.preencode(state, m.seedBuffer)
     c.string.preencode(state, m.config)
   },
-  encode (state, m) {
-    const flags =
-      (m.enableDebugLogs ? 1 : 0) |
-      (m.seedPhrase ? 2 : 0) |
-      (m.seedBuffer ? 4 : 0)
+  encode(state, m) {
+    const flags = (m.enableDebugLogs ? 1 : 0) | (m.seedPhrase ? 2 : 0) | (m.seedBuffer ? 4 : 0)
 
     c.uint.encode(state, flags)
 
@@ -81,7 +77,7 @@ const encoding2 = {
     if (m.seedBuffer) c.string.encode(state, m.seedBuffer)
     c.string.encode(state, m.config)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -95,19 +91,19 @@ const encoding2 = {
 
 // @wdk-core/workletStart-response
 const encoding3 = {
-  preencode (state, m) {
+  preencode(state, m) {
     state.end++ // max flag is 1 so always one byte
 
     if (m.status) c.string.preencode(state, m.status)
   },
-  encode (state, m) {
+  encode(state, m) {
     const flags = m.status ? 1 : 0
 
     c.uint.encode(state, flags)
 
     if (m.status) c.string.encode(state, m.status)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -118,13 +114,13 @@ const encoding3 = {
 
 // @wdk-core/dispose-request
 const encoding4 = {
-  preencode (state, m) {
+  preencode(state, m) {
 
   },
-  encode (state, m) {
+  encode(state, m) {
 
   },
-  decode (state) {
+  decode(state) {
     return {
     }
   }
@@ -132,19 +128,17 @@ const encoding4 = {
 
 // @wdk-core/callMethod-request
 const encoding5 = {
-  preencode (state, m) {
+  preencode(state, m) {
     c.string.preencode(state, m.methodName)
     c.string.preencode(state, m.network)
     c.uint.preencode(state, m.accountIndex)
     state.end++ // max flag is 2 so always one byte
 
     if (m.args) c.string.preencode(state, m.args)
-    if (version >= 2 && m.options) c.string.preencode(state, m.options)
+    if (m.options) c.string.preencode(state, m.options)
   },
-  encode (state, m) {
-    const flags =
-      (m.args ? 1 : 0) |
-      ((version >= 2 && m.options) ? 2 : 0)
+  encode(state, m) {
+    const flags = (m.args ? 1 : 0) | (m.options ? 2 : 0)
 
     c.string.encode(state, m.methodName)
     c.string.encode(state, m.network)
@@ -152,9 +146,9 @@ const encoding5 = {
     c.uint.encode(state, flags)
 
     if (m.args) c.string.encode(state, m.args)
-    if (version >= 2 && m.options) c.string.encode(state, m.options)
+    if (m.options) c.string.encode(state, m.options)
   },
-  decode (state) {
+  decode(state) {
     const r0 = c.string.decode(state)
     const r1 = c.string.decode(state)
     const r2 = c.uint.decode(state)
@@ -165,26 +159,26 @@ const encoding5 = {
       network: r1,
       accountIndex: r2,
       args: (flags & 1) !== 0 ? c.string.decode(state) : null,
-      options: (version >= 2 && (flags & 2) !== 0) ? c.string.decode(state) : null
+      options: (flags & 2) !== 0 ? c.string.decode(state) : null
     }
   }
 }
 
 // @wdk-core/callMethod-response
 const encoding6 = {
-  preencode (state, m) {
+  preencode(state, m) {
     state.end++ // max flag is 1 so always one byte
 
     if (m.result) c.string.preencode(state, m.result)
   },
-  encode (state, m) {
+  encode(state, m) {
     const flags = m.result ? 1 : 0
 
     c.uint.encode(state, flags)
 
     if (m.result) c.string.encode(state, m.result)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -193,15 +187,64 @@ const encoding6 = {
   }
 }
 
-// @wdk-core/generateEntropyAndEncrypt-request
+// @wdk-core/registerWallet-request
 const encoding7 = {
-  preencode (state, m) {
+  preencode(state, m) {
+    c.string.preencode(state, m.config)
+  },
+  encode(state, m) {
+    c.string.encode(state, m.config)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+
+    return {
+      config: r0
+    }
+  }
+}
+
+// @wdk-core/registerWallet-response
+const encoding8 = {
+  preencode(state, m) {
+    state.end++ // max flag is 2 so always one byte
+
+    if (m.status) c.string.preencode(state, m.status)
+    if (m.blockchains) c.string.preencode(state, m.blockchains)
+  },
+  encode(state, m) {
+    const flags = (m.status ? 1 : 0) | (m.blockchains ? 2 : 0)
+
+    c.uint.encode(state, flags)
+
+    if (m.status) c.string.encode(state, m.status)
+    if (m.blockchains) c.string.encode(state, m.blockchains)
+  },
+  decode(state) {
+    const flags = c.uint.decode(state)
+
+    return {
+      status: (flags & 1) !== 0 ? c.string.decode(state) : null,
+      blockchains: (flags & 2) !== 0 ? c.string.decode(state) : null
+    }
+  }
+}
+
+// @wdk-core/registerProtocol-request
+const encoding9 = encoding7
+
+// @wdk-core/registerProtocol-response
+const encoding10 = encoding3
+
+// @wdk-core/generateEntropyAndEncrypt-request
+const encoding11 = {
+  preencode(state, m) {
     c.uint.preencode(state, m.wordCount)
   },
-  encode (state, m) {
+  encode(state, m) {
     c.uint.encode(state, m.wordCount)
   },
-  decode (state) {
+  decode(state) {
     const r0 = c.uint.decode(state)
 
     return {
@@ -211,15 +254,15 @@ const encoding7 = {
 }
 
 // @wdk-core/generateEntropyAndEncrypt-response
-const encoding8 = {
-  preencode (state, m) {
+const encoding12 = {
+  preencode(state, m) {
     state.end++ // max flag is 4 so always one byte
 
     if (m.encryptionKey) c.string.preencode(state, m.encryptionKey)
     if (m.encryptedSeedBuffer) c.string.preencode(state, m.encryptedSeedBuffer)
     if (m.encryptedEntropyBuffer) c.string.preencode(state, m.encryptedEntropyBuffer)
   },
-  encode (state, m) {
+  encode(state, m) {
     const flags =
       (m.encryptionKey ? 1 : 0) |
       (m.encryptedSeedBuffer ? 2 : 0) |
@@ -231,7 +274,7 @@ const encoding8 = {
     if (m.encryptedSeedBuffer) c.string.encode(state, m.encryptedSeedBuffer)
     if (m.encryptedEntropyBuffer) c.string.encode(state, m.encryptedEntropyBuffer)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -243,16 +286,16 @@ const encoding8 = {
 }
 
 // @wdk-core/getMnemonicFromEntropy-request
-const encoding9 = {
-  preencode (state, m) {
+const encoding13 = {
+  preencode(state, m) {
     c.string.preencode(state, m.encryptedEntropy)
     c.string.preencode(state, m.encryptionKey)
   },
-  encode (state, m) {
+  encode(state, m) {
     c.string.encode(state, m.encryptedEntropy)
     c.string.encode(state, m.encryptionKey)
   },
-  decode (state) {
+  decode(state) {
     const r0 = c.string.decode(state)
     const r1 = c.string.decode(state)
 
@@ -264,20 +307,20 @@ const encoding9 = {
 }
 
 // @wdk-core/getMnemonicFromEntropy-response
-const encoding10 = {
-  preencode (state, m) {
+const encoding14 = {
+  preencode(state, m) {
     state.end++ // max flag is 1 so always one byte
 
     if (m.mnemonic) c.string.preencode(state, m.mnemonic)
   },
-  encode (state, m) {
+  encode(state, m) {
     const flags = m.mnemonic ? 1 : 0
 
     c.uint.encode(state, flags)
 
     if (m.mnemonic) c.string.encode(state, m.mnemonic)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -287,14 +330,14 @@ const encoding10 = {
 }
 
 // @wdk-core/getSeedAndEntropyFromMnemonic-request
-const encoding11 = {
-  preencode (state, m) {
+const encoding15 = {
+  preencode(state, m) {
     c.string.preencode(state, m.mnemonic)
   },
-  encode (state, m) {
+  encode(state, m) {
     c.string.encode(state, m.mnemonic)
   },
-  decode (state) {
+  decode(state) {
     const r0 = c.string.decode(state)
 
     return {
@@ -304,11 +347,11 @@ const encoding11 = {
 }
 
 // @wdk-core/getSeedAndEntropyFromMnemonic-response
-const encoding12 = encoding8
+const encoding16 = encoding12
 
 // @wdk-core/initializeWDK-request
-const encoding13 = {
-  preencode (state, m) {
+const encoding17 = {
+  preencode(state, m) {
     state.end++ // max flag is 4 so always one byte
 
     if (m.seedPhrase) c.string.preencode(state, m.seedPhrase)
@@ -316,11 +359,8 @@ const encoding13 = {
     if (m.encryptedSeed) c.string.preencode(state, m.encryptedSeed)
     c.string.preencode(state, m.config)
   },
-  encode (state, m) {
-    const flags =
-      (m.seedPhrase ? 1 : 0) |
-      (m.encryptionKey ? 2 : 0) |
-      (m.encryptedSeed ? 4 : 0)
+  encode(state, m) {
+    const flags = (m.seedPhrase ? 1 : 0) | (m.encryptionKey ? 2 : 0) | (m.encryptedSeed ? 4 : 0)
 
     c.uint.encode(state, flags)
 
@@ -329,7 +369,7 @@ const encoding13 = {
     if (m.encryptedSeed) c.string.encode(state, m.encryptedSeed)
     c.string.encode(state, m.config)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -342,71 +382,26 @@ const encoding13 = {
 }
 
 // @wdk-core/initializeWDK-response
-const encoding14 = encoding3
+const encoding18 = encoding3
 
-// @wdk-core/registerWallet-request
-const encoding15 = {
-  preencode (state, m) {
-    c.string.preencode(state, m.config)
-  },
-  encode (state, m) {
-    c.string.encode(state, m.config)
-  },
-  decode (state) {
-    const r0 = c.string.decode(state)
+// @wdk-core/resetWdkWallets-request
+const encoding19 = encoding7
 
-    return {
-      config: r0
-    }
-  }
-}
-
-// @wdk-core/registerWallet-response
-const encoding16 = {
-  preencode (state, m) {
-    state.end++ // max flag is 2 so always one byte
-
-    if (version >= 2 && m.status) c.string.preencode(state, m.status)
-    if (version >= 2 && m.blockchains) c.string.preencode(state, m.blockchains)
-  },
-  encode (state, m) {
-    const flags =
-      ((version >= 2 && m.status) ? 1 : 0) |
-      ((version >= 2 && m.blockchains) ? 2 : 0)
-
-    c.uint.encode(state, flags)
-
-    if (version >= 2 && m.status) c.string.encode(state, m.status)
-    if (version >= 2 && m.blockchains) c.string.encode(state, m.blockchains)
-  },
-  decode (state) {
-    const flags = c.uint.decode(state)
-
-    return {
-      status: (version >= 2 && (flags & 1) !== 0) ? c.string.decode(state) : null,
-      blockchains: (version >= 2 && (flags & 2) !== 0) ? c.string.decode(state) : null
-    }
-  }
-}
-
-// @wdk-core/registerProtocol-request
-const encoding17 = encoding15
-
-// @wdk-core/registerProtocol-response
-const encoding18 = {
-  preencode (state, m) {
+// @wdk-core/resetWdkWallets-response
+const encoding20 = {
+  preencode(state, m) {
     state.end++ // max flag is 1 so always one byte
 
     if (version >= 2 && m.status) c.string.preencode(state, m.status)
   },
-  encode (state, m) {
+  encode(state, m) {
     const flags = (version >= 2 && m.status) ? 1 : 0
 
     c.uint.encode(state, flags)
 
     if (version >= 2 && m.status) c.string.encode(state, m.status)
   },
-  decode (state) {
+  decode(state) {
     const flags = c.uint.decode(state)
 
     return {
@@ -415,64 +410,90 @@ const encoding18 = {
   }
 }
 
-function setVersion (v) {
+function setVersion(v) {
   version = v
 }
 
-function encode (name, value, v = VERSION) {
+function encode(name, value, v = VERSION) {
   version = v
   return c.encode(getEncoding(name), value)
 }
 
-function decode (name, buffer, v = VERSION) {
+function decode(name, buffer, v = VERSION) {
   version = v
   return c.decode(getEncoding(name), buffer)
 }
 
-function getEnum (name) {
+function getEnum(name) {
   switch (name) {
-    case '@wdk-core/log-type-enum': return encoding0_enum
-    default: throw new Error('Enum not found ' + name)
+    case '@wdk-core/log-type-enum':
+      return encoding0_enum
+    default:
+      throw new Error('Enum not found ' + name)
   }
 }
 
-function getEncoding (name) {
+function getEncoding(name) {
   switch (name) {
-    case '@wdk-core/log-type-enum': return encoding0
-    case '@wdk-core/log-request': return encoding1
-    case '@wdk-core/workletStart-request': return encoding2
-    case '@wdk-core/workletStart-response': return encoding3
-    case '@wdk-core/dispose-request': return encoding4
-    case '@wdk-core/callMethod-request': return encoding5
-    case '@wdk-core/callMethod-response': return encoding6
-    case '@wdk-core/generateEntropyAndEncrypt-request': return encoding7
-    case '@wdk-core/generateEntropyAndEncrypt-response': return encoding8
-    case '@wdk-core/getMnemonicFromEntropy-request': return encoding9
-    case '@wdk-core/getMnemonicFromEntropy-response': return encoding10
-    case '@wdk-core/getSeedAndEntropyFromMnemonic-request': return encoding11
-    case '@wdk-core/getSeedAndEntropyFromMnemonic-response': return encoding12
-    case '@wdk-core/initializeWDK-request': return encoding13
-    case '@wdk-core/initializeWDK-response': return encoding14
-    case '@wdk-core/registerWallet-request': return encoding15
-    case '@wdk-core/registerWallet-response': return encoding16
-    case '@wdk-core/registerProtocol-request': return encoding17
-    case '@wdk-core/registerProtocol-response': return encoding18
-    default: throw new Error('Encoder not found ' + name)
+    case '@wdk-core/log-type-enum':
+      return encoding0
+    case '@wdk-core/log-request':
+      return encoding1
+    case '@wdk-core/workletStart-request':
+      return encoding2
+    case '@wdk-core/workletStart-response':
+      return encoding3
+    case '@wdk-core/dispose-request':
+      return encoding4
+    case '@wdk-core/callMethod-request':
+      return encoding5
+    case '@wdk-core/callMethod-response':
+      return encoding6
+    case '@wdk-core/registerWallet-request':
+      return encoding7
+    case '@wdk-core/registerWallet-response':
+      return encoding8
+    case '@wdk-core/registerProtocol-request':
+      return encoding9
+    case '@wdk-core/registerProtocol-response':
+      return encoding10
+    case '@wdk-core/generateEntropyAndEncrypt-request':
+      return encoding11
+    case '@wdk-core/generateEntropyAndEncrypt-response':
+      return encoding12
+    case '@wdk-core/getMnemonicFromEntropy-request':
+      return encoding13
+    case '@wdk-core/getMnemonicFromEntropy-response':
+      return encoding14
+    case '@wdk-core/getSeedAndEntropyFromMnemonic-request':
+      return encoding15
+    case '@wdk-core/getSeedAndEntropyFromMnemonic-response':
+      return encoding16
+    case '@wdk-core/initializeWDK-request':
+      return encoding17
+    case '@wdk-core/initializeWDK-response':
+      return encoding18
+    case '@wdk-core/resetWdkWallets-request':
+      return encoding19
+    case '@wdk-core/resetWdkWallets-response':
+      return encoding20
+    default:
+      throw new Error('Encoder not found ' + name)
   }
 }
 
-function getStruct (name, v = VERSION) {
+function getStruct(name, v = VERSION) {
   const enc = getEncoding(name)
   return {
-    preencode (state, m) {
+    preencode(state, m) {
       version = v
       enc.preencode(state, m)
     },
-    encode (state, m) {
+    encode(state, m) {
       version = v
       enc.encode(state, m)
     },
-    decode (state) {
+    decode(state) {
       version = v
       return enc.decode(state)
     }
@@ -481,4 +502,13 @@ function getStruct (name, v = VERSION) {
 
 const resolveStruct = getStruct // compat
 
-module.exports = { resolveStruct, getStruct, getEnum, getEncoding, encode, decode, setVersion, version }
+module.exports = {
+  resolveStruct,
+  getStruct,
+  getEnum,
+  getEncoding,
+  encode,
+  decode,
+  setVersion,
+  version
+}

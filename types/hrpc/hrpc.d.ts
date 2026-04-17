@@ -9,6 +9,7 @@ import type {
   WdkGenerateEntropyParams,
   WdkEntropyResult,
   WdkGetMnemonicParams,
+  WdkResetWalletParams,
 } from '../rpc';
 
 /**
@@ -47,6 +48,8 @@ export class HRPC {
    * Initialize WDK
    */
   initializeWDK(args: WdkInitializeParams): Promise<{ status: string }>;
+  
+  resetWdkWallets(args: WdkResetWalletParams): Promise<{ status: string }>;
 
   /**
    * Generate entropy and encrypt it
@@ -147,6 +150,13 @@ export class HRPC {
    */
   onRegisterProtocol(
     responseFn: (request: { config: string }) => Promise<{ status: string }>
+  ): void;
+  
+  /**
+   * Register a handler for WDK initialization
+   */
+  onResetWdkWallets(
+    responseFn: (request: WdkResetWalletParams) => Promise<{ status: string }>
   ): void;
 }
 

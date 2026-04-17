@@ -308,7 +308,7 @@ describe('RPC Handlers', () => {
           config: JSON.stringify(config),
           encryptedSeed: 'some-encrypted-seed'
         }),
-        /encryptionKey.*must be provided/
+        /encryptionKey.*must be provided or omitted/
       )
     })
   })

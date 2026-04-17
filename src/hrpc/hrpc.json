@@ -122,6 +122,19 @@
         "stream": false
       },
       "version": 1
+    },
+    {
+      "id": 10,
+      "name": "@wdk-core/resetWdkWallets",
+      "request": {
+        "name": "@wdk-core/resetWdkWallets-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/resetWdkWallets-response",
+        "stream": false
+      },
+      "version": 1
     }
   ]
 }

@@ -351,6 +351,33 @@
           "version": 1
         }
       ]
+    },
+    {
+      "name": "resetWdkWallets-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "config",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "resetWdkWallets-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "status",
+          "type": "string",
+          "version": 1
+        }
+      ]
     }
   ]
 }

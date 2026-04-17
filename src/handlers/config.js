@@ -8,8 +8,8 @@ const {
 } = require('../utils/validation')
 
 /** @typedef {import('../../types/rpc').RpcContext} RpcContext */
-/** @typedef {import('../../types/rpc').NetworkConfigs} NetworkConfigs */
-/** @typedef {import('../../types/rpc').ProtocolConfigs} ProtocolConfigs */
+/** @typedef {import('../../types/rpc').NetworkConfig} NetworkConfig */
+/** @typedef {import('../../types/rpc').ProtocolConfig} ProtocolConfig */
 
 /**
  * @param {{ config: string }} request
@@ -20,7 +20,7 @@ async function registerWalletHandler (request, context) {
   const { config: configJson } = request
   const { walletManagers, wdk } = context
 
-  /** @type {NetworkConfigs} */
+  /** @type {Record<string, NetworkConfig>} */
   let networkConfigs
   validateRequest(
     request,
@@ -90,7 +90,7 @@ async function registerProtocolHandler (request, context) {
   const { config: workletConfig } = request
   const { wdk, protocolManagers, walletManagers } = context
 
-  /** @type {ProtocolConfigs} */
+  /** @type {Record<string, ProtocolConfig>} */
   const protocolConfigs = validateJSON(workletConfig, 'config')
 
   if (!wdk) {
