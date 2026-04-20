@@ -730,7 +730,8 @@ class WdkManager {
 
   async rgbDecodeInvoice (invoiceString) {
     // Decode uses rgb-lib-bare's Invoice class directly
-    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const rgblib = await import('@utexo/rgb-lib-bare')
+    const Invoice = rgblib.Invoice || rgblib.default?.Invoice
     const invoice = new Invoice(invoiceString)
     const data = invoice.invoiceData()
     return data
@@ -749,19 +750,22 @@ class WdkManager {
 
   async rgbInvoiceNew (invoiceString) {
     // Create Invoice object — invoiceString is an existing RGB invoice
-    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const rgblib = await import('@utexo/rgb-lib-bare')
+    const Invoice = rgblib.Invoice || rgblib.default?.Invoice
     const invoice = new Invoice(invoiceString)
     return { invoice: invoice.toString() }
   }
 
   async rgbInvoiceData (invoiceString) {
-    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const rgblib = await import('@utexo/rgb-lib-bare')
+    const Invoice = rgblib.Invoice || rgblib.default?.Invoice
     const invoice = new Invoice(invoiceString)
     return invoice.invoiceData()
   }
 
   async rgbInvoiceString (invoiceString) {
-    const { Invoice } = await import('@utexo/rgb-lib-bare')
+    const rgblib = await import('@utexo/rgb-lib-bare')
+    const Invoice = rgblib.Invoice || rgblib.default?.Invoice
     const invoice = new Invoice(invoiceString)
     return invoice.toString()
   }
