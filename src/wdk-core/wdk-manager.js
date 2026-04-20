@@ -594,8 +594,7 @@ class WdkManager {
    */
   async rgbInflate (accountIndex, options) {
     const account = await this.getAccount('rgb', accountIndex)
-    const wallet = account.getRgbWallet()
-    return await wallet.inflate(options)
+    return await account.inflate(options)
   }
 
   /**
