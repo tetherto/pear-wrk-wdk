@@ -308,6 +308,23 @@ rpc.onRgbIssueAssetUda(async payload => {
   }
 })
 
+rpc.onRgbIssueAssetIfa(async payload => {
+  try {
+    const options = {
+      ticker: payload.ticker,
+      name: payload.name,
+      precision: payload.precision,
+      amounts: JSON.parse(payload.amounts),
+      inflationAmounts: JSON.parse(payload.inflationAmounts)
+    }
+    if (payload.rejectListUrl) options.rejectListUrlOpt = payload.rejectListUrl
+    const result = await wdk.rgbIssueAssetIfa(payload.accountIndex, options)
+    return { assetId: result?.assetId || '', details: JSON.stringify(result) }
+  } catch (error) {
+    throw new Error(rpcException.stringifyError(error))
+  }
+})
+
 rpc.onRgbInflate(async payload => {
   try {
     const options = {

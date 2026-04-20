@@ -629,6 +629,19 @@
         "stream": false
       },
       "version": 2
+    },
+    {
+      "id": 54,
+      "name": "@wdk-core/rgbIssueAssetIfa",
+      "request": {
+        "name": "@wdk-core/rgbIssueAssetIfa-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/rgbIssueAssetIfa-response",
+        "stream": false
+      },
+      "version": 2
     }
   ]
 }

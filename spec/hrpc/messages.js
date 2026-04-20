@@ -2215,6 +2215,56 @@ const encoding111 = encoding101
 // @wdk-core/rgbInvoiceString-response
 const encoding112 = encoding108
 
+// @wdk-core/rgbIssueAssetIfa-request
+const encoding113 = {
+  preencode (state, m) {
+    c.uint.preencode(state, m.accountIndex)
+    c.string.preencode(state, m.ticker)
+    c.string.preencode(state, m.name)
+    c.uint.preencode(state, m.precision)
+    c.string.preencode(state, m.amounts)
+    c.string.preencode(state, m.inflationAmounts)
+    state.end++ // max flag is 1 so always one byte
+
+    if (m.rejectListUrl) c.string.preencode(state, m.rejectListUrl)
+  },
+  encode (state, m) {
+    const flags = m.rejectListUrl ? 1 : 0
+
+    c.uint.encode(state, m.accountIndex)
+    c.string.encode(state, m.ticker)
+    c.string.encode(state, m.name)
+    c.uint.encode(state, m.precision)
+    c.string.encode(state, m.amounts)
+    c.string.encode(state, m.inflationAmounts)
+    c.uint.encode(state, flags)
+
+    if (m.rejectListUrl) c.string.encode(state, m.rejectListUrl)
+  },
+  decode (state) {
+    const r0 = c.uint.decode(state)
+    const r1 = c.string.decode(state)
+    const r2 = c.string.decode(state)
+    const r3 = c.uint.decode(state)
+    const r4 = c.string.decode(state)
+    const r5 = c.string.decode(state)
+    const flags = c.uint.decode(state)
+
+    return {
+      accountIndex: r0,
+      ticker: r1,
+      name: r2,
+      precision: r3,
+      amounts: r4,
+      inflationAmounts: r5,
+      rejectListUrl: (flags & 1) !== 0 ? c.string.decode(state) : null
+    }
+  }
+}
+
+// @wdk-core/rgbIssueAssetIfa-response
+const encoding114 = encoding58
+
 function setVersion (v) {
   version = v
 }
@@ -2351,6 +2401,8 @@ function getEncoding (name) {
     case '@wdk-core/rgbInvoiceData-response': return encoding110
     case '@wdk-core/rgbInvoiceString-request': return encoding111
     case '@wdk-core/rgbInvoiceString-response': return encoding112
+    case '@wdk-core/rgbIssueAssetIfa-request': return encoding113
+    case '@wdk-core/rgbIssueAssetIfa-response': return encoding114
     default: throw new Error('Encoder not found ' + name)
   }
 }

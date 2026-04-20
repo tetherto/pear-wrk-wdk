@@ -112,7 +112,9 @@ const methods = new Map([
   ['@wdk-core/rgbInvoiceString', 52],
   [52, '@wdk-core/rgbInvoiceString'],
   ['@wdk-core/rgbSignPsbt', 53],
-  [53, '@wdk-core/rgbSignPsbt']
+  [53, '@wdk-core/rgbSignPsbt'],
+  ['@wdk-core/rgbIssueAssetIfa', 54],
+  [54, '@wdk-core/rgbIssueAssetIfa']
 ])
 
 class HRPC {
@@ -173,7 +175,8 @@ class HRPC {
       ['@wdk-core/rgbInvoiceNew', getEncoding('@wdk-core/rgbInvoiceNew-request')],
       ['@wdk-core/rgbInvoiceData', getEncoding('@wdk-core/rgbInvoiceData-request')],
       ['@wdk-core/rgbInvoiceString', getEncoding('@wdk-core/rgbInvoiceString-request')],
-      ['@wdk-core/rgbSignPsbt', getEncoding('@wdk-core/rgbSignPsbt-request')]
+      ['@wdk-core/rgbSignPsbt', getEncoding('@wdk-core/rgbSignPsbt-request')],
+      ['@wdk-core/rgbIssueAssetIfa', getEncoding('@wdk-core/rgbIssueAssetIfa-request')]
     ])
     this._responseEncodings = new Map([
       ['@wdk-core/workletStart', getEncoding('@wdk-core/workletStart-response')],
@@ -227,7 +230,8 @@ class HRPC {
       ['@wdk-core/rgbInvoiceNew', getEncoding('@wdk-core/rgbInvoiceNew-response')],
       ['@wdk-core/rgbInvoiceData', getEncoding('@wdk-core/rgbInvoiceData-response')],
       ['@wdk-core/rgbInvoiceString', getEncoding('@wdk-core/rgbInvoiceString-response')],
-      ['@wdk-core/rgbSignPsbt', getEncoding('@wdk-core/rgbSignPsbt-response')]
+      ['@wdk-core/rgbSignPsbt', getEncoding('@wdk-core/rgbSignPsbt-response')],
+      ['@wdk-core/rgbIssueAssetIfa', getEncoding('@wdk-core/rgbIssueAssetIfa-response')]
     ])
     this._rpc = new RPC(stream, async (req) => {
       const command = methods.get(req.command)
@@ -507,6 +511,10 @@ class HRPC {
     return this._call('@wdk-core/rgbSignPsbt', args)
   }
 
+  async rgbIssueAssetIfa (args) {
+    return this._call('@wdk-core/rgbIssueAssetIfa', args)
+  }
+
   onLog (responseFn) {
     this._handlers['@wdk-core/log'] = responseFn
   }
@@ -721,6 +729,10 @@ class HRPC {
 
   onRgbSignPsbt (responseFn) {
     this._handlers['@wdk-core/rgbSignPsbt'] = responseFn
+  }
+
+  onRgbIssueAssetIfa (responseFn) {
+    this._handlers['@wdk-core/rgbIssueAssetIfa'] = responseFn
   }
 
   _requestIsStream (command) {

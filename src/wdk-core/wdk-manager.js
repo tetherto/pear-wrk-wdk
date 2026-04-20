@@ -527,7 +527,9 @@ class WdkManager {
    */
   async rgbGetAssetBalance (accountIndex, assetId) {
     const account = await this.getAccount('rgb', accountIndex)
-    return await account.getTokenBalance(assetId)
+    const wallet = account.getRgbWallet()
+    // Return full balance object { settled, future, spendable } instead of just scalar
+    return await wallet.getAssetBalance(assetId)
   }
 
   /**
@@ -584,6 +586,18 @@ class WdkManager {
     const account = await this.getAccount('rgb', accountIndex)
     const wallet = account.getRgbWallet()
     return await wallet.issueAssetUda(options)
+  }
+
+  /**
+   * RGB: Issue an Inflatable Fungible Asset (IFA).
+   * @param {number} accountIndex
+   * @param {Object} options - { ticker, name, precision, amounts, inflationAmounts, rejectListUrl? }
+   * @returns {Promise<Object>} The issued asset
+   */
+  async rgbIssueAssetIfa (accountIndex, options) {
+    const account = await this.getAccount('rgb', accountIndex)
+    const wallet = account.getRgbWallet()
+    return await wallet.issueAssetIfa(options)
   }
 
   /**
