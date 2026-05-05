@@ -23,7 +23,8 @@ const mockRpc = {
   onCallMethod: function (handler) { this.handlers.callMethod = handler },
   onRegisterWallet: function (handler) { this.handlers.registerWallet = handler },
   onRegisterProtocol: function (handler) { this.handlers.registerProtocol = handler },
-  onDispose: function (handler) { this.handlers.dispose = handler }
+  onDispose: function (handler) { this.handlers.dispose = handler },
+  onResetWdkWallets: function (handler) { this.handlers.resetWdkWallets = handler }
 }
 
 describe('RPC Handlers', () => {

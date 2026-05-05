@@ -105,17 +105,24 @@ async function initializeWdkHandler (init, context) {
   for (const [networkName, networkConfig] of Object.entries(workletConfig.networks)) {
     const blockchain = networkConfig.blockchain
 
+    if (networkName !== blockchain) {
+      throw createErrorWithCode(
+        `Network key "${networkName}" must match blockchain field "${blockchain}"`,
+        ERROR_CODES.BAD_REQUEST
+      )
+    }
+
     if (networkConfig.config && typeof networkConfig.config === 'object') {
-      const walletManager = walletManagers[blockchain]
+      const walletManager = walletManagers[networkName]
 
       if (!walletManager) {
         throw createErrorWithCode(
-          `No wallet manager found for blockchain: ${blockchain}`,
+          `No wallet manager found for blockchain: ${networkName}`,
           ERROR_CODES.WDK_MANAGER_INIT
         )
       }
 
-      logger.info(`Registering ${networkName} wallet (blockchain: ${blockchain})`)
+      logger.info(`Registering ${networkName} wallet`)
       context.wdk.registerWallet(networkName, walletManager, networkConfig.config)
     }
   }
