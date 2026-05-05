@@ -102,15 +102,22 @@ async function initializeWdkHandler (init, context) {
     )
   }
 
-  for (const networkConfig of Object.values(workletConfig.networks)) {
-    const networkName = networkConfig.blockchain
+  for (const [networkName, networkConfig] of Object.entries(workletConfig.networks)) {
+    const blockchain = networkConfig.blockchain
+
+    if (networkName !== blockchain) {
+      throw createErrorWithCode(
+        `Network key "${networkName}" must match blockchain field "${blockchain}"`,
+        ERROR_CODES.BAD_REQUEST
+      )
+    }
 
     if (networkConfig.config && typeof networkConfig.config === 'object') {
       const walletManager = walletManagers[networkName]
 
       if (!walletManager) {
         throw createErrorWithCode(
-          `No wallet manager found for network: ${networkName}`,
+          `No wallet manager found for blockchain: ${networkName}`,
           ERROR_CODES.WDK_MANAGER_INIT
         )
       }
@@ -237,6 +244,8 @@ async function disposeWdkHandler (request, context) {
     context.wdk.dispose()
     context.wdk = null
   }
+  logger.info('WDK disposed')
+  return { status: 'disposed' }
 }
 
 module.exports = {
