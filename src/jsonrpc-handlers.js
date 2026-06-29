@@ -58,7 +58,7 @@ function registerJsonRpcHandlers (ipc, context) {
       }
 
       const messageData = readBuffer.slice(4, totalLength)
-      readBuffer = readBuffer.slice(totalLength)
+      readBuffer = Buffer.from(readBuffer.slice(totalLength))
 
       try {
         const message = JSON.parse(messageData.toString())
@@ -66,13 +66,26 @@ function registerJsonRpcHandlers (ipc, context) {
           handleJsonRpcMessage(message)
         }
       } catch (e) {
-        logger.error('Failed to parse framed message:', e)
+        logger.error('Failed to parse framed JSON-RPC message; dropping frame (no response will be sent, client must rely on request timeout):', e)
       }
     }
   }
 
   async function handleJsonRpcMessage (message) {
     const { id, method, params } = message
+
+    if (id === null || id === undefined) {
+      const response = safeStringify({
+        jsonrpc: '2.0',
+        id: null,
+        error: {
+          message: 'Request id is required and cannot be null or undefined',
+          code: ERROR_CODES.BAD_REQUEST
+        }
+      })
+      writeFramed(Buffer.from(response))
+      return
+    }
 
     if (inflightRequests.has(id)) {
       const response = safeStringify({
@@ -123,7 +136,18 @@ function registerJsonRpcHandlers (ipc, context) {
           try {
             result = { result: JSON.parse(callResult.result) }
           } catch (e) {
-            result = callResult
+            logger.error('callMethod result is not valid JSON, returning error response:', e)
+            const response = safeStringify({
+              jsonrpc: '2.0',
+              id,
+              error: {
+                message: 'callMethod result could not be serialized as JSON',
+                code: ERROR_CODES.INTERNAL_ERROR,
+                data: { result: callResult.result }
+              }
+            })
+            writeFramed(Buffer.from(response))
+            return
           }
           break
         }
