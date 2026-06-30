@@ -1,5 +1,5 @@
 const { entropyToMnemonic, mnemonicToSeedSync, mnemonicToEntropy } = require('@scure/bip39')
-const { wordlist } = require('@scure/bip39/wordlists/english')
+const { wordlist } = require('@scure/bip39/wordlists/english.js')
 const { validateRequest, validateBase64, validateMnemonic, validateWordCount } = require('../utils/validation')
 const { memzero, decrypt, generateEntropy, encryptSecrets } = require('../utils/crypto')
 
