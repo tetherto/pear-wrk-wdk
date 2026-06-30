@@ -109,7 +109,7 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
 
   if (typeof account[methodName] !== 'function') {
     if (options?.defaultValue !== undefined) {
-      logger.warn(`${methodName} not available for network: ${network}, returning default value`)
+      logger.error(`${methodName} not available for network: ${network}, returning default value`)
       return options.defaultValue
     }
 
@@ -122,14 +122,6 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
       ERROR_CODES.BAD_REQUEST
     )
   }
-
-  const proto = Object.getPrototypeOf(account)
-  logger.info({
-    constructor: proto?.constructor?.name,
-    protoKeys: Object.getOwnPropertyNames(proto)
-  })
-
-  logger.info('Args:', args)
 
   // Support array args for multi-parameter methods (e.g., transfer(options, config))
   // - Array: spread as positional arguments -> method(arg1, arg2, ...)
