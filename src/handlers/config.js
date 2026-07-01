@@ -47,9 +47,16 @@ async function registerWalletHandler (request, context) {
     )
   }
 
-  const registeredBlockchains = []
-  for (const networkConfig of Object.values(networkConfigs)) {
-    const networkName = networkConfig.blockchain
+  const registeredNetworks = []
+  for (const [networkName, networkConfig] of Object.entries(networkConfigs)) {
+    const blockchain = networkConfig.blockchain
+
+    if (networkName !== blockchain) {
+      throw createErrorWithCode(
+        `Network key "${networkName}" must match blockchain field "${blockchain}"`,
+        ERROR_CODES.BAD_REQUEST
+      )
+    }
 
     if (networkConfig.config && typeof networkConfig.config === 'object') {
       const walletManager = walletManagers[networkName]
@@ -63,11 +70,11 @@ async function registerWalletHandler (request, context) {
 
       logger.info(`Registering ${networkName} wallet dynamically`)
       wdk.registerWallet(networkName, walletManager, networkConfig.config)
-      registeredBlockchains.push(networkName)
+      registeredNetworks.push(networkName)
     }
   }
 
-  if (registeredBlockchains.length === 0) {
+  if (registeredNetworks.length === 0) {
     throw createErrorWithCode(
       'No valid network configurations provided',
       ERROR_CODES.BAD_REQUEST
@@ -76,7 +83,7 @@ async function registerWalletHandler (request, context) {
 
   return {
     status: 'registered',
-    blockchains: JSON.stringify(registeredBlockchains)
+    blockchains: JSON.stringify(registeredNetworks)
   }
 }
 
@@ -115,7 +122,7 @@ async function registerProtocolHandler (request, context) {
 
       if (!walletManagers[protocolConfig.blockchain]) {
         throw createErrorWithCode(
-          `No wallet manager found for network: ${protocolConfig.network}`,
+          `No wallet manager found for network: ${protocolConfig.blockchain}`,
           ERROR_CODES.BAD_REQUEST
         )
       }

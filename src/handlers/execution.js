@@ -123,6 +123,28 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
     )
   }
 
+  logger.info('Args:', args)
+
+  // JSC (iOS/macOS) has a native-call optimization in bare-inspect's binding
+  // that ignores JS-side property overrides and dispatches directly to the
+  // native getOwnNonIndexPropertyNames implementation, which throws
+  // "Unsupported operation" when given certain prototype objects. To keep
+  // V8 (Android) logging quality, structured-log on V8 and string-log on JSC.
+  const proto = Object.getPrototypeOf(account)
+  const barePlatform = globalThis.Bare && globalThis.Bare.platform
+  const isJSC = barePlatform === 'ios' || barePlatform === 'darwin'
+  if (isJSC) {
+    logger.info(
+      `account: constructor=${proto?.constructor?.name} ` +
+      `protoKeys=[${Object.getOwnPropertyNames(proto).join(',')}]`
+    )
+  } else {
+    logger.info({
+      constructor: proto?.constructor?.name,
+      protoKeys: Object.getOwnPropertyNames(proto)
+    })
+  }
+
   // Support array args for multi-parameter methods (e.g., transfer(options, config))
   // - Array: spread as positional arguments -> method(arg1, arg2, ...)
   // - Non-array (object/primitive): pass as single argument -> method(args)
