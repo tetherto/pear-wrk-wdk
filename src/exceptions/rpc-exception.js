@@ -75,8 +75,9 @@ function rpcException (payload) {
  * @returns {rpcExceptionResponse} Structured error response
  */
 function createStructuredError (error, code, message) {
-  // Infer error code from error type if not provided
-  if (!code) {
+  if (error.code) {
+    code = error.code
+  } else if (!code) {
     if (error instanceof TypeError) {
       code = ERROR_CODES.BAD_REQUEST
     } else if (error.message && error.message.includes('WDK')) {

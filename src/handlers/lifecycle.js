@@ -102,15 +102,22 @@ async function initializeWdkHandler (init, context) {
     )
   }
 
-  for (const networkConfig of Object.values(workletConfig.networks)) {
-    const networkName = networkConfig.blockchain
+  for (const [networkName, networkConfig] of Object.entries(workletConfig.networks)) {
+    const blockchain = networkConfig.blockchain
+
+    if (networkName !== blockchain) {
+      throw createErrorWithCode(
+        `Network key "${networkName}" must match blockchain field "${blockchain}"`,
+        ERROR_CODES.BAD_REQUEST
+      )
+    }
 
     if (networkConfig.config && typeof networkConfig.config === 'object') {
       const walletManager = walletManagers[networkName]
 
       if (!walletManager) {
         throw createErrorWithCode(
-          `No wallet manager found for network: ${networkName}`,
+          `No wallet manager found for blockchain: ${networkName}`,
           ERROR_CODES.WDK_MANAGER_INIT
         )
       }
@@ -228,15 +235,29 @@ async function resetWdkWallets (params, context) {
 }
 
 /**
+ * Dispose the WDK instance, fully or for specific blockchains.
  *
- * @param {any} request
+ * @param {{ blockchains?: string[] }} [request] - Optional list of blockchains to
+ *   dispose. Omit to dispose the entire WDK instance.
  * @param {RpcContext} context
  */
 async function disposeWdkHandler (request, context) {
+  // A non-empty array means a targeted dispose; anything else (omitted, empty
+  // array, non-array) falls back to the legacy "dispose everything" behavior.
+  const blockchains = request && Array.isArray(request.blockchains) && request.blockchains.length > 0
+    ? request.blockchains
+    : undefined
+
   if (context.wdk) {
-    context.wdk.dispose()
-    context.wdk = null
+    if (blockchains) {
+      context.wdk.dispose(blockchains)
+    } else {
+      context.wdk.dispose()
+      context.wdk = null
+    }
   }
+  logger.info('WDK disposed', blockchains || 'all')
+  return { status: 'disposed' }
 }
 
 module.exports = {
