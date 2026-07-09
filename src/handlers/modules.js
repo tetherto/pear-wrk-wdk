@@ -9,12 +9,17 @@ const {
 } = require('../utils/validation')
 
 /** @typedef {import('../../types/rpc').RpcContext} RpcContext */
+/** @typedef {import('../../types/rpc').ModuleEventRequest} ModuleEventRequest */
+/**
+ * @typedef {Object} ModuleEventEmitter
+ * @property {(request: ModuleEventRequest) => void} moduleEvent - Send a module event to the host.
+ */
 
 /**
  * Generic, module-agnostic runtime for bundled WDK modules. Modules are built from
  * config at WDK init via context.moduleManagers, then driven by the host over IPC.
  *
- * @param {any} rpc - HRPC instance (used to emit moduleEvent)
+ * @param {ModuleEventEmitter} rpc - HRPC instance (used to emit moduleEvent)
  * @param {RpcContext} context - Shared context (moduleManagers, capabilities)
  */
 function createModuleRuntime (rpc, context) {
@@ -22,7 +27,7 @@ function createModuleRuntime (rpc, context) {
   if (!context.moduleInstances) {
     context.moduleInstances = new Map()
   }
-  const instances = context.moduleInstances // moduleName -> { mgr, instance, ready }
+  const instances = context.moduleInstances // moduleName -> { mgr, instance, ready, error }
 
   const getManagers = () => context.moduleManagers || {}
 
@@ -43,7 +48,7 @@ function createModuleRuntime (rpc, context) {
       })
     }
 
-    const entry = { mgr, instance: null, ready: null }
+    const entry = { mgr, instance: null, ready: null, error: null }
     instances.set(name, entry)
 
     const wire = (instance) => {
@@ -66,14 +71,14 @@ function createModuleRuntime (rpc, context) {
         emit
       })
     } catch (err) {
-      instances.delete(name)
+      entry.error = err
       emit('error', toErrorPayload(err))
       throw err
     }
 
     if (result && typeof result.then === 'function') {
       entry.ready = result.then(wire).catch((err) => {
-        instances.delete(name)
+        entry.error = err
         logger.error(`Module construction failed: ${name}: ${err && err.message}`)
         emit('error', toErrorPayload(err))
         throw err
@@ -119,6 +124,14 @@ function createModuleRuntime (rpc, context) {
       },
       'callModule'
     )
+
+    const entry = instances.get(req.module)
+    if (entry && entry.error) {
+      throw createErrorWithCode(
+        `Module "${req.module}" failed to initialize: ${entry.error.message}`,
+        ERROR_CODES.WDK_MANAGER_INIT
+      )
+    }
 
     const instance = await resolveInstance(req.module)
     if (!instance) {

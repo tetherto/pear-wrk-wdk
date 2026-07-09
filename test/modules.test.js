@@ -115,7 +115,7 @@ describe('module runtime (generic)', () => {
     assert.ok(context.moduleInstances.get('fake').instance instanceof FakeModule)
   })
 
-  test('forgets the instance and emits a structured error if construction fails', async () => {
+  test('retains the construction error and surfaces it via callModule', async () => {
     const events = []
     const rpc = { moduleEvent: (p) => events.push(p) }
     const context = {
@@ -126,7 +126,11 @@ describe('module runtime (generic)', () => {
     }
     const rt = createModuleRuntime(rpc, context)
     await assert.rejects(() => rt.construct('boom', {}, SEED), /construction failed/)
-    assert.strictEqual(context.moduleInstances.has('boom'), false, 'failed instance forgotten')
+
+    // Retained (not forgotten) with the error, so callModule can tell "failed to
+    // initialize" apart from "never configured".
+    assert.strictEqual(context.moduleInstances.has('boom'), true, 'failed entry retained')
+    assert.ok(context.moduleInstances.get('boom').error, 'error recorded on the entry')
 
     const errored = events.find((e) => e.event === 'error')
     assert.ok(errored, 'an error moduleEvent was emitted')
@@ -135,6 +139,17 @@ describe('module runtime (generic)', () => {
     assert.strictEqual(payload.name, 'Error')
     assert.strictEqual(payload.message, 'construction failed')
     assert.ok(payload.stack, 'error payload carries a stack for app devs')
+
+    // A failed module reports its construction error distinctly...
+    await assert.rejects(
+      () => rt.callModule({ module: 'boom', method: 'x', args: '[]' }),
+      /failed to initialize: construction failed/
+    )
+    // ...whereas a never-configured module still reports "not initialized".
+    await assert.rejects(
+      () => rt.callModule({ module: 'ghost', method: 'x', args: '[]' }),
+      /Module not initialized/
+    )
   })
 
   test('callModule awaits an async (pending) construction', async () => {

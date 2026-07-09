@@ -222,6 +222,7 @@ async function resetWdkWallets (params, context) {
   const targetChains = Object.values(workletConfig.networks)
     .filter(networkConfig => networkConfig.config && typeof networkConfig.config === 'object')
     .map(networkConfig => networkConfig.blockchain)
+  // Only disposes these chains; modules stay up (a full dispose closes them).
   wdk.dispose(targetChains)
 
   for (const networkConfig of Object.values(workletConfig.networks)) {
