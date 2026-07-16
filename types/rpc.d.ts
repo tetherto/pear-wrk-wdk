@@ -53,6 +53,12 @@ export interface RpcContext {
 
   // Capabilities injected into modules (reserved; empty by default). Optional.
   capabilities?: Record<string, any>;
+
+  // Optional per-surface allowlist for callMethod. Unlisted surfaces stay
+  // unrestricted, so adopting this is opt-in, one surface at a time.
+  //
+  // Example: { ethereum: ['getAddress', 'getBalance'], uniswap: ['quoteSwap'] }
+  allowedMethods?: Record<string, string[]>;
 }
 
 /**

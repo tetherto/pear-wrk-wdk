@@ -62,7 +62,11 @@ describe('RPC Handlers', () => {
           }
           return {
             getAddress: async () => ({ address: `0x${network}-${index}` }),
-            getBalance: async () => ({ balance: '1000000000000000000' })
+            getBalance: async () => ({ balance: '1000000000000000000' }),
+            getSwapProtocol: (protocolName) => ({
+              quoteSwap: async () => ({ network, protocolName, price: 1 }),
+              swap: async () => ({ network, protocolName, txHash: '0xdeadbeef' })
+            })
           }
         }
 
@@ -498,6 +502,145 @@ describe('RPC Handlers', () => {
           accountIndex: -1
         }),
         /accountIndex must be a non-negative integer/
+      )
+    })
+
+    test('should allow any method when allowedMethods is unset (default backward-compatible)', async () => {
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const result = await mockRpc.handlers.callMethod({
+        methodName: 'getBalance',
+        network: 'ethereum',
+        accountIndex: 0
+      })
+      assert.ok(result.result)
+    })
+
+    test('should reject a method not in allowedMethods for a restricted surface', async () => {
+      context.allowedMethods = { ethereum: ['getAddress'] }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      await assert.rejects(
+        async () => await mockRpc.handlers.callMethod({
+          methodName: 'getBalance',
+          network: 'ethereum',
+          accountIndex: 0
+        }),
+        /Method.*not found/
+      )
+    })
+
+    test('should allow a method listed in allowedMethods for a restricted surface', async () => {
+      context.allowedMethods = { ethereum: ['getAddress'] }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const result = await mockRpc.handlers.callMethod({
+        methodName: 'getAddress',
+        network: 'ethereum',
+        accountIndex: 0
+      })
+      assert.ok(result.result)
+    })
+
+    test('should leave a network unrestricted when allowedMethods is set but omits that network', async () => {
+      context.allowedMethods = { spark: ['getAddress'] }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const result = await mockRpc.handlers.callMethod({
+        methodName: 'getBalance',
+        network: 'ethereum',
+        accountIndex: 0
+      })
+      assert.ok(result.result)
+    })
+
+    test('should block a method not in allowedMethods for a protocol surface keyed by protocolName', async () => {
+      context.allowedMethods = { uniswap: ['quoteSwap'] }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const callOptions = { protocolType: 'swap', protocolName: 'uniswap' }
+
+      // Blocked: uniswap surface only allows 'quoteSwap'.
+      await assert.rejects(
+        async () => await mockRpc.handlers.callMethod({
+          methodName: 'swap',
+          network: 'ethereum',
+          accountIndex: 0,
+          options: JSON.stringify(callOptions)
+        }),
+        /Method.*not found/
+      )
+
+      // Allowed: 'quoteSwap' is listed for the uniswap surface.
+      const result = await mockRpc.handlers.callMethod({
+        methodName: 'quoteSwap',
+        network: 'ethereum',
+        accountIndex: 0,
+        options: JSON.stringify(callOptions)
+      })
+      assert.ok(result.result)
+    })
+
+    test('should not let an unrecognized protocolType bypass a network-level restriction', async () => {
+      context.allowedMethods = { ethereum: ['getAddress'] }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      await assert.rejects(
+        async () => await mockRpc.handlers.callMethod({
+          methodName: 'getBalance',
+          network: 'ethereum',
+          accountIndex: 0,
+          options: JSON.stringify({ protocolType: 'MOCK_PROTOCOL_TYPE', protocolName: 'MOCK_PROTOCOL_NAME' })
+        }),
+        /Method.*not found/
       )
     })
   })

@@ -82,7 +82,19 @@ const context = {
   },
   protocolManagers: {}, // e.g. AAVE, Uniswap adapters
   requiredNetworks: ['ethereum', 'spark'],
-  wdk: null // Initialized via RPC later
+  wdk: null, // Initialized via RPC later
+
+  // Optional: restrict which methods callMethod may invoke per surface. Keys
+  // are network names, or protocolName once a protocol has been resolved. A
+  // surface left out of this map (or omitting allowedMethods entirely) stays
+  // unrestricted, so this is opt-in and backward compatible.
+  // (Illustrative: `publicMethods` isn't a real export today. If a wallet
+  // manager exposes its own public API list, wire it in here instead of
+  // hand-maintaining the array in the app.)
+  allowedMethods: {
+    ethereum: ['getAddress', 'getBalance', 'sendTransaction'],
+    uniswap: ['quoteSwap']
+  }
 }
 
 // Bind the standard WDK RPC handlers to the provided RPC server
@@ -152,6 +164,7 @@ const address = await hrpc.callMethod({
     *   `accountIndex`: The index of the account to use (e.g., `0`).
     *   `args`: Arguments for the method (JSON-stringified).
     *   `options`: Additional options for the method (JSON-stringified).
+    *   By default, `callMethod` can call any method on the resolved account/protocol object. To restrict this, pass `context.allowedMethods` when registering handlers — see [Context Setup](#1-the-worklet-entry-background-context) above. Restricting is opt-in per network/protocol surface; anything not covered by `allowedMethods` remains unrestricted.
 
 ### Dynamic Registration
 *   **`registerWallet(config)`**: Add support for a new blockchain network at runtime.

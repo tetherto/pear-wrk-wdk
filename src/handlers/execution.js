@@ -80,45 +80,51 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
     )
   }
 
+  let protocolResolved = false
+
   switch (options?.protocolType) {
     case 'swap':
       if (!options?.protocolName) {
         throw createErrorWithCode('Protocol name is required for swap protocol', ERROR_CODES.BAD_REQUEST)
       }
       account = account.getSwapProtocol(options?.protocolName)
+      protocolResolved = true
       break
     case 'bridge':
       if (!options?.protocolName) {
         throw createErrorWithCode('Protocol name is required for bridge protocol', ERROR_CODES.BAD_REQUEST)
       }
       account = account.getBridgeProtocol(options?.protocolName)
+      protocolResolved = true
       break
     case 'lending':
       if (!options?.protocolName) {
         throw createErrorWithCode('Protocol name is required for lending protocol', ERROR_CODES.BAD_REQUEST)
       }
       account = account.getLendingProtocol(options?.protocolName)
+      protocolResolved = true
       break
     case 'fiat':
       if (!options?.protocolName) {
         throw createErrorWithCode('Protocol name is required for fiat protocol', ERROR_CODES.BAD_REQUEST)
       }
       account = account.getFiatProtocol(options?.protocolName)
+      protocolResolved = true
       break
   }
 
-  if (typeof account[methodName] !== 'function') {
+  const surfaceKey = protocolResolved ? options.protocolName : network
+  const allowedForSurface = context.allowedMethods?.[surfaceKey]
+  const isAllowed = !allowedForSurface || allowedForSurface.includes(methodName)
+
+  if (!isAllowed || typeof account[methodName] !== 'function') {
     if (options?.defaultValue !== undefined) {
       logger.error(`${methodName} not available for network: ${network}, returning default value`)
       return options.defaultValue
     }
 
-    const availableMethods = Object.keys(account)
-      .filter(key => typeof account[key] === 'function')
-      .join(', ')
     throw createErrorWithCode(
-      `Method "${methodName}" not found on account for network "${network}". ` +
-      `Available methods: ${availableMethods}`,
+      `Method "${methodName}" not found on account for network "${network}".`,
       ERROR_CODES.BAD_REQUEST
     )
   }
