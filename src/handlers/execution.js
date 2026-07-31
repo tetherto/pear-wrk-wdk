@@ -12,7 +12,8 @@ const PROTOCOL_ACCESSORS = {
   swap: 'getSwapProtocol',
   bridge: 'getBridgeProtocol',
   lending: 'getLendingProtocol',
-  fiat: 'getFiatProtocol'
+  fiat: 'getFiatProtocol',
+  swidge: 'getSwidgeProtocol'
 }
 
 function isProtocolSurface (options) {
