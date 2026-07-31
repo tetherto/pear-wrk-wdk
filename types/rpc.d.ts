@@ -70,6 +70,13 @@ export interface RpcContext {
   //   }
   // }
   allowedMethods?: Record<string, NetworkAllowedMethods>;
+
+  // Optional but recommended: without this, callModule can invoke any method
+  // on a bundled module instance. Keyed by module name — modules aren't
+  // scoped to a blockchain or protocol, so each entry is just
+  // `{ methods: [...] }`. A module left out of this map (or the map being
+  // unset entirely) stays unrestricted.
+  allowedModuleMethods?: Record<string, ProtocolAllowedMethods>;
 }
 
 export interface ProtocolAllowedMethods {
