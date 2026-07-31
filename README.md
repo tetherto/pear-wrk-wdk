@@ -84,16 +84,16 @@ const context = {
   requiredNetworks: ['ethereum', 'spark'],
   wdk: null, // Initialized via RPC later
 
-  // Optional: restrict which methods callMethod may invoke per surface. Keys
-  // are network names, or protocolName once a protocol has been resolved. A
-  // surface left out of this map (or omitting allowedMethods entirely) stays
-  // unrestricted, so this is opt-in and backward compatible.
-  // (Illustrative: `publicMethods` isn't a real export today. If a wallet
-  // manager exposes its own public API list, wire it in here instead of
-  // hand-maintaining the array in the app.)
+  // Optional but recommended: without this, callMethod can invoke any method
+  // on the resolved account/protocol object, including fund-moving or
+  // key-export operations. Listing a network or protocol here restricts it
+  // to just the given methods; anything left out stays unrestricted, so you
+  // can lock this down one surface at a time.
   allowedMethods: {
-    ethereum: ['getAddress', 'getBalance', 'sendTransaction'],
-    uniswap: ['quoteSwap']
+    ethereum: {
+      methods: ['getAddress', 'getBalance', 'sendTransaction'],
+      protocols: { swap: { uniswap: { methods: ['quoteSwap'] } } }
+    }
   }
 }
 
@@ -164,7 +164,7 @@ const address = await hrpc.callMethod({
     *   `accountIndex`: The index of the account to use (e.g., `0`).
     *   `args`: Arguments for the method (JSON-stringified).
     *   `options`: Additional options for the method (JSON-stringified).
-    *   By default, `callMethod` can call any method on the resolved account/protocol object. To restrict this, pass `context.allowedMethods` when registering handlers — see [Context Setup](#1-the-worklet-entry-background-context) above. Restricting is opt-in per network/protocol surface; anything not covered by `allowedMethods` remains unrestricted.
+    *   By default, `callMethod` can call any method on the resolved account/protocol object, including fund-moving or key-export operations — passing `context.allowedMethods` when registering handlers is optional but recommended to restrict this. See [Context Setup](#1-the-worklet-entry-background-context) above. Restricting is opt-in per network/protocol surface; anything not covered by `allowedMethods` remains unrestricted.
 
 ### Dynamic Registration
 *   **`registerWallet(config)`**: Add support for a new blockchain network at runtime.

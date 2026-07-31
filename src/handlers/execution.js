@@ -113,8 +113,12 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
       break
   }
 
-  const surfaceKey = protocolResolved ? options.protocolName : network
-  const allowedForSurface = context.allowedMethods?.[surfaceKey]
+  // Nested to mirror WDK's own protocol storage shape:
+  // https://github.com/tetherto/wdk 
+  const allowedForNetwork = context.allowedMethods?.[network]
+  const allowedForSurface = protocolResolved
+    ? allowedForNetwork?.protocols?.[options.protocolType]?.[options.protocolName]?.methods
+    : allowedForNetwork?.methods
   const isAllowed = !allowedForSurface || allowedForSurface.includes(methodName)
 
   if (!isAllowed || typeof account[methodName] !== 'function') {

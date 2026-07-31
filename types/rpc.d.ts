@@ -54,11 +54,42 @@ export interface RpcContext {
   // Capabilities injected into modules (reserved; empty by default). Optional.
   capabilities?: Record<string, any>;
 
-  // Optional per-surface allowlist for callMethod. Unlisted surfaces stay
-  // unrestricted, so adopting this is opt-in, one surface at a time.
+  // Optional but recommended: without this, callMethod can invoke any method
+  // on the resolved account/protocol object, including fund-moving or
+  // key-export operations. Shaped like WDK's own protocol storage:
+  // https://github.com/tetherto/wdk. Only restricts the surfaces you list —
+  // any level left out (a network, `protocols`, a protocolType, a
+  // protocolName, or `methods` itself) stays fully unrestricted, so this is
+  // opt-in one surface at a time.
   //
-  // Example: { ethereum: ['getAddress', 'getBalance'], uniswap: ['quoteSwap'] }
-  allowedMethods?: Record<string, string[]>;
+  // Example:
+  // {
+  //   ethereum: {
+  //     methods: ['getAddress', 'getBalance'],
+  //     protocols: { swap: { uniswap: { methods: ['quoteSwap'] } } }
+  //   }
+  // }
+  allowedMethods?: Record<string, NetworkAllowedMethods>;
+}
+
+export interface ProtocolAllowedMethods {
+  // Methods allowed on this protocol surface. Omit to leave unrestricted.
+  methods?: string[];
+}
+
+// protocolName -> allowed methods, for one protocol type (e.g. all 'swap' protocols).
+export interface ProtocolNameAllowedMethods {
+  [protocolName: string]: ProtocolAllowedMethods;
+}
+
+// protocolType -> ProtocolNameAllowedMethods (e.g. 'swap', 'bridge', 'lending', 'fiat').
+export interface ProtocolTypeAllowedMethods {
+  [protocolType: string]: ProtocolNameAllowedMethods;
+}
+
+export interface NetworkAllowedMethods extends ProtocolAllowedMethods {
+  // Omit a level (protocols, a protocolType, or a protocolName) to leave it unrestricted.
+  protocols?: ProtocolTypeAllowedMethods;
 }
 
 /**

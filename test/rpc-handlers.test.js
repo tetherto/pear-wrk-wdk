@@ -525,7 +525,7 @@ describe('RPC Handlers', () => {
     })
 
     test('should reject a method not in allowedMethods for a restricted surface', async () => {
-      context.allowedMethods = { ethereum: ['getAddress'] }
+      context.allowedMethods = { ethereum: { methods: ['getAddress'] } }
       registerRpcHandlers(mockRpc, context)
 
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -547,7 +547,7 @@ describe('RPC Handlers', () => {
     })
 
     test('should allow a method listed in allowedMethods for a restricted surface', async () => {
-      context.allowedMethods = { ethereum: ['getAddress'] }
+      context.allowedMethods = { ethereum: { methods: ['getAddress'] } }
       registerRpcHandlers(mockRpc, context)
 
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -567,7 +567,7 @@ describe('RPC Handlers', () => {
     })
 
     test('should leave a network unrestricted when allowedMethods is set but omits that network', async () => {
-      context.allowedMethods = { spark: ['getAddress'] }
+      context.allowedMethods = { spark: { methods: ['getAddress'] } }
       registerRpcHandlers(mockRpc, context)
 
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -586,8 +586,8 @@ describe('RPC Handlers', () => {
       assert.ok(result.result)
     })
 
-    test('should block a method not in allowedMethods for a protocol surface keyed by protocolName', async () => {
-      context.allowedMethods = { uniswap: ['quoteSwap'] }
+    test('should block a method not in allowedMethods for a protocol surface nested under network/protocolType/protocolName', async () => {
+      context.allowedMethods = { ethereum: { protocols: { swap: { uniswap: { methods: ['quoteSwap'] } } } } }
       registerRpcHandlers(mockRpc, context)
 
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -600,7 +600,7 @@ describe('RPC Handlers', () => {
 
       const callOptions = { protocolType: 'swap', protocolName: 'uniswap' }
 
-      // Blocked: uniswap surface only allows 'quoteSwap'.
+      // Blocked: ethereum.protocols.swap.uniswap only allows 'quoteSwap'.
       await assert.rejects(
         async () => await mockRpc.handlers.callMethod({
           methodName: 'swap',
@@ -611,7 +611,7 @@ describe('RPC Handlers', () => {
         /Method.*not found/
       )
 
-      // Allowed: 'quoteSwap' is listed for the uniswap surface.
+      // Allowed: 'quoteSwap' is listed for that surface.
       const result = await mockRpc.handlers.callMethod({
         methodName: 'quoteSwap',
         network: 'ethereum',
@@ -621,8 +621,65 @@ describe('RPC Handlers', () => {
       assert.ok(result.result)
     })
 
+    test('should not let allowedMethods for one network leak to the same protocolName on a different network', async () => {
+      // WDK scopes a protocol label to its own blockchain (see registerProtocol
+      // in wdk.js), so the same protocolName ('uniswap') on two networks must
+      // be treated as two independent surfaces — nesting under network makes
+      // that structurally impossible to conflate.
+      context.allowedMethods = { ethereum: { protocols: { swap: { uniswap: { methods: ['quoteSwap'] } } } } }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({
+          networks: {
+            ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } },
+            spark: { blockchain: 'spark', config: { rpcUrl: 'https://spark.example.com' } }
+          }
+        }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const callOptions = { protocolType: 'swap', protocolName: 'uniswap' }
+
+      // spark isn't in allowedMethods at all, so it stays unrestricted even
+      // though ethereum.protocols.swap.uniswap is locked down to 'quoteSwap'.
+      const result = await mockRpc.handlers.callMethod({
+        methodName: 'swap',
+        network: 'spark',
+        accountIndex: 0,
+        options: JSON.stringify(callOptions)
+      })
+      assert.ok(result.result)
+    })
+
+    test('should leave protocol surfaces unrestricted when a network entry only restricts methods', async () => {
+      // A network entry with `methods` but no `protocols` key must not
+      // accidentally restrict (or deny) protocol calls on that network.
+      context.allowedMethods = { ethereum: { methods: ['getAddress'] } }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const result = await mockRpc.handlers.callMethod({
+        methodName: 'swap',
+        network: 'ethereum',
+        accountIndex: 0,
+        options: JSON.stringify({ protocolType: 'swap', protocolName: 'uniswap' })
+      })
+      assert.ok(result.result)
+    })
+
     test('should not let an unrecognized protocolType bypass a network-level restriction', async () => {
-      context.allowedMethods = { ethereum: ['getAddress'] }
+      context.allowedMethods = { ethereum: { methods: ['getAddress'] } }
       registerRpcHandlers(mockRpc, context)
 
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
