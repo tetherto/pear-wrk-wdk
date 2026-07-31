@@ -8,6 +8,36 @@ const { validateNonEmptyString, validateNonNegativeInteger, validateJSON, valida
 /** @typedef {import('../../types/rpc').CallMethodOptions} CallMethodOptions */
 /** @typedef {import('../../types/rpc').RpcContext} RpcContext */
 
+const PROTOCOL_ACCESSORS = {
+  swap: 'getSwapProtocol',
+  bridge: 'getBridgeProtocol',
+  lending: 'getLendingProtocol',
+  fiat: 'getFiatProtocol'
+}
+
+function isProtocolSurface (options) {
+  return Boolean(options?.protocolType && PROTOCOL_ACCESSORS[options.protocolType] && options?.protocolName)
+}
+
+/**
+ * Whether methodName is permitted for this network/protocol surface. With no
+ * context.allowedMethods (or no entry for this surface), everything is allowed.
+ *
+ * @param {RpcContext} context
+ * @param {string} network
+ * @param {string} methodName
+ * @param {CallMethodOptions} options
+ * @returns {boolean}
+ */
+function isMethodAllowed (context, network, methodName, options) {
+  const allowedForNetwork = context.allowedMethods?.[network]
+  const allowedForSurface = isProtocolSurface(options)
+    ? allowedForNetwork?.protocols?.[options.protocolType]?.[options.protocolName]?.methods
+    : allowedForNetwork?.methods
+
+  return !allowedForSurface || allowedForSurface.includes(methodName)
+}
+
 /**
  * @param {CallMethodRequest} payload
  * @param {RpcContext} context
@@ -38,6 +68,18 @@ async function callMethodHandler (payload, context) {
     },
     'Payload'
   )
+
+  if (!isMethodAllowed(context, network, methodName, options)) {
+    if (options?.defaultValue !== undefined) {
+      logger.error(`${methodName} not allowed for network: ${network}, returning default value`)
+      return { result: safeStringify(options.defaultValue) }
+    }
+
+    throw createErrorWithCode(
+      `Method "${methodName}" is not allowed for network "${network}".`,
+      ERROR_CODES.METHOD_NOT_ALLOWED
+    )
+  }
 
   const result = await callWdkMethod({
     context,
@@ -80,48 +122,15 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
     )
   }
 
-  let protocolResolved = false
-
-  switch (options?.protocolType) {
-    case 'swap':
-      if (!options?.protocolName) {
-        throw createErrorWithCode('Protocol name is required for swap protocol', ERROR_CODES.BAD_REQUEST)
-      }
-      account = account.getSwapProtocol(options?.protocolName)
-      protocolResolved = true
-      break
-    case 'bridge':
-      if (!options?.protocolName) {
-        throw createErrorWithCode('Protocol name is required for bridge protocol', ERROR_CODES.BAD_REQUEST)
-      }
-      account = account.getBridgeProtocol(options?.protocolName)
-      protocolResolved = true
-      break
-    case 'lending':
-      if (!options?.protocolName) {
-        throw createErrorWithCode('Protocol name is required for lending protocol', ERROR_CODES.BAD_REQUEST)
-      }
-      account = account.getLendingProtocol(options?.protocolName)
-      protocolResolved = true
-      break
-    case 'fiat':
-      if (!options?.protocolName) {
-        throw createErrorWithCode('Protocol name is required for fiat protocol', ERROR_CODES.BAD_REQUEST)
-      }
-      account = account.getFiatProtocol(options?.protocolName)
-      protocolResolved = true
-      break
+  const protocolAccessor = PROTOCOL_ACCESSORS[options?.protocolType]
+  if (protocolAccessor) {
+    if (!options?.protocolName) {
+      throw createErrorWithCode(`Protocol name is required for ${options.protocolType} protocol`, ERROR_CODES.BAD_REQUEST)
+    }
+    account = account[protocolAccessor](options.protocolName)
   }
 
-  // Nested to mirror WDK's own protocol storage shape:
-  // https://github.com/tetherto/wdk 
-  const allowedForNetwork = context.allowedMethods?.[network]
-  const allowedForSurface = protocolResolved
-    ? allowedForNetwork?.protocols?.[options.protocolType]?.[options.protocolName]?.methods
-    : allowedForNetwork?.methods
-  const isAllowed = !allowedForSurface || allowedForSurface.includes(methodName)
-
-  if (!isAllowed || typeof account[methodName] !== 'function') {
+  if (typeof account[methodName] !== 'function') {
     if (options?.defaultValue !== undefined) {
       logger.error(`${methodName} not available for network: ${network}, returning default value`)
       return options.defaultValue

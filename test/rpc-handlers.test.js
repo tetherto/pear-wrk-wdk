@@ -542,7 +542,35 @@ describe('RPC Handlers', () => {
           network: 'ethereum',
           accountIndex: 0
         }),
-        /Method.*not found/
+        /not allowed/
+      )
+    })
+
+    test('should reject with a distinct METHOD_NOT_ALLOWED code (not the generic "not found" one)', async () => {
+      // Lets a developer tell "add this to allowedMethods" apart from "this
+      // method doesn't exist" without parsing the message text.
+      context.allowedMethods = { ethereum: { methods: ['getAddress'] } }
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify({ networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } } }),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      await assert.rejects(
+        async () => await mockRpc.handlers.callMethod({
+          methodName: 'getBalance',
+          network: 'ethereum',
+          accountIndex: 0
+        }),
+        (error) => {
+          const parsed = JSON.parse(error.message)
+          assert.strictEqual(parsed.code, 'METHOD_NOT_ALLOWED')
+          return true
+        }
       )
     })
 
@@ -608,7 +636,7 @@ describe('RPC Handlers', () => {
           accountIndex: 0,
           options: JSON.stringify(callOptions)
         }),
-        /Method.*not found/
+        /not allowed/
       )
 
       // Allowed: 'quoteSwap' is listed for that surface.
@@ -697,7 +725,7 @@ describe('RPC Handlers', () => {
           accountIndex: 0,
           options: JSON.stringify({ protocolType: 'MOCK_PROTOCOL_TYPE', protocolName: 'MOCK_PROTOCOL_NAME' })
         }),
-        /Method.*not found/
+        /not allowed/
       )
     })
   })
