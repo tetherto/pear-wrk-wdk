@@ -36,7 +36,7 @@ function isMethodAllowed (context, network, methodName, options) {
     ? allowedForNetwork?.protocols?.[options.protocolType]?.[options.protocolName]?.methods
     : allowedForNetwork?.methods
 
-  return !allowedForSurface || allowedForSurface.includes(methodName)
+  return !allowedForSurface || (Array.isArray(allowedForSurface) && allowedForSurface.includes(methodName))
 }
 
 /**
