@@ -71,11 +71,6 @@ async function callMethodHandler (payload, context) {
   )
 
   if (!isMethodAllowed(context, network, methodName, options)) {
-    if (options?.defaultValue !== undefined) {
-      logger.error(`${methodName} not allowed for network: ${network}, returning default value`)
-      return { result: safeStringify(options.defaultValue) }
-    }
-
     throw createErrorWithCode(
       `Method "${methodName}" is not allowed for network "${network}".`,
       ERROR_CODES.METHOD_NOT_ALLOWED
