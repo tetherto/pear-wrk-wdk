@@ -536,7 +536,7 @@ describe('RPC Handlers', () => {
       )
     })
 
-    test('should reject invalid method name', async () => {
+    test('should reject invalid method name even when options include a legacy defaultValue', async () => {
       registerRpcHandlers(mockRpc, context)
 
       const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -557,7 +557,8 @@ describe('RPC Handlers', () => {
         async () => await mockRpc.handlers.callMethod({
           methodName: 'nonExistentMethod',
           network: 'ethereum',
-          accountIndex: 0
+          accountIndex: 0,
+          options: JSON.stringify({ defaultValue: 'fallback' })
         }),
         /Method.*not found/
       )
