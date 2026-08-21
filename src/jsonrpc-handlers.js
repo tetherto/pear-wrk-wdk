@@ -104,7 +104,7 @@ function registerJsonRpcHandlers (ipc, context) {
 
     try {
       let result
-      logger.info(`JSON-RPC request: ${method}`, params)
+      logger.info(`JSON-RPC request: ${method}`)
 
       switch (method) {
         case 'workletStart':
@@ -168,7 +168,7 @@ function registerJsonRpcHandlers (ipc, context) {
           throw new Error(`Unknown method: ${method}`)
       }
 
-      logger.info(`JSON-RPC response: ${method}`, result)
+      logger.info(`JSON-RPC response: ${method}`)
 
       const response = safeStringify({
         jsonrpc: '2.0',
@@ -177,7 +177,7 @@ function registerJsonRpcHandlers (ipc, context) {
       })
       writeFramed(Buffer.from(response))
     } catch (error) {
-      logger.error(`JSON-RPC error: ${method}`, error)
+      logger.error(`JSON-RPC error: ${method}`)
 
       let errorResponse
       try {

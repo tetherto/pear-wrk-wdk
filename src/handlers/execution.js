@@ -138,7 +138,11 @@ const callWdkMethod = async ({ context, methodName, network, accountIndex, args 
     )
   }
 
-  logger.info('Args:', args)
+  // args is arbitrary, caller-supplied data for whatever WDK account method
+  // is being invoked — it can legitimately hold a bare secret (e.g. a
+  // private key passed positionally, with no field name to redact by), so
+  // this stays at debug level (off by default) rather than info.
+  logger.debug('Args:', args)
 
   // JSC (iOS/macOS) has a native-call optimization in bare-inspect's binding
   // that ignores JS-side property overrides and dispatches directly to the
