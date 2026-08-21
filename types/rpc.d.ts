@@ -169,11 +169,11 @@ export interface CallMethodOptions {
 }
 
 export interface WdkInitializeParams {
-  encryptionKey?: string;
-  encryptedSeed?: string;
-  
+  encryptionKey?: Buffer;
+  encryptedSeed?: Buffer;
+
   // JSON string of WdkWorkletConfig
-  config: string; 
+  config: string;
 }
 
 export interface WdkResetWalletParams {
@@ -186,14 +186,14 @@ export interface WdkGenerateEntropyParams {
 }
 
 export interface WdkEntropyResult {
-  encryptionKey: string;
-  encryptedSeedBuffer: string;
-  encryptedEntropyBuffer: string;
+  encryptionKey: Buffer;
+  encryptedSeedBuffer: Buffer;
+  encryptedEntropyBuffer: Buffer;
 }
 
 export interface WdkGetMnemonicParams {
-  encryptedEntropy: string;
-  encryptionKey: string;
+  encryptedEntropy: Buffer;
+  encryptionKey: Buffer;
 }
 
 export enum ProtocolType {
