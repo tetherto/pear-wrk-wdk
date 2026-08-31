@@ -229,25 +229,31 @@ describe('RPC Handlers', () => {
       )
     })
 
-    test('should reject mnemonic with a non-BIP39 word', async () => {
+    test('should reject mnemonic with a non-BIP39 word, reporting position but never the word text', async () => {
       registerRpcHandlers(mockRpc, context)
 
       await assert.rejects(
         async () => await mockRpc.handlers.getSeedAndEntropyFromMnemonic({
           mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon notaword'
         }),
-        /contains words not in the BIP-39 wordlist.*notaword.*position 12/
+        (error) => {
+          const message = error.message || String(error)
+          return message.includes('position(s): 12') && !message.includes('notaword')
+        }
       )
     })
 
-    test('should reject mnemonic with multiple non-BIP39 words', async () => {
+    test('should reject mnemonic with multiple non-BIP39 words, reporting positions but never the word text', async () => {
       registerRpcHandlers(mockRpc, context)
 
       await assert.rejects(
         async () => await mockRpc.handlers.getSeedAndEntropyFromMnemonic({
           mnemonic: 'abandon typo1 abandon abandon abandon abandon abandon abandon abandon abandon abandon typo2'
         }),
-        /contains words not in the BIP-39 wordlist.*typo1.*position 2.*typo2.*position 12/
+        (error) => {
+          const message = error.message || String(error)
+          return message.includes('position(s): 2, 12') && !message.includes('typo1') && !message.includes('typo2')
+        }
       )
     })
 
