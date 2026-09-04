@@ -83,15 +83,27 @@ function validateJSON (value, fieldName) {
 }
 
 /**
+ * Normalize a mnemonic phrase: trim, collapse whitespace, lowercase.
+ * Case and spacing must be normalized before seed derivation or the seed changes.
+ * @param {string} value - Mnemonic phrase
+ * @returns {string} Normalized mnemonic (words joined with single spaces)
+ */
+function normalizeMnemonic (value) {
+  return value.trim().split(/\s+/).map((word) => word.toLowerCase()).join(' ')
+}
+
+/**
  * Validate mnemonic phrase (12 or 24 words)
  * @param {any} value - Value to validate
  * @param {string} fieldName - Name of the field for error messages
+ * @returns {string} Normalized mnemonic
  * @throws {Error} If validation fails
  */
 function validateMnemonic (value, fieldName) {
   validateNonEmptyString(value, fieldName)
 
-  const words = value.trim().split(/\s+/)
+  const normalized = normalizeMnemonic(value)
+  const words = normalized.split(' ')
   if (words.length !== 12 && words.length !== 24) {
     throw new Error(`${fieldName} must contain exactly 12 or 24 words`)
   }
@@ -104,9 +116,17 @@ function validateMnemonic (value, fieldName) {
     // Report position only, never the word text — this message can end up
     // in an RPC error response and in logs, and the word itself may be a
     // near-miss typo of a real seed-phrase word.
+    const nonEnglish = invalid.filter(({ word }) => /[^a-z]/.test(word))
+    if (nonEnglish.length > 0) {
+      const positions = nonEnglish.map(({ position }) => position).join(', ')
+      throw new Error(`${fieldName} contains non-English characters at positions ${positions}; only the English BIP-39 wordlist is supported for now`)
+    }
     const positions = invalid.map(({ position }) => position).join(', ')
-    throw new Error(`${fieldName} contains ${invalid.length} word(s) not in the BIP-39 wordlist (position(s): ${positions})`)
+    const wordLabel = invalid.length === 1 ? 'word' : 'words'
+    throw new Error(`${fieldName} contains ${invalid.length} ${wordLabel} not in the English BIP-39 wordlist at positions ${positions}`)
   }
+
+  return normalized
 }
 
 /**
@@ -165,6 +185,7 @@ module.exports = {
   validateEnum,
   validateBase64,
   validateJSON,
+  normalizeMnemonic,
   validateMnemonic,
   validateWordCount,
   createErrorWithCode,

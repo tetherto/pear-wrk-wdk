@@ -238,7 +238,8 @@ describe('RPC Handlers', () => {
         }),
         (error) => {
           const message = error.message || String(error)
-          return message.includes('position(s): 12') && !message.includes('notaword')
+          return message.includes('1 word not in the English BIP-39 wordlist at positions 12') &&
+            !message.includes('notaword')
         }
       )
     })
@@ -248,12 +249,75 @@ describe('RPC Handlers', () => {
 
       await assert.rejects(
         async () => await mockRpc.handlers.getSeedAndEntropyFromMnemonic({
-          mnemonic: 'abandon typo1 abandon abandon abandon abandon abandon abandon abandon abandon abandon typo2'
+          mnemonic: 'abandon notaword abandon abandon abandon abandon abandon abandon abandon abandon abandon alsofake'
         }),
         (error) => {
           const message = error.message || String(error)
-          return message.includes('position(s): 2, 12') && !message.includes('typo1') && !message.includes('typo2')
+          return message.includes('2 words not in the English BIP-39 wordlist at positions 2, 12') &&
+            !message.includes('notaword') && !message.includes('alsofake')
         }
+      )
+    })
+
+    test('should reject mnemonic with non-English characters, reporting positions but never the word text', async () => {
+      registerRpcHandlers(mockRpc, context)
+
+      await assert.rejects(
+        async () => await mockRpc.handlers.getSeedAndEntropyFromMnemonic({
+          mnemonic: 'niño abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+        }),
+        (error) => {
+          const message = error.message || String(error)
+          return message.includes('non-English characters at positions 1') &&
+            message.includes('only the English BIP-39 wordlist is supported for now') &&
+            !message.includes('niño')
+        }
+      )
+    })
+
+    test('should restore an ALL CAPS mnemonic to the same seed as the lowercase phrase', async () => {
+      registerRpcHandlers(mockRpc, context)
+      const { decrypt } = require('../src/utils/crypto')
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+
+      const canonical = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      const result = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({
+        mnemonic: mnemonic.toUpperCase()
+      })
+
+      assert.deepStrictEqual(
+        decrypt(result.encryptedSeedBuffer, result.encryptionKey),
+        decrypt(canonical.encryptedSeedBuffer, canonical.encryptionKey)
+      )
+    })
+
+    test('should restore a Title Case mnemonic to the same seed as the lowercase phrase', async () => {
+      registerRpcHandlers(mockRpc, context)
+      const { decrypt } = require('../src/utils/crypto')
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const titleCase = mnemonic.split(' ').map((word) => word[0].toUpperCase() + word.slice(1)).join(' ')
+
+      const canonical = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      const result = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic: titleCase })
+
+      assert.deepStrictEqual(
+        decrypt(result.encryptedSeedBuffer, result.encryptionKey),
+        decrypt(canonical.encryptedSeedBuffer, canonical.encryptionKey)
+      )
+    })
+
+    test('should restore a padded mnemonic to the same seed as the lowercase phrase', async () => {
+      registerRpcHandlers(mockRpc, context)
+      const { decrypt } = require('../src/utils/crypto')
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const padded = `  ${mnemonic.split(' ').join('  ')}  `
+
+      const canonical = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      const result = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic: padded })
+
+      assert.deepStrictEqual(
+        decrypt(result.encryptedSeedBuffer, result.encryptionKey),
+        decrypt(canonical.encryptedSeedBuffer, canonical.encryptionKey)
       )
     })
 
