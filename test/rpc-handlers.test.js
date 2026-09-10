@@ -928,6 +928,38 @@ describe('RPC Handlers', () => {
       assert.deepStrictEqual(context.wdkSeedBuffer, original, 'seed buffer left untouched on a targeted dispose')
     })
 
+    test('config-only re-init does not zero the seed the existing WDK instance still holds', async () => {
+      registerRpcHandlers(mockRpc, context)
+
+      const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const config = {
+        networks: { ethereum: { blockchain: 'ethereum', config: { rpcUrl: 'https://eth.example.com' } } }
+      }
+
+      const seedData = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+      await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify(config),
+        encryptionKey: seedData.encryptionKey,
+        encryptedSeed: seedData.encryptedSeedBuffer
+      })
+
+      const wdkInstance = context.wdk
+      const seedBuffer = context.wdkSeedBuffer
+      const original = Buffer.from(seedBuffer)
+      assert.ok(original.some(byte => byte !== 0), 'seed buffer should hold real data before re-init')
+
+      const result = await mockRpc.handlers.initializeWDK({
+        config: JSON.stringify(config)
+      })
+
+      assert.strictEqual(result.status, 'initialized')
+      assert.strictEqual(context.wdk, wdkInstance, 'same WDK instance reused — no new seed was provided')
+      assert.strictEqual(context.wdkSeedBuffer, seedBuffer, 'same retained seed buffer')
+      assert.deepStrictEqual(seedBuffer, original, 'seed bytes not wiped on config-only re-init')
+      assert.deepStrictEqual(context.wdk.seed, original, 'WDK still holds the live seed (same buffer, not zeros)')
+      assert.ok(context.wdk.wallets.ethereum, 'wallets re-registered after dispose')
+    })
+
     test('re-init zeroes the previous seed buffer', async () => {
       registerRpcHandlers(mockRpc, context)
 

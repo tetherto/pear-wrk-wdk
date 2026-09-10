@@ -57,7 +57,10 @@ async function initializeWdkHandler (init, context) {
     // Close hosted modules too, so they reconstruct with the new seed below.
     if (context.moduleRuntime) await context.moduleRuntime.closeAll()
     wdk.dispose()
-    releaseWdkSeedBuffer(context)
+    // Wipe only when replacing the seed; config-only re-init reuses it.
+    if (init.encryptedSeed && init.encryptionKey) {
+      releaseWdkSeedBuffer(context)
+    }
   }
 
   /** @type {WdkWorkletConfig} */
