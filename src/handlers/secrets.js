@@ -79,12 +79,15 @@ async function getMnemonicFromEntropyHandler (request) {
 async function getSeedAndEntropyFromMnemonicHandler (request) {
   const { mnemonic } = request
 
-  validateRequest(request, () => validateMnemonic(mnemonic, 'mnemonic'))
+  let normalizedMnemonic
+  validateRequest(request, () => {
+    normalizedMnemonic = validateMnemonic(mnemonic, 'mnemonic')
+  })
 
-  const seed = mnemonicToSeedSync(mnemonic)
+  const seed = mnemonicToSeedSync(normalizedMnemonic)
   let entropy
   try {
-    entropy = mnemonicToEntropy(mnemonic, wordlist)
+    entropy = mnemonicToEntropy(normalizedMnemonic, wordlist)
   } catch (err) {
     memzero(seed)
     throw err
