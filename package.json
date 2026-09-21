@@ -27,6 +27,9 @@
     "hrpc": "^4.0.1",
     "hyperschema": "^1.12.4"
   },
+  "peerDependencies": {
+    "bare-crypto": ">=1.13.1"
+  },
   "optionalDependencies": {
     "bare-walk-handles": "^2.1.0"
   },
