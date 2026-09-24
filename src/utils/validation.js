@@ -72,15 +72,30 @@ function validateJSON (value, fieldName) {
 }
 
 /**
- * Validate mnemonic phrase (12 or 24 words)
+ * Normalize a BIP-39 mnemonic: trim, collapse whitespace, lowercase.
+ * Derivation must use this form so case variants restore the same wallet.
+ * @param {string} value
+ * @returns {string}
+ */
+function normalizeMnemonic (value) {
+  return String(value).trim().split(/\s+/).filter(Boolean).map((w) => w.toLowerCase()).join(' ')
+}
+
+/**
+ * Validate mnemonic phrase (12 or 24 words).
+ * Accepts case variants and extra whitespace; validates the normalized form.
+ * Error messages report positions only — never the word text (may be a
+ * near-miss of a real seed word and can end up in logs / RPC errors).
  * @param {any} value - Value to validate
  * @param {string} fieldName - Name of the field for error messages
+ * @returns {string} Normalized mnemonic (trim, single spaces, lowercase)
  * @throws {Error} If validation fails
  */
 function validateMnemonic (value, fieldName) {
   validateNonEmptyString(value, fieldName)
 
-  const words = value.trim().split(/\s+/)
+  const normalized = normalizeMnemonic(value)
+  const words = normalized.split(' ')
   if (words.length !== 12 && words.length !== 24) {
     throw new Error(`${fieldName} must contain exactly 12 or 24 words`)
   }
@@ -90,12 +105,19 @@ function validateMnemonic (value, fieldName) {
     .filter(({ word }) => !bip39WordlistSet.has(word))
 
   if (invalid.length > 0) {
-    // Report position only, never the word text — this message can end up
-    // in an RPC error response and in logs, and the word itself may be a
-    // near-miss typo of a real seed-phrase word.
     const positions = invalid.map(({ position }) => position).join(', ')
-    throw new Error(`${fieldName} contains ${invalid.length} word(s) not in the BIP-39 wordlist (position(s): ${positions})`)
+    const nonEnglish = invalid.some(({ word }) => /[^a-z]/.test(word))
+    if (nonEnglish) {
+      throw new Error(
+        `${fieldName} contains non-English characters at position(s) ${positions}; only the English BIP-39 wordlist is supported for now`
+      )
+    }
+    throw new Error(
+      `${fieldName} contains ${invalid.length} word(s) not in the English BIP-39 wordlist at position(s) ${positions}`
+    )
   }
+
+  return normalized
 }
 
 /**
@@ -154,6 +176,7 @@ module.exports = {
   validateEnum,
   validateBuffer,
   validateJSON,
+  normalizeMnemonic,
   validateMnemonic,
   validateWordCount,
   createErrorWithCode,
