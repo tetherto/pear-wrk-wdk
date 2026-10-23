@@ -93,10 +93,14 @@ async function getSeedAndEntropyFromMnemonicHandler (request) {
   const scope = createSecretScope()
 
   try {
-    validateRequest(request, () => validateMnemonic(mnemonic, 'mnemonic'))
+    let normalized
+    validateRequest(request, () => {
+      normalized = validateMnemonic(mnemonic, 'mnemonic')
+    })
 
-    const seed = scope.track(mnemonicToSeedSync(mnemonic))
-    const entropy = scope.track(mnemonicToEntropy(mnemonic, wordlist))
+    // Derive from the normalized phrase so ALL CAPS / Title Case restore the same wallet.
+    const seed = scope.track(mnemonicToSeedSync(normalized))
+    const entropy = scope.track(mnemonicToEntropy(normalized, wordlist))
 
     return encryptSecrets(seed, entropy)
   } finally {
