@@ -38,11 +38,11 @@ function registerRpcHandlers (rpc, context) {
   }
 
   /**
-   * @deprecated
-   * Generate entropy and encrypt seed buffer and entropy
+   * Startup handshake — confirms the worklet's RPC layer has finished
+   * registering handlers and is ready to receive calls. Carries no
+   * parameters; WDK initialization happens separately via initializeWDK.
    */
-  rpc.onWorkletStart(withErrorHandling(async (init) => {
-    // workletStart no longer initializes WDK - that's done via initializeWDK
+  rpc.onWorkletStart(withErrorHandling(async () => {
     return { status: 'started' }
   }))
 
@@ -85,7 +85,7 @@ function registerRpcHandlers (rpc, context) {
   // constructed from config at WDK init (lifecycle.js); here we expose the
   // runtime on the context and wire the per-instance handlers.
   if (context.moduleManagers && Object.keys(context.moduleManagers).length > 0) {
-    const moduleRuntime = createModuleRuntime(rpc, context)
+    const moduleRuntime = createModuleRuntime({ moduleEvent: (event) => rpc.moduleEvent(event) }, context)
     context.moduleRuntime = moduleRuntime
     rpc.onCallModule(withErrorHandling(moduleRuntime.callModule))
   }

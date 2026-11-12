@@ -30,6 +30,13 @@ export interface RpcContext {
   // WDK instance (can be null)
   wdk: any;
 
+  // The decrypted seed Buffer that was handed to `wdk`'s constructor.
+  // Retained here purely so it can be zeroed later — WDK itself never
+  // zeroes it (verified: it retains the same reference for its whole
+  // life, reused on every registerWallet() call, and dispose() never
+  // touches it). null when no seed-backed WDK instance is live.
+  wdkSeedBuffer?: Buffer | null;
+
   // WDK class constructor
   WDK: new (...args: any[]) => any;
 
@@ -155,9 +162,6 @@ export interface CallMethodResponse {
 }
 
 export interface CallMethodOptions {
-  // Optional function to transform the result
-  transformResult: Function;
-
   // Protocol type (e.g., 'swap', 'swidge', 'bridge', 'lending', 'fiat')
   protocolType: ProtocolType;
 
@@ -166,11 +170,11 @@ export interface CallMethodOptions {
 }
 
 export interface WdkInitializeParams {
-  encryptionKey?: string;
-  encryptedSeed?: string;
-  
+  encryptionKey?: Buffer;
+  encryptedSeed?: Buffer;
+
   // JSON string of WdkWorkletConfig
-  config: string; 
+  config: string;
 }
 
 export interface WdkResetWalletParams {
@@ -183,14 +187,14 @@ export interface WdkGenerateEntropyParams {
 }
 
 export interface WdkEntropyResult {
-  encryptionKey: string;
-  encryptedSeedBuffer: string;
-  encryptedEntropyBuffer: string;
+  encryptionKey: Buffer;
+  encryptedSeedBuffer: Buffer;
+  encryptedEntropyBuffer: Buffer;
 }
 
 export interface WdkGetMnemonicParams {
-  encryptedEntropy: string;
-  encryptionKey: string;
+  encryptedEntropy: Buffer;
+  encryptionKey: Buffer;
 }
 
 export enum ProtocolType {

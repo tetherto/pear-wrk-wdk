@@ -24,12 +24,12 @@ export function validateNonNegativeInteger(value: any, fieldName: string): void;
 export function validateEnum(value: any, allowedValues: any[], fieldName: string): void;
 
 /**
- * Validate base64 encoded string format
+ * Validate that a value is a non-empty Buffer
  * @param value - Value to validate
  * @param fieldName - Name of the field for error messages
  * @throws {Error} If validation fails
  */
-export function validateBase64(value: any, fieldName: string): void;
+export function validateBuffer(value: any, fieldName: string): void;
 
 /**
  * Validate JSON string
@@ -41,20 +41,12 @@ export function validateBase64(value: any, fieldName: string): void;
 export function validateJSON(value: any, fieldName: string): any;
 
 /**
- * Normalize a mnemonic phrase: trim, collapse whitespace, lowercase.
- * @param value - Mnemonic phrase
- * @returns Normalized mnemonic (words joined with single spaces)
- */
-export function normalizeMnemonic(value: string): string;
-
-/**
  * Validate mnemonic phrase (12 or 24 words)
  * @param value - Value to validate
  * @param fieldName - Name of the field for error messages
- * @returns Normalized mnemonic
  * @throws {Error} If validation fails
  */
-export function validateMnemonic(value: any, fieldName: string): string;
+export function validateMnemonic(value: any, fieldName: string): void;
 
 /**
  * Validate word count (must be 12 or 24)

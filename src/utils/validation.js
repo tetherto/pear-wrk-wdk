@@ -41,25 +41,14 @@ function validateEnum (value, allowedValues, fieldName) {
 }
 
 /**
- * Validate base64 encoded string format
+ * Validate that a value is a non-empty Buffer
  * @param {any} value - Value to validate
  * @param {string} fieldName - Name of the field for error messages
  * @throws {Error} If validation fails
  */
-function validateBase64 (value, fieldName) {
-  validateNonEmptyString(value, fieldName)
-
-  // Basic base64 validation (alphanumeric, +, /, =, and whitespace)
-  const base64Regex = /^[A-Za-z0-9+/=\s]*$/
-  if (!base64Regex.test(value)) {
-    throw new Error(`${fieldName} must be a valid base64-encoded string`)
-  }
-
-  // Try to decode to ensure it's valid base64
-  try {
-    Buffer.from(value, 'base64')
-  } catch (error) {
-    throw new Error(`${fieldName} is not valid base64: ${error.message}`)
+function validateBuffer (value, fieldName) {
+  if (!Buffer.isBuffer(value) || value.length === 0) {
+    throw new Error(`${fieldName} must be a non-empty buffer`)
   }
 }
 
@@ -77,33 +66,21 @@ function validateJSON (value, fieldName) {
 
   try {
     return JSON.parse(value)
-  } catch (error) {
-    throw new Error(`${fieldName} must be valid JSON: ${error.message}`)
+  } catch {
+    throw new Error(`${fieldName} must be valid JSON`)
   }
-}
-
-/**
- * Normalize a mnemonic phrase: trim, collapse whitespace, lowercase.
- * Case and spacing must be normalized before seed derivation or the seed changes.
- * @param {string} value - Mnemonic phrase
- * @returns {string} Normalized mnemonic (words joined with single spaces)
- */
-function normalizeMnemonic (value) {
-  return value.trim().split(/\s+/).map((word) => word.toLowerCase()).join(' ')
 }
 
 /**
  * Validate mnemonic phrase (12 or 24 words)
  * @param {any} value - Value to validate
  * @param {string} fieldName - Name of the field for error messages
- * @returns {string} Normalized mnemonic
  * @throws {Error} If validation fails
  */
 function validateMnemonic (value, fieldName) {
   validateNonEmptyString(value, fieldName)
 
-  const normalized = normalizeMnemonic(value)
-  const words = normalized.split(' ')
+  const words = value.trim().split(/\s+/)
   if (words.length !== 12 && words.length !== 24) {
     throw new Error(`${fieldName} must contain exactly 12 or 24 words`)
   }
@@ -116,17 +93,9 @@ function validateMnemonic (value, fieldName) {
     // Report position only, never the word text — this message can end up
     // in an RPC error response and in logs, and the word itself may be a
     // near-miss typo of a real seed-phrase word.
-    const nonEnglish = invalid.filter(({ word }) => /[^a-z]/.test(word))
-    if (nonEnglish.length > 0) {
-      const positions = nonEnglish.map(({ position }) => position).join(', ')
-      throw new Error(`${fieldName} contains non-English characters at positions ${positions}; only the English BIP-39 wordlist is supported for now`)
-    }
     const positions = invalid.map(({ position }) => position).join(', ')
-    const wordLabel = invalid.length === 1 ? 'word' : 'words'
-    throw new Error(`${fieldName} contains ${invalid.length} ${wordLabel} not in the English BIP-39 wordlist at positions ${positions}`)
+    throw new Error(`${fieldName} contains ${invalid.length} word(s) not in the BIP-39 English wordlist (position(s): ${positions})`)
   }
-
-  return normalized
 }
 
 /**
@@ -183,9 +152,8 @@ module.exports = {
   validateNonEmptyString,
   validateNonNegativeInteger,
   validateEnum,
-  validateBase64,
+  validateBuffer,
   validateJSON,
-  normalizeMnemonic,
   validateMnemonic,
   validateWordCount,
   createErrorWithCode,
