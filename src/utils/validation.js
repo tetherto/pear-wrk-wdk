@@ -94,7 +94,7 @@ function validateMnemonic (value, fieldName) {
     // in an RPC error response and in logs, and the word itself may be a
     // near-miss typo of a real seed-phrase word.
     const positions = invalid.map(({ position }) => position).join(', ')
-    throw new Error(`${fieldName} contains ${invalid.length} word(s) not in the BIP-39 wordlist (position(s): ${positions})`)
+    throw new Error(`${fieldName} contains ${invalid.length} word(s) not in the BIP-39 English wordlist (position(s): ${positions})`)
   }
 }
 

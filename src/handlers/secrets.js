@@ -89,11 +89,14 @@ async function getMnemonicFromEntropyHandler (request) {
  *   zeroed for JSON-RPC (buffer-fields.js), left live for HRPC.
  */
 async function getSeedAndEntropyFromMnemonicHandler (request) {
-  const { mnemonic } = request
+  let { mnemonic } = request
   const scope = createSecretScope()
 
   try {
     validateRequest(request, () => validateMnemonic(mnemonic, 'mnemonic'))
+
+    // Same split as validateMnemonic, so the phrase derived from is the one that was validated.
+    mnemonic = mnemonic.trim().split(/\s+/).join(' ')
 
     const seed = scope.track(mnemonicToSeedSync(mnemonic))
     const entropy = scope.track(mnemonicToEntropy(mnemonic, wordlist))

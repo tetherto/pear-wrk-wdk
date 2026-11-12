@@ -257,6 +257,30 @@ describe('RPC Handlers', () => {
       )
     })
 
+    describe('whitespace between words', () => {
+      const { decrypt } = require('../src/utils/crypto')
+
+      const MNEMONIC = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+      const SEED = '5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19a5ac40b389cd370d086206dec8aa6c43daea6690f20ad3d8d48b2d2ce9e38e4'
+
+      const VARIANTS = [
+        ['double spaces', MNEMONIC.split(' ').join('  ')],
+        ['leading and trailing spaces', `  ${MNEMONIC}  `],
+        ['tabs and newlines', MNEMONIC.split(' ').join('\t\n')]
+      ]
+
+      for (const [name, mnemonic] of VARIANTS) {
+        test(`should derive the seed from a mnemonic with ${name}`, async () => {
+          registerRpcHandlers(mockRpc, context)
+
+          const result = await mockRpc.handlers.getSeedAndEntropyFromMnemonic({ mnemonic })
+
+          const seed = decrypt(result.encryptedSeedBuffer, result.encryptionKey)
+          assert.strictEqual(Buffer.from(seed).toString('hex'), SEED)
+        })
+      }
+    })
+
     test('should reject missing mnemonic', async () => {
       registerRpcHandlers(mockRpc, context)
 
