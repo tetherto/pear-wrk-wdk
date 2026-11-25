@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 6,
   "schema": [
     {
       "name": "log-type-enum",
@@ -63,7 +63,15 @@
       "namespace": "wdk-core",
       "compact": false,
       "flagsPosition": -1,
-      "fields": []
+      "fields": [
+        {
+          "name": "blockchains",
+          "required": false,
+          "type": "string",
+          "array": true,
+          "version": 6
+        }
+      ]
     },
     {
       "name": "callMethod-request",
@@ -410,6 +418,33 @@
           "required": false,
           "type": "string",
           "version": 1
+        }
+      ]
+    },
+    {
+      "name": "ping-request",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": []
+    },
+    {
+      "name": "ping-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": []
+    },
+    {
+      "name": "dispose-response",
+      "namespace": "wdk-core",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "status",
+          "type": "string",
+          "version": 6
         }
       ]
     }

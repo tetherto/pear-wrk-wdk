@@ -1,20 +1,43 @@
-import { RpcContext } from './rpc';
+import BareRPC = require('./bare-rpc');
 
 export { HRPC } from './hrpc/hrpc';
 export * from './rpc';
 
 /**
- * Register all RPC handlers with the provided RPC instance
+ * What bare-stow asks a provider to generate.
  */
-export function registerRpcHandlers(rpc: any, context: RpcContext): void;
+export interface GenerateContext {
+  // The side to generate for: the host or the bundle.
+  role: 'client' | 'server';
 
-export const utils: {
-  crypto: typeof import('./utils/crypto');
-  logger: typeof import('./utils/logger').default;
-  validation: typeof import('./utils/validation');
-};
+  // The options of the language.
+  options: { module?: 'esm' | 'cjs' };
+}
 
-export const exceptions: {
-  errorCodes: typeof import('./exceptions/error-codes').default;
-  rpcExceptionPayload: typeof import('./exceptions/rpc-exception');
-};
+/**
+ * An RPC library, as bare-stow takes one in its `server` option.
+ */
+export interface ServerProvider {
+  // The name of the provider.
+  name: string;
+
+  // The languages it generates for. A worklet is always JavaScript.
+  languages: {
+    javascript: {
+      /**
+       * Generate the module that attaches the transport to the IPC of the worklet.
+       * @throws {Error} If asked for the client role.
+       */
+      generate(context: GenerateContext): { source: string };
+    };
+  };
+}
+
+/**
+ * Create the bare-stow server provider of a transport, to give to bare-stow
+ * as its `server` option when the bundle is packed. The worklet then serves
+ * that transport, and the entry made by createStart (./worklet) receives an
+ * instance of its class. The limits are for 'bare-rpc' only: HRPC has none.
+ */
+export function createServerProvider(transport: 'bare-rpc', options?: BareRPC.BareRPCOptions): ServerProvider;
+export function createServerProvider(transport: 'hrpc'): ServerProvider;

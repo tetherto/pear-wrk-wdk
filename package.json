@@ -13,14 +13,13 @@
     "lint:fix": "standard --fix",
     "test": "node --test test/**/*.test.js",
     "test:watch": "node --test --watch test/**/*.test.js",
-    "gen:hrpc": "node scripts/generate-hrpc.js",
-    "gen:schema": "npm run gen:hrpc",
-    "prepare": "npm run gen:hrpc"
+    "test:stow": "node --test test/stow.smoke.js",
+    "gen:rpcs": "node scripts/generate-rpcs.js",
+    "prepare": "npm run gen:rpcs"
   },
   "files": [
     "index.js",
     "worklet.js",
-    "jsonrpc.js",
     "src",
     "types",
     "generated",
@@ -29,7 +28,10 @@
   ],
   "dependencies": {
     "@scure/bip39": "^2.2.0",
-    "hrpc": "^4.0.1",
+    "bare-abort-controller": "^1.1.2",
+    "bare-rpc": "^2.0.0",
+    "compact-encoding": "^3.3.0",
+    "hrpc": "^4.3.2",
     "hyperschema": "^1.12.4"
   },
   "peerDependencies": {
@@ -40,6 +42,11 @@
   },
   "devDependencies": {
     "bare-ipc": "^1.1.1",
+    "bare-sidecar": "^0.5.16",
+    "bare-stow": "^0.3.9",
+    "bare-stow-host": "^0.2.0",
+    "bare-stow-runtime": "^0.1.2",
+    "bare-wdk-runtime": "^3.0.1",
     "rimraf": "6.0.1",
     "standard": "17.1.2",
     "typescript": "5.8.3"
@@ -50,21 +57,21 @@
       "default": "./index.js"
     },
     "./worklet": {
-      "types": "./types/index.d.ts",
+      "types": "./types/worklet.d.ts",
       "default": "./worklet.js"
     },
     "./diagnostics/handle-leak-check": {
       "types": "./types/diagnostics/handle-leak-check.d.ts",
       "default": "./src/diagnostics/handle-leak-check.js"
     },
-    "./jsonrpc": {
-      "types": "./types/jsonrpc.d.ts",
-      "default": "./jsonrpc.js"
-    },
     "./package.json": "./package.json",
     "./hrpc": {
       "types": "./types/hrpc/hrpc.d.ts",
       "default": "./generated/hrpc/index.js"
+    },
+    "./bare-rpc": {
+      "types": "./types/bare-rpc.d.ts",
+      "default": "./generated/bare-rpc/index.js"
     }
   },
   "author": "Tether",

@@ -2,7 +2,10 @@ import type {
   LogRequest,
   WorkletStartRequest,
   WorkletStartResponse,
+  PingRequest,
+  PingResponse,
   DisposeRequest,
+  DisposeResponse,
   CallMethodRequest,
   CallMethodResponse,
   CallModuleRequest,
@@ -43,9 +46,9 @@ export class HRPC {
 
   /**
    * @deprecated
-   * Start the worklet
+   * Start the worklet. The request has no fields: call it with no argument.
    */
-  workletStart(args: WorkletStartRequest): Promise<WorkletStartResponse>;
+  workletStart(args?: WorkletStartRequest): Promise<WorkletStartResponse>;
 
   /**
    * Initialize WDK
@@ -70,9 +73,10 @@ export class HRPC {
   getSeedAndEntropyFromMnemonic(args: { mnemonic: string }): Promise<WdkEntropyResult>;
 
   /**
-   * Dispose of the worklet
+   * Dispose the WDK instance, or only the given blockchains. Resolves once
+   * the teardown has finished. The argument is required: pass {} for a full dispose.
    */
-  dispose(args: DisposeRequest): void;
+  dispose(args: DisposeRequest): Promise<DisposeResponse>;
 
   /**
    * Call a method on a wallet account
@@ -100,15 +104,22 @@ export class HRPC {
   moduleEvent(args: ModuleEventRequest): void;
 
   /**
-   * Register a handler for log messages
+   * Check that the worklet answers. Resolves with an empty object.
    */
-  onLog(responseFn: (request: LogRequest) => Promise<void>): void;
+  ping(args?: PingRequest): Promise<PingResponse>;
 
   /**
-   * Register a handler for worklet start
+   * Register a handler for log messages. The request has no required field,
+   * so the handler receives null when the peer sends none.
+   */
+  onLog(responseFn: (request: LogRequest | null) => Promise<void>): void;
+
+  /**
+   * Register a handler for worklet start. The request has no fields, so the
+   * handler receives null.
    */
   onWorkletStart(
-    responseFn: (request: WorkletStartRequest) => Promise<WorkletStartResponse>
+    responseFn: (request: WorkletStartRequest | null) => Promise<WorkletStartResponse>
   ): void;
 
   /**
@@ -140,9 +151,12 @@ export class HRPC {
   ): void;
 
   /**
-   * Register a handler for dispose
+   * Register a handler for dispose. The request has no required field, so the
+   * handler receives null when the peer sends none.
    */
-  onDispose(responseFn: (request: DisposeRequest) => Promise<void>): void;
+  onDispose(
+    responseFn: (request: DisposeRequest | null) => Promise<DisposeResponse>
+  ): void;
 
   /**
    * Register a handler for call method
@@ -184,6 +198,13 @@ export class HRPC {
    */
   onModuleEvent(
     responseFn: (request: ModuleEventRequest) => Promise<void>
+  ): void;
+
+  /**
+   * Register a handler for ping. The request has no fields, so the handler receives null.
+   */
+  onPing(
+    responseFn: (request: PingRequest | null) => Promise<PingResponse>
   ): void;
 }
 

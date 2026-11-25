@@ -21,9 +21,19 @@ export interface WorkletStartResponse {
   status?: string | null;
 }
 
+// The ping command carries no fields, in either direction.
+export type PingRequest = Record<string, never>;
+
+export type PingResponse = Record<string, never>;
+
 export interface DisposeRequest {
   // Optional list of blockchains to dispose. Omit to dispose the entire WDK instance.
-  blockchains?: string[];
+  blockchains?: string[] | null;
+}
+
+export interface DisposeResponse {
+  // Sent once the teardown has finished.
+  status: 'disposed';
 }
 
 export interface RpcContext {
@@ -47,7 +57,7 @@ export interface RpcContext {
   protocolManagers: Record<string, unknown>;
 
   // WDK load error (if any)
-  wdkLoadError: any;
+  wdkLoadError?: any;
 
   // Generic module managers (from the bundler-generated entry). Optional.
   moduleManagers?: Record<string, WdkModuleManager>;
@@ -60,6 +70,12 @@ export interface RpcContext {
 
   // Capabilities injected into modules (reserved; empty by default). Optional.
   capabilities?: Record<string, any>;
+
+  // Set by a debug build only: the errors returned to the host then also
+  // carry the stack trace of the thrown error and of each of its causes,
+  // and so does the `error` event of a module that fails to construct.
+  // Off by default. It is part of the bundle, so a host cannot turn it on.
+  debug?: boolean;
 
   // Optional but recommended: without this, callMethod can invoke any method
   // on the resolved account/protocol object, including fund-moving or

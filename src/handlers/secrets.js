@@ -1,6 +1,7 @@
 const { entropyToMnemonic, mnemonicToSeedSync, mnemonicToEntropy } = require('@scure/bip39')
 const { wordlist } = require('@scure/bip39/wordlists/english.js')
-const { validateRequest, validateBuffer, validateMnemonic, validateWordCount } = require('../utils/validation')
+const ERROR_CODES = require('../exceptions/error-codes')
+const { validateRequest, validateBuffer, validateMnemonic, validateWordCount, createErrorWithCode } = require('../utils/validation')
 const { decrypt, generateEntropy, encryptSecrets } = require('../utils/crypto')
 const { createSecretScope } = require('../utils/secret-scope')
 
@@ -11,12 +12,12 @@ const { createSecretScope } = require('../utils/secret-scope')
 /**
  * @param {WdkGenerateEntropyParams} request
  * @returns {Promise<WdkEntropyResult>} Return buffers, not zeroed by this
- *   handler. JSON-RPC zeroes them after base64-encoding (see
- *   buffer-fields.js); HRPC hands them back live with no interception
+ *   handler. The bare-rpc transport zeroes them once they are encoded (see
+ *   src/bare-rpc/runtime.js); HRPC hands them back live with no interception
  *   point in this repo, so zeroing them is that caller's responsibility.
  */
 async function generateEntropyAndEncryptHandler (request) {
-  const { wordCount } = request
+  const { wordCount } = request ?? {}
   const scope = createSecretScope()
 
   try {
@@ -51,7 +52,7 @@ async function generateEntropyAndEncryptHandler (request) {
  *   displayed to the user.
  */
 async function getMnemonicFromEntropyHandler (request) {
-  const { encryptedEntropy, encryptionKey } = request
+  const { encryptedEntropy, encryptionKey } = request ?? {}
   const scope = createSecretScope()
 
   try {
@@ -63,7 +64,15 @@ async function getMnemonicFromEntropyHandler (request) {
       validateBuffer(encryptionKey, 'encryptionKey')
     })
 
-    const entropyBuffer = scope.track(decrypt(encryptedEntropy, encryptionKey))
+    let entropyBuffer
+    try {
+      entropyBuffer = scope.track(decrypt(encryptedEntropy, encryptionKey))
+    } catch (error) {
+      throw createErrorWithCode(
+        `Failed to decrypt entropy: ${error.message}`,
+        ERROR_CODES.DECRYPTION_FAILED
+      )
+    }
 
     // For @scure/bip39 compatibility
     const entropy = scope.track(new Uint8Array(entropyBuffer.length))
@@ -86,10 +95,10 @@ async function getMnemonicFromEntropyHandler (request) {
  *   As a JS string, it cannot be zeroed and remains in the V8 heap after this call.
  * @returns {Promise<WdkEntropyResult>} Not zeroed by this handler — same
  *   transport-dependent handling as generateEntropyAndEncryptHandler:
- *   zeroed for JSON-RPC (buffer-fields.js), left live for HRPC.
+ *   zeroed by the bare-rpc transport (src/bare-rpc/runtime.js), left live for HRPC.
  */
 async function getSeedAndEntropyFromMnemonicHandler (request) {
-  let { mnemonic } = request
+  let { mnemonic } = request ?? {}
   const scope = createSecretScope()
 
   try {

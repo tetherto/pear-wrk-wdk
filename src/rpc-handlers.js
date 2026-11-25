@@ -1,33 +1,15 @@
 const { generateEntropyAndEncryptHandler, getMnemonicFromEntropyHandler, getSeedAndEntropyFromMnemonicHandler, initializeWdkHandler, resetWdkWallets, disposeWdkHandler, registerWalletHandler, registerProtocolHandler, callMethodHandler, createModuleRuntime } = require('./handlers')
 const rpcException = require('./exceptions/rpc-exception')
+const ERROR_CODES = require('./exceptions/error-codes')
+const { createErrorWithCode } = require('./utils/validation')
 
 /** @typedef {import('../types/rpc').RpcContext} RpcContext */
-
-/**
- * Wrapper for RPC handlers that provides structured error handling
- * Preserves error codes and metadata instead of converting to plain strings
- * @param {Function} handler - The async handler function
- * @param {string} [defaultErrorCode] - Optional default error code
- * @returns {Function} Wrapped handler with error handling
- */
-const withErrorHandling = (handler, defaultErrorCode) => {
-  return async (...args) => {
-    try {
-      return await handler(...args)
-    } catch (error) {
-      // Create structured error response
-      const structuredError = rpcException.createStructuredError(error, defaultErrorCode)
-      // Throw as Error with structured data in message (for RPC transport)
-      // The RPC layer will handle serialization
-      const errorMessage = JSON.stringify(structuredError)
-      throw new Error(errorMessage)
-    }
-  }
-}
+/** @typedef {import('../types/hrpc/hrpc').HRPC} HRPC */
+/** @typedef {import('../types/bare-rpc')} BareRPC */
 
 /**
  * Register all RPC handlers with the provided RPC instance
- * @param {any} rpc - The HRPC instance
+ * @param {HRPC | BareRPC} rpc - The transport: an instance of either generated class
  * @param {RpcContext} context - Context object containing state and dependencies
  */
 function registerRpcHandlers (rpc, context) {
@@ -38,12 +20,38 @@ function registerRpcHandlers (rpc, context) {
   }
 
   /**
+   * Wrapper for RPC handlers that provides structured error handling
+   * Preserves error codes and metadata instead of converting to plain strings
+   * @param {Function} handler - The async handler function
+   * @returns {Function} Wrapped handler with error handling
+   */
+  const withErrorHandling = (handler) => {
+    return async (...args) => {
+      try {
+        return await handler(...args)
+      } catch (error) {
+        // Throw as Error with structured data in message (for RPC transport)
+        // The RPC layer will handle serialization
+        throw rpcException.toRpcError(error, { debug: context.debug })
+      }
+    }
+  }
+
+  /**
    * Startup handshake — confirms the worklet's RPC layer has finished
    * registering handlers and is ready to receive calls. Carries no
    * parameters; WDK initialization happens separately via initializeWDK.
    */
   rpc.onWorkletStart(withErrorHandling(async () => {
     return { status: 'started' }
+  }))
+
+  /**
+   * Liveness check — answers at once and touches nothing. A host that gets
+   * no answer knows the worklet's event loop is blocked, not just slow.
+   */
+  rpc.onPing(withErrorHandling(async () => {
+    return {}
   }))
 
   /**
@@ -88,6 +96,11 @@ function registerRpcHandlers (rpc, context) {
     const moduleRuntime = createModuleRuntime({ moduleEvent: (event) => rpc.moduleEvent(event) }, context)
     context.moduleRuntime = moduleRuntime
     rpc.onCallModule(withErrorHandling(moduleRuntime.callModule))
+  } else {
+    // Still registered, so a host that calls it gets an answer instead of waiting forever.
+    rpc.onCallModule(withErrorHandling(async () => {
+      throw createErrorWithCode('No modules are bundled in this worklet', ERROR_CODES.BAD_REQUEST)
+    }))
   }
 }
 

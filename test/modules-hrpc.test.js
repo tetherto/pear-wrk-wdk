@@ -17,12 +17,11 @@ require('./setup.js')
 
 const { test } = require('node:test')
 const assert = require('node:assert')
-const { Duplex } = require('streamx')
-const b4a = require('b4a')
 const { EventEmitter } = require('events')
 
 const HRPC = require('../generated/hrpc')
 const { registerRpcHandlers } = require('../src/rpc-handlers')
+const { createPipePair } = require('./helpers/pipe-pair')
 
 class FakeModule extends EventEmitter {
   constructor () { super(); this.items = [] }
@@ -30,12 +29,6 @@ class FakeModule extends EventEmitter {
   listItems () { return this.items.slice() }
   clear () { this.items = [] } // void return — exercises undefined round-trip
   async close () { this.closed = true }
-}
-
-function createPipePair () {
-  const a = new Duplex({ write (data, cb) { queueMicrotask(() => b.push(b4a.from(data))); cb(null) } })
-  const b = new Duplex({ write (data, cb) { queueMicrotask(() => a.push(b4a.from(data))); cb(null) } })
-  return [a, b]
 }
 
 function withTimeout (p, ms) {
@@ -84,7 +77,7 @@ test('module subsystem over real HRPC: call / event', async () => {
   const listRes = await hostRpc.callModule({ module: 'fake', method: 'listItems', args: JSON.stringify([]) })
   assert.strictEqual(JSON.parse(listRes.result).length, 1, 'listItems over real HRPC')
 
-  // Void methods use the same JSON null result as the JSON-RPC transport.
+  // A void method answers with JSON null.
   const clearRes = await hostRpc.callModule({ module: 'fake', method: 'clear', args: JSON.stringify([]) })
   assert.strictEqual(clearRes.result, 'null', 'void method returns serialized null over real HRPC')
   const afterClear = JSON.parse((await hostRpc.callModule({ module: 'fake', method: 'listItems', args: JSON.stringify([]) })).result)

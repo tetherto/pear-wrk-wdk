@@ -28,7 +28,11 @@
       "name": "@wdk-core/dispose",
       "request": {
         "name": "@wdk-core/dispose-request",
-        "send": true
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/dispose-response",
+        "stream": false
       },
       "version": 1
     },
@@ -155,6 +159,19 @@
       "request": {
         "name": "@wdk-core/moduleEvent-request",
         "send": true
+      },
+      "version": 1
+    },
+    {
+      "id": 13,
+      "name": "@wdk-core/ping",
+      "request": {
+        "name": "@wdk-core/ping-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@wdk-core/ping-response",
+        "stream": false
       },
       "version": 1
     }

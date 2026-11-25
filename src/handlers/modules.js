@@ -1,4 +1,5 @@
 const ERROR_CODES = require('../exceptions/error-codes')
+const { callExternal } = require('../exceptions/rpc-exception')
 const logger = require('../utils/logger')
 const { safeStringify } = require('../utils/safe-stringify')
 const {
@@ -72,7 +73,7 @@ function createModuleRuntime (rpc, context) {
       })
     } catch (err) {
       entry.error = err
-      emit('error', toErrorPayload(err))
+      emit('error', toErrorPayload(err, context.debug))
       throw err
     }
 
@@ -80,7 +81,7 @@ function createModuleRuntime (rpc, context) {
       entry.ready = result.then(wire).catch((err) => {
         entry.error = err
         logger.error(`Module construction failed: ${name}: ${err && err.message}`)
-        emit('error', toErrorPayload(err))
+        emit('error', toErrorPayload(err, context.debug))
         throw err
       })
     } else {
@@ -153,8 +154,10 @@ function createModuleRuntime (rpc, context) {
 
     // Array args spread as positional; non-array passed as a single argument.
     const argsArray = Array.isArray(args) ? args : (args !== null && args !== undefined ? [args] : [])
-    let result = await fn.apply(instance, argsArray)
-    result = await materialize(result) // stream / async-iterable -> array
+    const result = await callExternal(
+      ERROR_CODES.MODULE_ERROR,
+      async () => materialize(await fn.apply(instance, argsArray)) // stream / async-iterable -> array
+    )
     return { result: safeStringify(normalize(result ?? null)) } // Buffer/Uint8Array -> hex
   }
 
@@ -201,11 +204,14 @@ async function materialize (value) {
   return value
 }
 
-// Serialize an error into a payload app devs can handle (name + message + stack).
-function toErrorPayload (err) {
-  return err instanceof Error
+// Serialize an error into a payload app devs can handle (name + message). The
+// stack is added in a debug build only, as for the error of a request.
+function toErrorPayload (err, debug) {
+  if (!(err instanceof Error)) return { name: 'Error', message: String(err) }
+
+  return debug
     ? { name: err.name, message: err.message, stack: err.stack }
-    : { name: 'Error', message: String(err) }
+    : { name: err.name, message: err.message }
 }
 
 function normalize (value) {
